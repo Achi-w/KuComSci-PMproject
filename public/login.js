@@ -14,7 +14,7 @@ document
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          window.location.href = "dashboard.html"; // :white_check_mark: Redirect on success
+          window.location.href = "announcement.html"; // :white_check_mark: Redirect on success
         } else {
           alert("Invalid username or password.");
         }

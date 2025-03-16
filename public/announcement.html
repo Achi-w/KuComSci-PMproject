@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Announcements</title>
+  <style>
+    /* RESET & BASIC STYLES */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #ffffff;
+      height: 100%;
+    }
+    /* LEFT NAVIGATION BAR */
+    .left-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 215px;
+      background-color: #bababa;
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 500;
+      overflow-y: auto;
+    }
+    .left-nav img {
+      width: 80%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    .left-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .left-nav li {
+      margin: 10px 0;
+    }
+    .left-nav a {
+      text-decoration: none;
+      color: #000;
+    }
+    /* TOP BAR */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 215px;
+      right: 0;
+      height: 50px;
+      background-color: #525252;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 1000;
+    }
+    .top-bar .left {
+      font-size: 1.2rem;
+    }
+    .top-bar .right span {
+      margin-right: 10px;
+    }
+    /* MAIN CONTENT */
+    .main-content {
+      margin-left: 200px;
+      margin-top: 50px;
+      min-height: calc(100vh - 50px);
+      box-sizing: border-box;
+    }
+    .content-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    /* Search + Post button area */
+    .top-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+    }
+    .search-container {
+      flex: 1;
+      margin-right: 20px;
+    }
+    #searchBar {
+      width: 100%;
+      padding: 8px;
+      background-color: #d9d9d9;
+      border: none;
+      outline: none;
+      border-radius: 4px;
+    }
+    #postBtn {
+      background-color: #58ff49;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      display: none;
+    }
+    /* ANNOUNCEMENT CARDS */
+    .announcement {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+      position: relative;
+      cursor: pointer;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .announcement p {
+      margin: 5px 0;
+    }
+    .announcement-header h4 {
+      margin: 5px 0;
+    }
+    .announcement-detail p {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .delete-btn {
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      color: #fff;
+      border-radius: 4px;
+      background-color: #fe1515;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    /* MODALS */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 99999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 100px auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+      box-sizing: border-box;
+      border-radius: 6px;
+    }
+    #postModal .modal-content {
+      background-color: #787878 !important;
+    }
+    #postModal .modal-content h3 {
+      color: #ffffff;
+    }
+    .modal-content input,
+    .modal-content textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      background-color: #d9d9d9;
+      border: none;
+      padding: 8px;
+      border-radius: 4px;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .popup-button {
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 5px;
+    }
+    .cancel-button {
+      background-color: #fe1515;
+      color: #fff;
+    }
+    .confirm-button {
+      background-color: #58ff49;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="left" id="roleTitle"></div>
+    <div class="right">
+      <span id="userName"></span>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <!-- Left navigation menu -->
+  <div class="left-nav">
+    <img src="favicon.ico" alt="Logo" />
+    <ul>
+      <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
+      <li><a href="ooooooooo">รวมตารางสอบและข้อสอบ</a></li>
+      <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
+      <li><a href="/roomBooking">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
+      <li><a href="oo">ช่องทางการติดต่ออาจารย์</a></li>
+      <li><a href="oo">จองห้องและย้ายห้อง</a></li>
+    </ul>
+  </div>
+
+  <!-- Main content area -->
+  <div class="main-content">
+    <div class="content-container">
+      <!-- Search + Post button area -->
+      <div class="top-controls">
+        <div class="search-container">
+          <input type="text" id="searchBar" placeholder="ค้นหาโพสต์ " />
+        </div>
+        <!-- Post button shown only for professors/admins -->
+        <button id="postBtn">สร้างประกาศ</button>
+      </div>
+      <!-- Announcements list -->
+      <div id="announcementsContainer"></div>
+    </div>
+  </div>
+
+  <!-- Post Modal -->
+  <div id="postModal" class="modal">
+    <div class="modal-content">
+      <h3>สร้างประกาศ</h3>
+      <div style="color: #ffffff; margin-bottom: 8px;">
+        <strong>Role:</strong> <span id="postRole"></span>
+      </div>
+      <!-- Here we revert to showing the user ID (as a fallback) -->
+      <input type="text" id="postAuthor" disabled placeholder="User ID" />
+      <input type="text" id="postDate" disabled />
+      <input type="text" id="postHeadline" placeholder="เพิ่มหัวเรื่อง" />
+      <textarea id="postDetail" rows="4" placeholder="เขียนตรงนี้..."></textarea>
+      <div>
+        <button id="uploadImageBtn" class="popup-button">Upload Image</button>
+        <input type="file" id="uploadImageInput" style="display:none" accept="image/*" />
+        <button id="cancelPost" class="popup-button cancel-button">ยกเลิก</button>
+        <button id="postNow" class="popup-button confirm-button">โพสต์เลย</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Confirmation Modal -->
+  <div id="postConfirmModal" class="modal">
+    <div class="modal-content">
+      <p>คุณตกลงที่จะโพสต์หรือไม่?</p>
+      <div>
+        <button id="cancelPostConfirm" class="popup-button cancel-button">ยกเลิก</button>
+        <button id="confirmPost" class="popup-button confirm-button">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Modal -->
+  <div id="validationModal" class="modal">
+    <div class="modal-content">
+      <p>ไม่สามารถโพสต์ประกาศได้กรุณากรอกข้อมูลให้ครบ</p>
+      <button id="confirmValidation" class="popup-button confirm-button">ยืนยัน</button>
+    </div>
+  </div>
+
+  <!-- Post Success Modal -->
+  <div id="postSuccessModal" class="modal">
+    <div class="modal-content">
+      <p>โพสต์ถูกอัปโหลดสำเร็จแล้ว</p>
+      <button id="confirmPostSuccess" class="popup-button confirm-button">ยืนยัน</button>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteConfirmModal" class="modal">
+    <div class="modal-content">
+      <h3>คุณตกลงที่จะลบโพสต์หรือไม่?</h3>
+      <p>หากลบแล้วไม่สามารถกู้คืนกลับมาได้</p>
+      <div>
+        <button id="cancelDelete" class="popup-button cancel-button">ยกเลิก</button>
+        <button id="confirmDelete" class="popup-button confirm-button">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Success Modal -->
+  <div id="deleteSuccessModal" class="modal">
+    <div class="modal-content">
+      <p>โพสต์ถูกลบสำเร็จแล้ว</p>
+      <button id="confirmDeleteSuccess" class="popup-button confirm-button">ยืนยัน</button>
+    </div>
+  </div>
+
+  <script src="announcement.js"></script>
+</body>
+</html>
