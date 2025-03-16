@@ -4,8 +4,8 @@
   "description": "A simple login system using Node.js, Express, MySQL, and bcrypt.",
   "main": "login.js",
   "scripts": {
-    "start": "node login.js",
-    "dev": "nodemon login.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
