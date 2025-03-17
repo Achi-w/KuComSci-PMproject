@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/addSecMain.styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>หน้าเซ็คหลัก</title>
+</head>
+<body>
+    <div class="Wrapper">
+        <div class="bar">
+            <div class="logoSec">
+                <img class='logo' src="/images/1a052da3db0dc0bc5288607939fc62ae.png" alt="">
+            </div>
+            <div class="choice">
+                <a href="announcement.html">
+                    <button class="button-bar">
+                        <p class="button-bar-text">ประกาศทางภาควิชา</p>
+                    </button>    
+                </a>
+                <a href="">
+                    <button class="button-bar">
+                        <p class="button-bar-text">รวมตารางสอบและข้อสอบ</p>    
+                    </button>
+                </a>
+                <a href="course_review">
+                    <button class="button-bar">
+                        <p class="button-bar-text">รีวิวภาควิชา</p>
+                    </button>    
+                </a>
+                <a href="addSecMain.html">
+                    <button class="button-bar now-bar">
+                        <p class="button-bar-text">ลงชื่อเปิดเซ็คเพิ่ม</p>
+                    </button>    
+                </a>
+                <a href="">
+                    <button class="button-bar">
+                        <p class="button-bar-text">ช่องทางการติดต่ออาจารย์</p>
+                    </button>    
+                </a>
+                <a href="">
+                    <button class="button-bar">
+                        <p class="button-bar-text">จองห้องและย้ายห้อง</p>
+                    </button>    
+                </a>
+            </div>
+        </div>
+        <div class="main">
+            <div class="info-bar">
+                <p>Nisit Comsci - comsci</p>
+                <div class="left-bar">
+                    <button class="swtichRole">Switch</button>
+                    <p id="nisit-name">Chanon</p>
+                    <button id="close-button"><i class="fa-solid fa-power-off"></i></button>    
+                </div>
+            </div>
+            <div class="info">
+                <div class="search-bar">
+                    <input id="searchBar" type="text" placeholder="Search">
+                    <button id="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+                <div class="sec-add">
+                    <button class="nes-button allSubjectBtn">ทั้งหมด</button>
+                    <a href="/addSec.html">
+                        <button class="nes-button make-sec">สร้างฟอร์มลงชื่อ</button>
+                    </a>
+                </div>
+                <div class="sec-list">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/script/addSecMainSection.js"></script>
+</body>
+</html>
