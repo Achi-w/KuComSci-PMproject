@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const path = require("path");
@@ -45,7 +45,7 @@ const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "pmdatabase4",
+  database: "pmproject2",
 });
 
 db.connect((err) => {
@@ -285,6 +285,425 @@ app.delete("/announcements/:id", (req, res) => {
     });
   });
 });
+
+
+//-------------------------------harry------------------------------
+//show sec uc8
+//ok front end implemented
+app.get('/api/sectionform',(req,res)=>{
+  console.log('request sectionform');
+  
+  db.query('SELECT `Section_Form_ID`, `Course_ID`, `USER_ID`, `SEC`, `Current_Nisit_Number`, `Section_Form_start_time`, `Section_Form_Maximum_Nisit`, `Section_Form_Minimum_Nisit`,`Section_Form_STATUS` FROM `section_form`',(err,result,fields)=>{
+      if(err){
+          console.error(err);
+          return res.status(201).send(
+              {
+                  status:0,
+                  info:'error'
+              }
+          )
+      }
+
+      console.log(result);
+      
+      return res.status(200).send(
+          {
+              status:1,
+              info: result
+          }
+      )
+      
+  })
+})
+
+//ok front end implemented
+app.post('/api/sectionform',(req,res)=>{
+  const data = req.body;
+  let userCurr;
+  console.log('---------------------user add section-------------------------');
+  
+  const idToinsertSec = crypto.randomUUID();
+  console.log(idToinsertSec);
+  console.log('---------------------------------------------------');
+  
+  if(data.who){
+      userCurr = 0;
+  }else{
+      userCurr = 1;
+  }
+  
+  db.query(`SELECT Section_Form_ID FROM section_form WHERE Course_ID = ? AND SEC = ? AND (Section_Form_STATUS = '0' OR Section_Form_STATUS = '1')`,[data.courseId,data.sec],(err,resultSec,fields)=>{
+      console.log('-------------------log now find if same sec--------------');
+      console.log();
+      
+      if(err){
+          console.error(err);
+          return res.status(201).send(
+              {
+                  status:0,
+                  errorId : 0,
+                  info:'error'
+              }
+          )
+      }
+
+      if(resultSec.length>0){
+          console.log('-------------------------------------smae sec--------------------------');
+          
+          return res.status(200).send(
+              {
+                  status:0,
+                  errorId : 1,
+                  info:'name already taken'
+              }
+          )
+      }else{
+          db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
+          [idToinsertSec,data.courseId, data.userId,data.sec, userCurr,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
+          (err,resutl,fields)=>{
+              if(err){
+                  console.error(err);
+                  return res.status(201).send(
+                      {
+                          status:0,
+                          errorId : 0,
+                          info:'error'
+                      }
+                  )
+              }
+
+              
+              if(data.who){
+                  return res.status(201).send(
+                      {
+                          status:1,
+                          info: 'ok'
+                      }
+                  )
+              }
+              const idToinsertSecList = crypto.randomUUID();
+
+                      
+              db.query(' INSERT INTO Section_Form_Nisit_List(Section_Form_Nisit_List_ID, Section_Form_ID,Section_Form_Nisit_List_Name) VALUES (?,?,?)',
+                  [idToinsertSecList,idToinsertSec, data.sectionFormNisitListName],
+                  (err,result,fields)=>{
+                      if(err){
+                          console.error(err);
+                          return res.status(201).send(
+                              {
+                                  status:0,
+                                  errorId : 0,
+                                  info:'error'
+                              }
+                          )
+                      }
+                      console.log('complete');
+
+                      return res.status(200).send(
+                          {
+                              status:1,
+                              info:'ok'
+                          }
+                      )
+                  }
+              )
+          }
+      )
+      }
+  })
+      
+})
+
+//ok implemted front end
+app.put('/api/sectionform/add',(req,res)=>{
+  console.log('user want to add nisit');
+  
+  const data = req.body;
+  console.log('------------------------------------------------------------------------');
+  
+  console.log(data);
+  console.log('------------------------------------------------------------------------');
+  db.query('SELECT USER_ID From Section_Form_Nisit_List Where USER_ID = ? AND Section_Form_ID = ?', [data.sectionFormNisitId,data.sectionFormId],(err,resultNisit,fields)=>{
+      if(err){
+          console.log(err);
+          return res.status(201).send(
+              {
+                  status:0,
+                  info:'error'
+              }
+          )
+      }
+      if(resultNisit.length >0){
+          console.log('this user had registered');
+          return res.status(201).send(
+              {
+                  status:0,
+                  errorCode:1,
+                  info:'error'
+              }
+          )
+      }else{
+          db.query('UPDATE section_form SET Current_Nisit_Number = ? WHERE Section_Form_ID = ?',
+              [data.currentNisitNumber, data.sectionFormId],
+              (err,result,fields)=>{
+                  if(err){
+                      console.error(err);
+                      return res.status(201).send(
+                          {
+                              status:0,
+                              info:'error'
+                          }
+                      )
+                  }
+                  
+                  const idToinsertSecList = crypto.randomUUID();
+                  
+                  db.query('INSERT INTO Section_Form_Nisit_List(Section_Form_Nisit_List_ID, Section_Form_ID, USER_ID) VALUES (?,?,?)',
+                          [idToinsertSecList,data.sectionFormId, data.sectionFormNisitId],
+                          (err,result,fields)=>{
+                              if(err){
+                                  console.error(err);
+                                  return res.status(201).send(
+                                      {
+                                          status:0,
+                                          info:'error'
+                                      }
+                                  )
+                              }
+                              console.log('complete');
+                              return res.status(200).send(
+                                  {
+                                      status:1,
+                                      info:'complete'
+                                  }
+                              )
+                      })
+              })        
+      }
+  })
+  
+})
+
+//ok front end implemented
+app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
+  const teacherId = req.params.teacherId;
+
+  db.query('SELECT Section_Form_ID,Course_ID,SEC,Current_Nisit_Number,Section_Form_start_time,Section_Form_STATUS, Section_Form_Minimum_Nisit, Section_Form_Maximum_Nisit FROM Section_Form WHERE Section_Form_STATUS = 0',
+      (err,result,fields)=>{
+          if(err){
+              console.error(err);
+              return res.status(201).send(
+                  {
+                      status:0,
+                      info:'error'
+                  }
+              )
+          }
+
+          console.log('complete');
+          return res.status(200).send(
+              {
+                  status:1,
+                  info:result
+              }
+          )
+
+      }
+  )
+
+})
+
+
+//ok impletmented
+app.put('/api/sectionform/status/:formId',(req,res)=>{
+  const data = req.body;
+  const formId = req.params.formId;
+  console.log(data, formId);
+  
+  db.query('UPDATE section_form SET Section_Form_STATUS = ? WHERE Section_Form_ID = ?',
+      [data.sectionFormStatus,formId],
+      (err,result,fields)=>{
+          if(err){
+              console.error(err);
+              return res.status(201).send(
+                  {
+                      status:0,
+                      info:'error'
+                  }
+              )
+          }
+          console.log('complete');
+          res.status(200).send(
+              {
+                  status:1,
+                  info:"complete"
+              }
+          )
+
+      }
+  )
+})
+
+//ok implemented front end
+app.get('/api/sectionform/id/:id',(req,res)=>{
+  const id = req.params.id; 
+  console.log(id);
+  
+  db.query('SELECT `Section_Form_ID`, `Course_ID`, `USER_ID`, `SEC`, `Current_Nisit_Number`, `Section_Form_start_time`, `Section_Form_Maximum_Nisit`, `Section_Form_Minimum_Nisit`,`Section_Form_STATUS` FROM `section_form` WHERE `Section_Form_ID` = ?',
+      [id], (err,result,fields)=>{
+          if(err){
+              console.error(err);
+              return res.status(201).send(
+                  {
+                      status:0,
+                      info:'error'
+                  }
+              )
+          }
+          console.log(result);
+          console.log();
+          
+          db.query('SELECT `Section_Form_Nisit_List_ID`, `Section_Form_ID`, `USER_ID` FROM `section_form_nisit_list` WHERE `Section_Form_ID` = ?',
+              [result[0].Section_Form_ID], async(err,resultNisit,field)=>{
+                  if(err){
+                      console.error(err);
+                      return res.status(201).send(
+                          {
+                              status:0,
+                              info:'error'
+                          }
+                      )
+                  }
+
+                  const nisitDetail = resultNisit.map(async (nisit)=>{
+                      const [resultEachNisit] = await db.promise().query(
+                          'SELECT `USER_ID`, `USER_Name`, `USER_Surname` FROM `user` WHERE USER_ID = ?',nisit.USER_ID
+                      )
+
+                      nisit.Section_Form_Nisit_List_Name = resultEachNisit[0].USER_Name + ' ' + resultEachNisit[0].USER_Surname + ' ' + resultEachNisit[0].USER_ID;
+                  })
+
+                  await Promise.all(nisitDetail);
+
+                  res.status(200).send(
+                      {
+                          status:1,
+                          info:{...result[0],
+                              nisitList : resultNisit
+                          }
+                      }
+                  )    
+              }
+          )
+      }
+  )
+})
+
+app.get('/api/course/:id',(req,res)=>{
+  console.log('user  get course');
+  
+  const id = req.params.id;
+  console.log(id);
+
+  db.query('SELECT Course_ID,Course_Name,Course_Detail FROM Course WHERE Course_id = ?',[id],(err,result,fields)=>{
+      if(err){
+          console.error(err);
+          return res.status(201).send(
+              {
+                  status:0,
+                  info:'error'
+              }
+          )
+      }
+      console.log(result);
+      
+      db.query('SELECT `USER_ID` FROM `user_s_course` WHERE `Course_ID` = ?',result[0].Course_ID,(err,resultCourseS,fields)=>{
+              if(err){
+                  console.log(err);
+                  
+                  return res.status(201).send({
+                      status:0,
+                      info:"error"
+                  })
+              }
+              
+              db.query('SELECT `USER_Name`, `USER_Surname` FROM `user` WHERE USER_ID = ?',resultCourseS[0].USER_ID,(err,resultUser,fields)=>{
+                  if(err){
+                      console.log(err);
+                      
+                      return res.status(201).send({
+                          status:0,
+                          info:"error"
+                      })
+                  }
+
+                  result[0].Course_Owner_Name = resultUser[0].USER_Name + ' ' +  resultUser[0].USER_Surname;
+                  console.log(result);
+                  
+                  return res.status(200).send(
+                      {
+                          status:1,
+                          info: result[0]
+                      }
+                  )
+              })
+          })
+
+      
+      
+      
+  })
+})
+
+app.get('/api/allcourse',(req,res)=>{
+  db.query('SELECT Course_ID,Course_Name,Course_Detail FROM Course',(err,result,fields)=>{
+      if(err){
+          console.error(err);
+          return res.status(201).send(
+              {
+                  status:0,
+                  info:'error'
+              }
+          )
+      }
+      return res.status(200).send(
+          {
+              status:1,
+              info: result
+          }
+      )
+      
+  })
+})
+
+app.delete('/api/sectionform/delete/:id',(req,res)=>{
+  const id = req.params.id;
+  console.log(`user want to delete sectionform : ${id}` );
+
+  db.query('DELETE FROM `section_form` WHERE `Section_Form_ID` = ?',[id],(err,result,fields)=>{
+      if(err){
+          console.error(err);
+          return res.status(201).send(
+              {
+                  status:0,
+                  info:'error'
+              }
+          )
+      }
+      console.log(`delete section form : ${id}`);
+      
+      return res.status(200).send(
+          {
+              status:1,
+              info: 'success'
+          }
+      )      
+  })
+  
+  
+})
+//-------------------------------harry------------------------------
+
 
 // -------------------------
 // Start the Server
