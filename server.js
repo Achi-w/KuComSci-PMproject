@@ -286,6 +286,122 @@ app.delete("/announcements/:id", (req, res) => {
   });
 });
 
+//-------------------------------ming------------------------------
+
+
+// ดึงข้อมูลรีวิวทั้งหมด
+app.get('/api/course_review', (req, res) => {
+  const query = `
+      SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time,Course_Name
+      FROM course_review
+  `;
+  db.query(query , (err, results) => {
+      if (err) {
+          console.error(err);
+          res.status(500).json({ error: 'Database query failed' });
+      } else {
+          res.json(results);
+      }
+  });
+});
+
+
+// ดึงข้อมูลคอร์สจาก Course_ID
+app.get('/api/course/:Course_ID', (req, res) => {
+  const CId = req.params.Course_ID;
+  db.query('SELECT Course_ID,Course_Name,Course_Detail FROM course WHERE Course_ID = ?', [CId], (err, results) => {
+      if (err) {
+          console.error(err);
+          res.status(500).json({ error: 'Database query failed' });
+      } else if (results.length === 0) {
+          res.status(404).json({ error: 'Course not found' });
+      } else {
+          res.json(results[0]);
+      }
+  });
+});
+
+// ดึงรีวิวของคอร์ส พร้อมคำนวณค่าเฉลี่ย Review_Course_Rate
+app.get('/api/course_review/:Course_ID', (req, res) => {
+  const CId = req.params.Course_ID;
+  const query = `
+  SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time,Course_Name
+  FROM course_review WHERE Course_ID = ? , [CId]
+`;
+  db.query(query , (err, results) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Database query failed' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ error: 'No course_review data found' });
+      }
+
+      // คำนวณค่าเฉลี่ย Review_Course_Rate
+      const totalScore = results.reduce((sum, row) => sum + row.Review_Course_Rate, 0);
+      const avgScore = results.length > 0 ? totalScore / results.length : 0;
+
+      res.json({ reviews: results, avgScore });
+  });
+});
+
+// ดึงข้อมูลคอร์สทั้งหมดพร้อมกับค่าเฉลี่ยของ Review_Course_Rate
+app.get('/api/course', (req, res) => {
+  const query = `
+      SELECT c.Course_ID, c.Course_Name, c.Course_Detail,
+          IFNULL(AVG(cr.Review_Course_Rate), 0) AS avg_rating
+      FROM course c
+      LEFT JOIN course_review cr ON c.Course_ID = cr.Course_ID
+      GROUP BY c.Course_ID
+  `;
+
+  db.query(query, (err, results) => {
+      if (err) {
+          console.error('Error fetching courses:', err);
+          res.status(500).json({ error: 'Database query failed' });
+      } else if (results.length === 0) {
+          res.status(404).json({ error: 'Course not found' });
+      } else {
+          res.json(results); // ส่งข้อมูลที่มีการคำนวณค่าเฉลี่ย
+      }
+  });
+});
+app.post('/api/course_review', async (req, res) => {
+  try {
+      const { Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name } = req.body;
+
+      if (!USER_ID || !Course_ID) {
+          return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const sql = `INSERT INTO course_review (Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
+      db.query(sql, [Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name]);
+
+      res.status(201).json({ message: 'Review added successfully' });
+  } catch (error) {
+      console.error('Error adding review:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+app.delete('/api/course_review/:Review_Course_ID', (req, res) => {
+  const reviewID = req.params.Review_Course_ID;
+  db.query('DELETE FROM course_review WHERE Review_Course_ID = ?', [reviewID], (err, results) => {
+      if (err) {
+          res.status(500).json({ error: 'Delete failed' });
+      } else {
+          res.json({ message: 'Review deleted successfully' });
+      }
+  });
+});
+
+
+
+
+//-------------------------------ming------------------------------
+
 
 //-------------------------------harry------------------------------
 //show sec uc8

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Review Details</title>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background-color: #ffffff;
+    height: 100%;
+    padding-left: 230px; /* Adjust this to match the width of the left-nav */
+}
+/* LEFT NAVIGATION BAR */
+.left-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 215px;
+    background-color: #bababa;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 500;
+    overflow-y: auto;
+}
+#course-details, #course-reviews, h3 {
+    margin-left: 230px; /* Ensures content starts after the left-nav */
+    padding: 20px; /* Adds spacing inside */
+}
+    .top-bar {
+    position: fixed;
+    top: 0;
+    left: 215px;
+    right: 0;
+    height: 50px;
+    background-color: #525252;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+}
+/* Container for Course Information and Reviews */
+.course-info-container {
+    display: flex;
+    justify-content: center; /* Keep the content in the center horizontally */
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Styling for Reviews */
+.review-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 5px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    max-width: 50%;  /* Ensure review does not overflow */
+    box-sizing: border-box;
+    margin-left: 25%;
+    word-wrap: break-word; /* Wrap long words if necessary */
+    word-break: break-word; /* Break long words to fit */
+    overflow-wrap: break-word; /* Prevent overflow of long words */
+}
+
+.review-content {
+    white-space: pre-wrap; /* คงรูปแบบการพิมพ์ เช่น การขึ้นบรรทัดใหม่ */
+    word-wrap: break-word;  /* ให้พิมพ์คำที่ยาวเกินไปให้แบ่งคำ */
+    word-break: break-word; /* ให้พิมพ์คำที่ยาวเกินไปให้พังคำ */
+    padding: 10px;         /* เพิ่ม padding เล็กน้อย */
+    font-size: 1rem;       /* ปรับขนาดตัวอักษร */
+    max-width: 70%;        /* กำหนดความกว้างสูงสุดของข้อความไม่เกิน 70% */
+    margin: 0 auto;        /* จัดให้ข้อความอยู่กลาง */
+    text-align: left;      /* จัดข้อความให้อยู่ซ้าย */
+}
+
+
+
+
+/* Other styling remains unchanged */
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.review-username {
+    font-weight: bold;
+}
+
+.review-rating {
+    color: #ff9900;
+}
+
+.review-actions {
+    margin-top: 10px;
+    text-align: right;
+    
+}
+
+.delete-btn {
+    color: white;
+    background-color: red;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.delete-btn:hover {
+    background-color: darkred;
+}
+
+.create-btn {
+    color: white;
+    background-color: green;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    position: fixed; /* This makes the button stay fixed on the screen */
+    top: 140px;
+    right: 20vw; /* 5% from the right edge of the screen */
+}
+
+.create-btn:hover {
+    background-color: darkgreen;
+}
+
+</style>
+</head>
+<body>
+      <!-- Left navigation menu -->
+  <div class="left-nav">
+    <img src="favicon.ico" alt="Logo" />
+    <ul>
+      <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
+      <li><a href="ooooooooo">รวมตารางสอบและข้อสอบ</a></li>
+      <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
+      <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
+      <li><a href="oo">ช่องทางการติดต่ออาจารย์</a></li>
+      <li><a href="oo">จองห้องและย้ายห้อง</a></li>
+    </ul>
+  </div>
+          <!-- Top bar -->
+  <div class="top-bar">
+    <div class="left" id="roleTitle"></div>
+    <div class="right">
+      <span id="userName"></span>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
+    <div id="course-details">
+        <h2 id="course-name"></h2>
+        <p id="course-description"></p>
+    </div>
+
+    <h3>รีวิวทั้งหมด</h3>
+    <div id="course-reviews"></div>
+
+    <div class="review-actions">
+        <button class="create-btn" id="create-review-btn">สร้างรีวิว</button>
+    </div>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="Course_Review_Details.js"></script>
+</body>
+</html>
