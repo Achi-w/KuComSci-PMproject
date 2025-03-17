@@ -45,7 +45,7 @@ const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "pmproject2",
+  database: "pmdatabase4",
 });
 
 db.connect((err) => {
