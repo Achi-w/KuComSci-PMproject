@@ -1,6 +1,6 @@
 import { fetchAllCourse, fetchCourse } from "../data/course.js"
 import { addNewSection } from "../data/sectionForm.js";
-import { reauth } from "./utils/auth.js";
+import { logout, reauth } from "./utils/auth.js";
 
 let userRole = 1; // 1 = teacher 0 = student
 let userid = '';
@@ -128,7 +128,14 @@ const initial = async()=>{
         }
     })
 
-    
+    document.querySelector('#close-button').addEventListener('click',async()=>{
+            const isLogout = await logout();
+            if(isLogout){
+                window.location.href = '/';
+            }else{
+                alert('logout failed')
+            }
+        })   
 }
 
 const checkAuth = async()=>{
@@ -143,6 +150,9 @@ const checkAuth = async()=>{
             userid = isAuth.info.USER_ID;
         }
         console.log('user auth  ok');
+
+        document.querySelector('#nisit-name').innerHTML = isAuth.info.USER_Name + ' ' + isAuth.info.USER_Surname;
+
         initial();
     }else{
         console.log('user not logged in');

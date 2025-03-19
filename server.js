@@ -647,6 +647,8 @@ app.put('/api/sectionform/add',(req,res)=>{
 
 //ok front end implemented
 app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
+  console.log('user teacher call section');
+  
   if (!req.session.user){
     console.log('user have no right');
 
@@ -657,8 +659,12 @@ app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
   }
   const teacherId = req.params.teacherId;
 
-  db.query('SELECT Section_Form_ID,Course_ID,SEC,Current_Nisit_Number,Section_Form_start_time,Section_Form_STATUS, Section_Form_Minimum_Nisit, Section_Form_Maximum_Nisit FROM Section_Form WHERE Section_Form_STATUS = 0',
-      (err,result,fields)=>{
+  db.query(`SELECT sf.*
+        FROM section_form sf
+        JOIN course c ON sf.Course_ID = c.Course_ID
+        JOIN user_s_course usc ON c.Course_ID = usc.Course_ID
+        WHERE usc.USER_ID = ?`,
+      teacherId,(err,result,fields)=>{
           if(err){
               console.error(err);
               return res.status(201).send(

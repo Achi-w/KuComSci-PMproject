@@ -1,6 +1,6 @@
 import { fetchCourse } from "../data/course.js";
 import { addNisitSectionForm, fetchSingleSectionForm } from "../data/sectionForm.js";
-import { reauth } from "./utils/auth.js";
+import { logout, reauth } from "./utils/auth.js";
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
@@ -81,12 +81,22 @@ const initial = async() =>{
       
     })
 
+    document.querySelector('#close-button').addEventListener('click',async()=>{
+            const isLogout = await logout();
+            if(isLogout){
+                window.location.href = '/';
+            }else{
+                alert('logout failed')
+            }
+        })
 }
 
 const checkAuth = async()=>{
     const isAuth = await reauth(); 
 
     if(isAuth.status){
+        document.querySelector('#nisit-name').innerHTML = isAuth.info.USER_Name + ' ' + isAuth.info.USER_Surname;
+
         userid = isAuth.info.USER_ID;
         console.log('user auth  ok');
         initial();

@@ -5,9 +5,7 @@ export const reauth = async()=>{
     })
         .then(response => response.json())
         .then(data =>{
-            if(data.status){
-                
-                console.log(data);
+            if(data.status){                
                 return data;
             }else{
                 console.log('user not logged in');
@@ -16,4 +14,22 @@ export const reauth = async()=>{
                 }
             }
         })
+}
+
+export const logout = async()=>{
+    return fetch(('http://localhost:3000/logout'),{
+        method: 'POST',
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then( data=>{
+        console.log(data);
+        
+        if(data.success){
+            return 1;   
+        }else{
+            return 0;
+        }
+    }
+    )
 }

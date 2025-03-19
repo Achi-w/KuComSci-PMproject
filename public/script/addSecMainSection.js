@@ -1,6 +1,6 @@
 import { fetchCourse, fetchAllCourse } from "../data/course.js";
 import { fetchNotYetAcceptSectionForm, fetchSectionForm } from "../data/sectionForm.js"
-import { reauth } from "./utils/auth.js";
+import { logout, reauth } from "./utils/auth.js";
 import { checkExpriedForm } from "./utils/date.js";
 
 
@@ -39,10 +39,10 @@ const initial = async ()=>{
     console.log(userRole);
     
     if(userRole === 0){
-        document.querySelector('#nisit-name').innerHTML = 'student';
         sections = await fetchSectionForm();    
     }else{
-        document.querySelector('#nisit-name').innerHTML = 'teacher';
+        console.log('teacher');
+        
         sections = await fetchNotYetAcceptSectionForm(userID); //use userid here for techer
     }
     
@@ -78,49 +78,7 @@ const initial = async ()=>{
         //check role
         const navigate = checkRole(section.Section_Form_ID,status);
         
-        //if(status === 'Accept' || status === 'Decline'){
-        //    html += `
-        //    ${navigate}
-        //        <div class="sec">
-        //            <div class="sec-upper">
-        //                <p class="text-sec">${course.Course_Name}</p>
-        //                <p class="text-sec">${section.Current_Nisit_Number}/${section.Section_Form_Maximum_Nisit}</p>
-        //            </div>
-        //            <div class="sec-middle">
-        //                <p  class="text-sec">${course.Course_Owner_Name}</p>
-        //                <p class="text-sec">Sec : ${section.SEC}</p>
-        //                <p  class="text-sec">เริ่ม : ${section.Section_Form_start_time.slice(0,10)}</p>
-        //            </div>
-        //            <div class="sec-bottom">
-        //                <p  class="text-sec">${course.Course_ID}</p>
-        //                <p  class="text-sec">สถานะ : ${status}</p>
-        //            </div>
-        //        </div>
-        //    
-        //`
-//
-        //}else{
-        //    html += `
-        //    ${navigate}
-        //        <div class="sec">
-        //            <div class="sec-upper">
-        //                <p class="text-sec">${course.Course_Name}</p>
-        //                <p class="text-sec">${section.Current_Nisit_Number}/${section.Section_Form_Maximum_Nisit}</p>
-        //            </div>
-        //            <div class="sec-middle">
-        //                <p  class="text-sec">${course.Course_Owner_Name}</p>
-        //                <p class="text-sec">Sec : ${section.SEC}</p>
-        //                <p  class="text-sec">เริ่ม : ${section.Section_Form_start_time.slice(0,10)}</p>
-        //            </div>
-        //            <div class="sec-bottom">
-        //                <p  class="text-sec">${course.Course_ID}</p>
-        //                <p  class="text-sec">สถานะ : ${status}</p>
-        //            </div>
-        //        </div>
-        //    
-        //`
-//
-        //}
+       
         html += `
             ${navigate}
                 <div class="sec">
@@ -285,6 +243,15 @@ const initial = async ()=>{
         document.querySelector('.sec-list').innerHTML = htmlSearch;
         
     })
+
+    document.querySelector('#close-button').addEventListener('click',async()=>{
+            const isLogout = await logout();
+            if(isLogout){
+                window.location.href = '/';
+            }else{
+                alert('logout failed')
+            }
+        })
 }
 
 const checkAuth = async()=>{
@@ -298,6 +265,8 @@ const checkAuth = async()=>{
             userRole = 0
             userID = isAuth.info.USER_ID;
         }
+
+        document.querySelector('#nisit-name').innerHTML = isAuth.info.USER_Name + ' ' + isAuth.info.USER_Surname;
         console.log('user auth  ok');
         initial();
     }else{
