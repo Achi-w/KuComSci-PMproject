@@ -1,8 +1,9 @@
 import { fetchAllCourse, fetchCourse } from "../data/course.js"
 import { addNewSection } from "../data/sectionForm.js";
+import { reauth } from "./utils/auth.js";
 
-const userRole = 1; // 1 = teacher 0 = student
-const userid = 'U001'
+let userRole = 1; // 1 = teacher 0 = student
+let userid = '';
 const initial = async()=>{
     let courseDetail = document.querySelector('#course-detail').innerHTML;
     let courseId = document.querySelector('#course-id').innerHTML;
@@ -58,7 +59,7 @@ const initial = async()=>{
             sectionFormStartTime: nowDate,
             sectionFormMaximumNisit: document.querySelector('#numberNisit').value,
             sectionFormMinimumNisit: document.querySelector('#numberNisitMin').value,
-            sectionFormNisitListName: 'nisit',
+            sectionFormNisitListName: userid,
             who:userRole
         }   
 
@@ -130,5 +131,25 @@ const initial = async()=>{
     
 }
 
-initial();
+const checkAuth = async()=>{
+    const isAuth = await reauth(); 
+
+    if(isAuth.status){
+        if(isAuth.info.USER_Role === 'Teacher'){
+            userRole = 1;
+            userid = isAuth.info.USER_ID;
+        }else{
+            userRole =0;
+            userid = isAuth.info.USER_ID;
+        }
+        console.log('user auth  ok');
+        initial();
+    }else{
+        console.log('user not logged in');
+        window.location.href = '/';
+    }
+
+}
+
+checkAuth();
 

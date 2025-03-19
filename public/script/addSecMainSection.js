@@ -1,11 +1,12 @@
 import { fetchCourse, fetchAllCourse } from "../data/course.js";
 import { fetchNotYetAcceptSectionForm, fetchSectionForm } from "../data/sectionForm.js"
+import { reauth } from "./utils/auth.js";
 import { checkExpriedForm } from "./utils/date.js";
 
 
 
 let userRole = 1; //0 is student 1 is teacher
-const userID = 0;
+let userID = 0;
 
 
 
@@ -35,7 +36,8 @@ const initial = async ()=>{
     let html = '';
 
     let sections ='';
-
+    console.log(userRole);
+    
     if(userRole === 0){
         document.querySelector('#nisit-name').innerHTML = 'student';
         sections = await fetchSectionForm();    
@@ -72,7 +74,6 @@ const initial = async ()=>{
             status = 'unknown';
         }
 
-        console.log(course.Course_Name, course.Course_ID,status);
         
         //check role
         const navigate = checkRole(section.Section_Form_ID,status);
@@ -150,7 +151,13 @@ const initial = async ()=>{
 
     document.querySelector('.allSubjectBtn').addEventListener('click',async ()=>{
         let html = '';
-        const sections = await fetchSectionForm();
+        let sections ='';
+        if(userRole === 0){
+            sections = await fetchSectionForm();
+        }else{
+            sections = await fetchNotYetAcceptSectionForm(userID);
+        }
+
         console.log(sections);
         
         for(const section of sections){
@@ -208,14 +215,6 @@ const initial = async ()=>{
         return curr.courseName === keyword
     }
 
-    document.querySelector('.swtichRole').addEventListener('click',async()=>{
-        if (userRole == 0){
-            userRole = 1;
-        }else{
-            userRole = 0;
-        }
-        await initial();
-    })
     document.querySelector('#search-btn').addEventListener('click',async()=>{
         let htmlSearch = '';
         const searchText = document.querySelector('#searchBar').value;
@@ -288,7 +287,24 @@ const initial = async ()=>{
     })
 }
 
+const checkAuth = async()=>{
+    const isAuth = await reauth(); 
 
+    if(isAuth.status){
+        if(isAuth.info.USER_Role === 'Teacher'){
+            userRole = 1
+            userID = isAuth.info.USER_ID;
+        }else{
+            userRole = 0
+            userID = isAuth.info.USER_ID;
+        }
+        console.log('user auth  ok');
+        initial();
+    }else{
+        console.log('user not logged in');
+        window.location.href = '/';
+    }
 
+}
 
-initial();
+checkAuth();

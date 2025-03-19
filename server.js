@@ -48,6 +48,7 @@ const db = mysql.createConnection({
   database: "pmdatabase4",
 });
 
+
 db.connect((err) => {
   if (err) {
     console.error("Database connection failed: " + err.message);
@@ -407,6 +408,14 @@ app.delete('/api/course_review/:Review_Course_ID', (req, res) => {
 //show sec uc8
 //ok front end implemented
 app.get('/api/sectionform',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   console.log('request sectionform');
   
   db.query('SELECT `Section_Form_ID`, `Course_ID`, `USER_ID`, `SEC`, `Current_Nisit_Number`, `Section_Form_start_time`, `Section_Form_Maximum_Nisit`, `Section_Form_Minimum_Nisit`,`Section_Form_STATUS` FROM `section_form`',(err,result,fields)=>{
@@ -434,6 +443,14 @@ app.get('/api/sectionform',(req,res)=>{
 
 //ok front end implemented
 app.post('/api/sectionform',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+    
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   const data = req.body;
   let userCurr;
   console.log('---------------------user add section-------------------------');
@@ -474,7 +491,9 @@ app.post('/api/sectionform',(req,res)=>{
               }
           )
       }else{
-          db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
+
+          if(data.who  === 1){
+            db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
           [idToinsertSec,data.courseId, data.userId,data.sec, userCurr,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
           (err,resutl,fields)=>{
               if(err){
@@ -487,20 +506,34 @@ app.post('/api/sectionform',(req,res)=>{
                       }
                   )
               }
-
+              return res.status(201).send(
+                  {
+                      status:1,
+                      info: 'ok'
+                  }
+              )
               
-              if(data.who){
+          }
+      )
+          }else{
+            db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
+          [idToinsertSec,data.courseId, data.userId,data.sec, userCurr,data.sectionFormStartTime, data.sectionFormMaximumNisit,1,data.sectionFormMinimumNisit],
+          (err,resutl,fields)=>{
+              if(err){
+                  console.error(err);
                   return res.status(201).send(
                       {
-                          status:1,
-                          info: 'ok'
+                          status:0,
+                          errorId : 0,
+                          info:'error'
                       }
                   )
               }
+
               const idToinsertSecList = crypto.randomUUID();
 
                       
-              db.query(' INSERT INTO Section_Form_Nisit_List(Section_Form_Nisit_List_ID, Section_Form_ID,Section_Form_Nisit_List_Name) VALUES (?,?,?)',
+              db.query(' INSERT INTO Section_Form_Nisit_List(Section_Form_Nisit_List_ID, Section_Form_ID,USER_ID) VALUES (?,?,?)',
                   [idToinsertSecList,idToinsertSec, data.sectionFormNisitListName],
                   (err,result,fields)=>{
                       if(err){
@@ -514,7 +547,7 @@ app.post('/api/sectionform',(req,res)=>{
                           )
                       }
                       console.log('complete');
-
+  
                       return res.status(200).send(
                           {
                               status:1,
@@ -523,8 +556,12 @@ app.post('/api/sectionform',(req,res)=>{
                       )
                   }
               )
+  
           }
-      )
+          )
+
+          }
+          
       }
   })
       
@@ -532,6 +569,14 @@ app.post('/api/sectionform',(req,res)=>{
 
 //ok implemted front end
 app.put('/api/sectionform/add',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   console.log('user want to add nisit');
   
   const data = req.body;
@@ -602,6 +647,14 @@ app.put('/api/sectionform/add',(req,res)=>{
 
 //ok front end implemented
 app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   const teacherId = req.params.teacherId;
 
   db.query('SELECT Section_Form_ID,Course_ID,SEC,Current_Nisit_Number,Section_Form_start_time,Section_Form_STATUS, Section_Form_Minimum_Nisit, Section_Form_Maximum_Nisit FROM Section_Form WHERE Section_Form_STATUS = 0',
@@ -632,6 +685,14 @@ app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
 
 //ok impletmented
 app.put('/api/sectionform/status/:formId',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   const data = req.body;
   const formId = req.params.formId;
   console.log(data, formId);
@@ -639,6 +700,7 @@ app.put('/api/sectionform/status/:formId',(req,res)=>{
   db.query('UPDATE section_form SET Section_Form_STATUS = ? WHERE Section_Form_ID = ?',
       [data.sectionFormStatus,formId],
       (err,result,fields)=>{
+
           if(err){
               console.error(err);
               return res.status(201).send(
@@ -662,6 +724,14 @@ app.put('/api/sectionform/status/:formId',(req,res)=>{
 
 //ok implemented front end
 app.get('/api/sectionform/id/:id',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   const id = req.params.id; 
   console.log(id);
   
@@ -715,7 +785,15 @@ app.get('/api/sectionform/id/:id',(req,res)=>{
   )
 })
 
-app.get('/api/course/:id',(req,res)=>{
+app.get('/api/courseSec/:id',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   console.log('user  get course');
   
   const id = req.params.id;
@@ -772,6 +850,14 @@ app.get('/api/course/:id',(req,res)=>{
 })
 
 app.get('/api/allcourse',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   db.query('SELECT Course_ID,Course_Name,Course_Detail FROM Course',(err,result,fields)=>{
       if(err){
           console.error(err);
@@ -793,6 +879,14 @@ app.get('/api/allcourse',(req,res)=>{
 })
 
 app.delete('/api/sectionform/delete/:id',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
   const id = req.params.id;
   console.log(`user want to delete sectionform : ${id}` );
 
@@ -817,6 +911,27 @@ app.delete('/api/sectionform/delete/:id',(req,res)=>{
   })
   
   
+})
+
+app.get('/api/reauth',(req,res)=>{
+  console.log(req.session);
+  
+  if(req.session.user){
+    console.log('have user');
+
+    res.status(200).send({
+      status:1,
+      info: req.session.user
+    })
+    
+  }else{
+    console.log(' no user');
+    
+    res.status(201).send({
+      status:0,
+      info: 'unauthorize access'
+    })
+  }
 })
 //-------------------------------harry------------------------------
 

@@ -1,9 +1,10 @@
 import { fetchCourse } from "../data/course.js";
 import { addNisitSectionForm, fetchSingleSectionForm } from "../data/sectionForm.js";
+import { reauth } from "./utils/auth.js";
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
-const userid = 'U003';
+let userid = 'U003';
 console.log(id);
 
 console.log(id);
@@ -82,5 +83,20 @@ const initial = async() =>{
 
 }
 
-initial();
+const checkAuth = async()=>{
+    const isAuth = await reauth(); 
+
+    if(isAuth.status){
+        userid = isAuth.info.USER_ID;
+        console.log('user auth  ok');
+        initial();
+    }else{
+        console.log('user not logged in');
+        window.location.href = '/';
+    }
+
+}
+
+checkAuth();
+
 

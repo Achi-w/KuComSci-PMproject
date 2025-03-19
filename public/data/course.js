@@ -2,7 +2,7 @@ export const fetchCourse = async(id) => {
     console.log(id);
     const d = await id;
     
-    return fetch(`http://localhost:3000/api/course/${d}`)
+    return fetch(`http://localhost:3000/api/courseSec/${d}`)
         .then(response => response.json())
         .then(data => {
             if(data.status){

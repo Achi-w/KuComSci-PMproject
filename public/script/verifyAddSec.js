@@ -1,5 +1,6 @@
 import { fetchCourse } from "../data/course.js";
 import { addNisitSectionForm, deleteSectionForm, fetchSingleSectionForm, updateSection } from "../data/sectionForm.js";
+import { reauth } from "./utils/auth.js";
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
@@ -120,4 +121,17 @@ const initial = async() =>{
 
 }
 
-initial();
+const checkAuth = async()=>{
+    const isAuth = await reauth(); 
+
+    if(isAuth.status){
+        console.log('user auth  ok');
+        initial();
+    }else{
+        console.log('user not logged in');
+        window.location.href = '/';
+    }
+
+}
+
+checkAuth();
