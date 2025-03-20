@@ -65,7 +65,7 @@ db.connect((err) => {
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
   const query =
-    "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password FROM USER WHERE USER_Name = ?";
+    "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password FROM USER WHERE USER_ID = ?";
   db.query(query, [username], (err, results) => {
     if (err) {
       console.error("Database query error: " + err.message);
