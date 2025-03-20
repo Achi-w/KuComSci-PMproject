@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>profMain</title>
+    <link rel="stylesheet" href="styles/profMain.css">
+</head>
+<body>
+    <div class="left-nav">
+        <img src="favicon.ico" alt="Logo" />
+        <ul>
+          <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
+          <li><a href="ooooooooo">รวมตารางสอบและข้อสอบ</a></li>
+          <li><a href="Course_Review.html"class="active">รีวิวภาควิชา</a></li>
+          <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
+          <li><a href="oo">ช่องทางการติดต่ออาจารย์</a></li>
+          <li><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+        </ul>
+      </div>
+          <!-- Top bar -->
+      <div class="top-bar">
+        <div class="left" id="roleTitle"></div>
+        <div class="right">
+          <span id="userName"></span>
+          <button id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    <div>
+        <input class="search" name="fsrch" id="fsrch" placeholder="Search">
+        <div class="button">
+            <div class="block1">รายชื่ออาจารย์ทั้งหมด</div>
+            <a href="addProf.html" class="block1">เพิ่มอาจารย์</a>
+        </div>
+        <div id="professor-list"></div> 
+    </div>
+
+    <script>
+        async function fetchProfessors() {
+            try {
+                const response = await fetch('http://localhost:3000/getProfessors');
+                const data = await response.json();
+                
+                const userResponse = await fetch('http://localhost:3000/api/reauth');
+                const userData = await userResponse.json();
+                const user = userData.info;
+
+                console.log("User Role:", user);  // ดูค่าของ role
+
+                const professorList = document.getElementById('professor-list');
+                professorList.innerHTML = '';
+
+                data.forEach(prof => {
+                    const isAdmin = user.USER_Role === "Admin";  // ถ้าเป็น Admin
+                    const isOwner = user.USER_Role === "Teacher" && user.USER_ID === prof.USER_ID; // ถ้าเป็น Teacher และ USER_ID ตรงกัน
+                    console.log("Is Admin:", isAdmin);  // ตรวจสอบว่าเป็น Admin หรือไม่
+                    console.log("Is Owner:", isOwner);  // ตรวจสอบว่าเป็น Teacher และ USER_ID ตรงกัน
+
+                    const professorCard = document.createElement('div');
+                    professorCard.classList.add('card');
+
+                    professorCard.innerHTML = `
+                        <p class="detail">${prof.USER_Name} ${prof.USER_Surname}</p>
+                        <div class="row">
+                            <img src="${prof.USER_Image || 'http://localhost:3000/uploads/default-image.jpg'}" alt="${prof.USER_Name}" />
+                            <div class="column">
+                                <p class="detail">รหัสอาจารย์: ${prof.USER_ID}</p>
+                                <p class="detail">ห้องทำงาน: ${prof.USER_Room}</p>
+                                <p class="detail">${prof.USER_Contact_DETAIL}</p>
+                            </div>
+                            <div class="column">
+                                ${isAdmin || isOwner ? `<a href="editProf.html?USER_ID=${prof.USER_ID}" class="edit">Edit</a>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    professorList.appendChild(professorCard);
+                });
+            } catch (error) {
+                console.error('Error fetching professors:', error);
+            }
+        }
+        // เรียกใช้ฟังก์ชันเมื่อโหลดหน้าเว็บ
+        window.onload = fetchProfessors;
+    </script>
+</body>
+</html>

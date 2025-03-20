@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Professor</title>
+    <link rel="stylesheet" href="profMain.css">
+</head>
+<body>
+    <h1>Edit Professor</h1>
+    <form id="edit-form" enctype="multipart/form-data">
+        <label for="USER_Name">Name:</label>
+        <input type="text" id="USER_Name" name="USER_Name" required>
+
+        <label for="USER_Surname">Surname:</label>
+        <input type="text" id="USER_Surname" name="USER_Surname" required>
+
+        <label for="USER_Contact_DETAIL">Contact Detail:</label>
+        <input type="text" id="USER_Contact_DETAIL" name="USER_Contact_DETAIL" required>
+
+        <label for="USER_Room">Room:</label>
+        <input type="text" id="USER_Room" name="USER_Room" required>
+
+        <label for="USER_Year">Year:</label>
+        <input type="number" id="USER_Year" name="USER_Year">
+
+        <label for="USER_Image">Profile Picture:</label>
+        <input type="file" id="USER_Image" name="USER_Image" accept="image/*">
+
+        <button type="submit">Update</button>
+    </form>
+
+    <script>
+        // ดึง USER_ID จาก URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('USER_ID');
+
+        // ฟังก์ชันดึงข้อมูลอาจารย์ที่ต้องการแก้ไข
+        async function fetchProfessorData() {
+            try {
+                const response = await fetch(`http://localhost:3000/user/${userId}`);
+                const data = await response.json();
+
+                // เติมข้อมูลลงในฟอร์ม
+                document.getElementById('USER_Name').value = data.USER_Name;
+                document.getElementById('USER_Surname').value = data.USER_Surname;
+                document.getElementById('USER_Contact_DETAIL').value = data.USER_Contact_DETAIL;
+                document.getElementById('USER_Room').value = data.USER_Room;
+                document.getElementById('USER_Year').value = data.USER_Year;
+            } catch (error) {
+                console.error('Error fetching professor data:', error);
+            }
+        }
+
+        async function updateProfessor(event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('USER_Image');
+            const formData = new FormData();
+
+            formData.append('USER_ID', userId);
+            formData.append('USER_Name', document.getElementById('USER_Name').value);
+            formData.append('USER_Surname', document.getElementById('USER_Surname').value);
+            formData.append('USER_Contact_DETAIL', document.getElementById('USER_Contact_DETAIL').value);
+            formData.append('USER_Room', document.getElementById('USER_Room').value);
+            formData.append('USER_Year', document.getElementById('USER_Year').value || 0);
+
+            // ถ้ามีการเลือกไฟล์
+            if (fileInput.files.length > 0) {
+                formData.append('USER_Image', fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/updateProf', {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Professor updated successfully');
+                } else {
+                    alert('Failed to update professor');
+                }
+            } catch (error) {
+                console.error('Error updating professor:', error);
+            }
+        }
+
+        // เรียกใช้ฟังก์ชันเมื่อโหลดหน้าเว็บ
+        window.onload = fetchProfessorData;
+
+        // เพิ่ม event listener เมื่อฟอร์มถูก submit
+        document.getElementById('edit-form').addEventListener('submit', updateProfessor);
+    </script>
+</body>
+</html>

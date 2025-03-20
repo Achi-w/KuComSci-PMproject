@@ -1,0 +1,132 @@
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f9; /* เพิ่มพื้นหลังให้ดูสบายตา */
+}
+
+div {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    max-width: 1200px; /* จำกัดขนาดให้เหมาะสมกับหน้าจอใหญ่ */
+    height: 60%;
+    gap: 20px;
+}
+
+.search {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box; /* เพื่อไม่ให้มีการหักล้างกับ padding */
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.search:focus {
+    border-color: #007BFF;
+}
+
+.button {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+}
+
+.block1 {
+    background-color: #ffebcd;
+    text-align: center;
+    height: 50px;
+    width: auto;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.block1:hover {
+    background-color: #f0c06f; /* เพิ่มเอฟเฟ็กต์ hover */
+}
+
+.card {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เพิ่มเงาให้กับการ์ด */
+    padding: 20px;
+    margin: 10px 0;
+}
+
+.card .row {
+    display: flex;
+    align-items: center;  /* จัดแนวให้ทุกองค์ประกอบอยู่ตรงกลางในแนวตั้ง */
+    gap: 20px;
+    flex-wrap: wrap; /* ทำให้ข้อมูลไม่เบียดกันถ้าไม่พอพื้นที่ */
+}
+
+.card img {
+    width: 150px;
+    height: 150px;
+    border-radius: 8px;
+    object-fit: cover; /* ให้รูปภาพไม่เสียสัดส่วน */
+}
+
+.card .column {
+    display: flex;
+    flex-direction: column;
+}
+
+.card .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.edit, .delete {
+    background-color: #28a745;
+    text-align: center;
+    height: 40px;
+    width: 100px;
+    line-height: 40px;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; /* เพิ่มช่องว่างระหว่างปุ่ม */
+}
+
+.delete {
+    background-color: #dc3545;
+}
+.edit {
+    background-color: rgb(237, 185, 87); /* เพิ่มเอฟเฟ็กต์ hover */
+}
+.edit:hover {
+    background-color: rgb(255, 166, 0); /* เพิ่มเอฟเฟ็กต์ hover */
+}
+
+.delete:hover {
+    background-color: #c82333; /* เพิ่มเอฟเฟ็กต์ hover */
+}
