@@ -51,7 +51,7 @@ log
         let courses;
         if (cond == 0) {
             courses = await this.schedule.getCourseList(user_id);
-            res.render('roomBookForm', {bookType: 'study_room', bookAction: action, label: 'ห้องเรียน', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher}, {role: role});
+            res.render('roomBookForm', {bookType: 'study_room', bookAction: action, label: 'ห้องเรียน', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher, role: role});
         } else if (cond == 1) {
             courses = await this.schedule.getCourseList(user_id);
             res.render('roomBookForm', {bookType: 'midterm_room', bookAction: action, label: 'ห้องสอบ', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher, role: role})
