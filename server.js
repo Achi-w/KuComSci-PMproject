@@ -670,6 +670,7 @@ app.put('/api/sectionform/add',(req,res)=>{
 app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
   console.log('user teacher call section');
   
+  const id = req.params.teacherId;
   if (!req.session.user){
     console.log('user have no right');
 
@@ -680,6 +681,30 @@ app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
   }
   const teacherId = req.params.teacherId;
 
+  if(teacherId == 'admin'){
+    db.query(`SELECT Section_Form_ID,Course_ID,SEC,Current_Nisit_Number,Section_Form_start_time,Section_Form_STATUS, Section_Form_Minimum_Nisit, Section_Form_Maximum_Nisit FROM Section_Form WHERE Section_Form_STATUS = 0`,
+    teacherId,(err,result,fields)=>{
+        if(err){
+            console.error(err);
+            return res.status(201).send(
+                {
+                    status:0,
+                    info:'error'
+                }
+            )
+        }
+
+        console.log('complete');
+        return res.status(200).send(
+            {
+                status:1,
+                info:result
+            }
+        )
+
+    }
+    )
+  }
   db.query(`SELECT sf.*
         FROM section_form sf
         JOIN course c ON sf.Course_ID = c.Course_ID

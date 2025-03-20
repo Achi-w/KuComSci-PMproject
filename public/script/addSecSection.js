@@ -128,31 +128,31 @@ const initial = async()=>{
         }
     })
 
-    document.querySelector('#close-button').addEventListener('click',async()=>{
-            const isLogout = await logout();
-            if(isLogout){
-                window.location.href = '/';
-            }else{
-                alert('logout failed')
-            }
-        })   
+
 }
 
 const checkAuth = async()=>{
     const isAuth = await reauth(); 
 
     if(isAuth.status){
-        if(isAuth.info.USER_Role === 'Teacher'){
+        if(isAuth.info.USER_Role === 'Teacher' && isAuth.info.USER_Role === 'Admin'){
+            if(isAuth.info.USER_Role === 'Teacher'){
+                document.querySelector('#info-header-title').innerHTML = 'Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
+            }else{
+                document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
+            }
+            document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
+
             userRole = 1;
             userid = isAuth.info.USER_ID;
         }else{
+            document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
             userRole =0;
             userid = isAuth.info.USER_ID;
         }
         console.log('user auth  ok');
 
         document.querySelector('#nisit-name').innerHTML = isAuth.info.USER_Name + ' ' + isAuth.info.USER_Surname;
-
         initial();
     }else{
         console.log('user not logged in');

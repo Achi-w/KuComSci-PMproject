@@ -117,15 +117,7 @@ const initial = async() =>{
      
      });
 
-    document.querySelector('#close-button').addEventListener('click',async()=>{
-        const isLogout = await logout();
-        if(isLogout){
-            window.location.href = '/';
-        }else{
-            alert('logout failed')
-        }
-    })
-
+    
 
 }
 
@@ -133,6 +125,11 @@ const checkAuth = async()=>{
     const isAuth = await reauth(); 
 
     if(isAuth.status){
+        if(isAuth.info.USER_Role === 'Teacher'){
+            document.querySelector('#info-header-title').innerHTML = 'Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
+        }else{
+            document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
+        }
         document.querySelector('#nisit-name').innerHTML = isAuth.info.USER_Name + ' ' + isAuth.info.USER_Surname;
 
         console.log('user auth  ok');
