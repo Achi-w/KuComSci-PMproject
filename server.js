@@ -538,7 +538,7 @@ app.post('/api/sectionform',(req,res)=>{
       )
           }else{
             db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
-          [idToinsertSec,data.courseId, data.userId,data.sec, userCurr,data.sectionFormStartTime, data.sectionFormMaximumNisit,1,data.sectionFormMinimumNisit],
+          [idToinsertSec,data.courseId, data.userId,data.sec, 1,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
           (err,resutl,fields)=>{
               if(err){
                   console.error(err);
