@@ -1,14 +1,63 @@
-.main, .bar, .info-bar, .search-bar, .sec-add, .sec-list, .sec {
+* {
     box-sizing: border-box;
 }
-
 body{
     font-family: "Inter", sans-serif;
-    width: 100%;
-    max-width: 1280px;
-    height: 100vh;
-    padding: 0;
     margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background-color: #ffffff;
+    height: 100vh;
+    width: 100%;
+}
+
+.left-nav {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 215px;
+    background-color: #bababa;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .left-nav img {
+    width: 80%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  .left-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .left-nav li {
+    margin: 10px 0;
+  }
+  .left-nav a {
+    text-decoration: none;
+    color: #000;
+  }
+  
+  .left-nav ul li a {
+display: block;
+text-decoration: none;
+color: black; /* Default text color */
+transition: background 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.left-nav ul li a:hover {
+background:#8E8E8E;
+}
+
+.left-nav ul li a:active {
+color: black;
+background:#8E8E8E;
+}
+
+/* If you want to highlight the active page */
+.left-nav ul li a.active {
+background:#8E8E8E;
+color: black;
 }
 
 
@@ -21,7 +70,6 @@ h1,p{
 
 .Wrapper{
     position: relative;
-    max-width: 1280px;
     height: 100vh;
     display: flex;
     width: 100%;
@@ -35,8 +83,6 @@ h1,p{
     width: 25%;
     padding-top: 20px;
     gap: 50px;
-    
-
 }
 .logoSec{
     display: flex;
@@ -81,18 +127,23 @@ h1,p{
 .main{
     display: flex;
     flex-direction: column;
-    width: 75%;
+    width: 100%;
+    flex: 1;
+    min-width: 0;
 }
 
 
 .info-bar{
     background-color: #525252;
     color: #fff;
+    height: 50px;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 0 20px;
+
+   
 }
 .left-bar{
     display: flex;
@@ -103,13 +154,8 @@ h1,p{
 
 
 .info{
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 20px;
+    padding-top: 70px;
+
 }
 
 .main-info{
@@ -120,8 +166,8 @@ h1,p{
     align-items: center;
     justify-content: center;
     gap: 15px;
-
-    
+    margin: 0 auto;
+    width: 60%;
 }
 
 .middle{
@@ -176,8 +222,8 @@ h1,p{
     display: none;
     position: fixed;
     top: 0%;
-    left: 25%;
-    width: 80%;
+    left: 215px;
+    width: 800%;
     height: 100%;
     z-index: 10;    
     background-color: rgba(0, 0, 0,0.5);
@@ -208,5 +254,18 @@ h1,p{
 }
 
 .now-bar{
+    background-color: #8E8E8E;
+}
+
+#logout-button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.logout-button:hover {
     background-color: #8E8E8E;
 }

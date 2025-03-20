@@ -12,49 +12,22 @@
 </head>
 <body>
     <div class="Wrapper">
-        <div class="bar">
-            <div class="logoSec">
-                <img class='logo' src="/images/1a052da3db0dc0bc5288607939fc62ae.png" alt="">
-            </div>
-            <div class="choice">
-                <a href="announcement.html">
-                    <button class="button-bar">
-                        <p class="button-bar-text">ประกาศทางภาควิชา</p>
-                    </button>    
-                </a>
-                <a href="">
-                    <button class="button-bar">
-                        <p class="button-bar-text">รวมตารางสอบและข้อสอบ</p>    
-                    </button>
-                </a>
-                <a href="Course_Review.html">
-                    <button class="button-bar">
-                        <p class="button-bar-text">รีวิวภาควิชา</p>
-                    </button>    
-                </a>
-                <a href="addSecMain.html">
-                    <button class="button-bar now-bar">
-                        <p class="button-bar-text">ลงชื่อเปิดเซ็คเพิ่ม</p>
-                    </button>    
-                </a>
-                <a href="">
-                    <button class="button-bar">
-                        <p class="button-bar-text">ช่องทางการติดต่ออาจารย์</p>
-                    </button>    
-                </a>
-                <a href="/roomBooking/studyRoom">
-                    <button class="button-bar">
-                        <p class="button-bar-text">จองห้องและย้ายห้อง</p>
-                    </button>    
-                </a>
-            </div>
+        <div class="left-nav">
+            <img src="favicon.ico" alt="Logo" />
+            <ul>
+              <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
+              <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
+              <li><a href="addSecMain.html" class="active">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
+              <li><a href="profMain.html">ช่องทางการติดต่ออาจารย์</a></li>
+              <li><a id="bookRoom" href="/roomBooking/studyRoom">ห้องเรียนเเละห้องสอบ</a></li>
+            </ul>
         </div>
         <div class="main">
             <div class="info-bar">
-                <p>Nisit Comsci - comsci</p>
+                <p id="info-header-title">Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์</p>                
                 <div class="left-bar">
                     <p id="nisit-name">User</p>
-                    <button id="close-button"><i class="fa-solid fa-power-off"></i></button>    
+                    <button id="logout-button"><i class="fa-solid fa-power-off"></i></button>    
                 </div>
             </div>
             <div class="info">
@@ -73,6 +46,55 @@
             </div>
         </div>
     </div>
+    
     <script type="module" src="/script/addSecMainSection.js"></script>
+    <link rel="stylesheet" href="/styles/dialog-styles.css">
+<!-- Dialog Container (Hidden by default) -->
+<div id="dialogContainer" class="dialog-container" style="display: none;">
+  <div class="dialog-backdrop"></div>
+  <div class="dialog-box">
+    <div class="dialog-content">
+      <p id="dialogMessage"></p>
+    </div>
+    <div class="dialog-actions" id="dialogActions">
+      <!-- Buttons will be dynamically inserted here -->
+    </div>
+  </div>
+</div>
+<script src="script/dialog-script.js"></script>
+
+<script>
+  const logoutButton = document.getElementById('logout-button');
+  console.log(logoutButton);
+  logoutButton.addEventListener('click', () => {
+    if (typeof DialogManager === "undefined") {
+        console.error("DialogManager is not defined. Check if dialog-script.js is loaded.");
+        return;
+      }
+
+      const dialogManager = new DialogManager();
+      console.log(dialogManager);
+
+      dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+          fetch("/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+          })
+          .then(res => res.json())
+          .then(data => {
+              if (data.success) {
+              currentUser = {};
+              announcements = [];
+              window.location.href = "/index.html"; // redirect to login page
+              } else {
+              console.error("Logout failed.");
+              }
+          })
+          .catch(err => console.error("Error during logout:", err));
+          }, null);
+
+      });
+</script>
+    
 </body>
 </html>

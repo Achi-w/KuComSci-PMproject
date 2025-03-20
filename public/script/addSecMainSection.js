@@ -41,6 +41,9 @@ const initial = async ()=>{
     if(userRole === 0){
         sections = await fetchSectionForm();    
     }else{
+        if(userRole === 2){
+            sections = await fetchNotYetAcceptSectionForm('admin');
+        }
         console.log('teacher');
         
         sections = await fetchNotYetAcceptSectionForm(userID); //use userid here for techer
@@ -113,6 +116,9 @@ const initial = async ()=>{
         if(userRole === 0){
             sections = await fetchSectionForm();
         }else{
+            if(userRole === 2){
+                sections = await fetchNotYetAcceptSectionForm('admin');
+            }
             sections = await fetchNotYetAcceptSectionForm(userID);
         }
 
@@ -181,6 +187,9 @@ const initial = async ()=>{
         if(userRole === 0){
             sections = await fetchSectionForm();
         }else{
+            if(userRole === 2){
+                sections = await fetchNotYetAcceptSectionForm('admin');
+            }
             sections = await fetchNotYetAcceptSectionForm(userID);
         }
 
@@ -244,14 +253,7 @@ const initial = async ()=>{
         
     })
 
-    document.querySelector('#close-button').addEventListener('click',async()=>{
-            const isLogout = await logout();
-            if(isLogout){
-                window.location.href = '/';
-            }else{
-                alert('logout failed')
-            }
-        })
+  
 }
 
 const checkAuth = async()=>{
@@ -259,9 +261,21 @@ const checkAuth = async()=>{
 
     if(isAuth.status){
         if(isAuth.info.USER_Role === 'Teacher'){
+            document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
+            document.querySelector('#info-header-title').innerHTML = 'Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
+            
             userRole = 1
             userID = isAuth.info.USER_ID;
+        }else if( isAuth.info.USER_Role === 'Admin'){
+            document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
+            document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
+            
+            userRole = 2
+            userID = isAuth.info.USER_ID;
         }else{
+            document.querySelector('#info-header-title').innerHTML = 'Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
+            document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
+            
             userRole = 0
             userID = isAuth.info.USER_ID;
         }
