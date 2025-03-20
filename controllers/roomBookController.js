@@ -16,19 +16,19 @@ log
         }
         const user_id = user.USER_ID;
         const user_full_name = user.USER_Name + ' ' + user.USER_Surname;
-
-     
+        const role = this.getRoleLaberl(user.USER_Role.toLowerCase());
+        
         let scheduleList;
         const isTeacher = (user.USER_Role.toLowerCase() == 'teacher');
         if (cond == 0) {
             scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('study_room'), isTeacher);
-            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'study_room', label:'ห้องเรียน', isTeacher: isTeacher, user_full_name: user_full_name});
+            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'study_room', label:'ห้องเรียน', isTeacher: isTeacher, user_full_name: user_full_name, role: role});
         } else if (cond == 1) {
             scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('midterm_room'), isTeacher);
-            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'midterm_room', label:'ห้องสอบ', isTeacher: isTeacher, user_full_name: user_full_name});
+            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'midterm_room', label:'ห้องสอบ', isTeacher: isTeacher, user_full_name: user_full_name, role: role});
         } else if (cond == 2) {
             scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('final_room'), isTeacher);
-            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'final_room', label: 'ห้องสอบ', isTeacher: isTeacher, user_full_name: user_full_name});
+            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'final_room', label: 'ห้องสอบ', isTeacher: isTeacher, user_full_name: user_full_name, role: role});
         }
     }
 
@@ -45,17 +45,19 @@ log
         if (!isTeacher) {
             res.redirect('/roomBooking/studyRoom');
         }
+
+        const role = this.getRoleLaberl(user.USER_Role.toLowerCase());
         
         let courses;
         if (cond == 0) {
             courses = await this.schedule.getCourseList(user_id);
-            res.render('roomBookForm', {bookType: 'study_room', bookAction: action, label: 'ห้องเรียน', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher});
+            res.render('roomBookForm', {bookType: 'study_room', bookAction: action, label: 'ห้องเรียน', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher}, {role: role});
         } else if (cond == 1) {
             courses = await this.schedule.getCourseList(user_id);
-            res.render('roomBookForm', {bookType: 'midterm_room', bookAction: action, label: 'ห้องสอบ', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher})
+            res.render('roomBookForm', {bookType: 'midterm_room', bookAction: action, label: 'ห้องสอบ', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher, role: role})
         } else if (cond == 2) {
             courses = await this.schedule.getCourseList(user_id);
-            res.render('roomBookForm', {bookType: 'final_room', bookAction: action, label: 'ห้องสอบ', courses: courses,  user_full_name: user_full_name, isTeacher: isTeacher})
+            res.render('roomBookForm', {bookType: 'final_room', bookAction: action, label: 'ห้องสอบ', courses: courses,  user_full_name: user_full_name, isTeacher: isTeacher, role: role})
         }
     }
 
@@ -167,6 +169,19 @@ log
                 return "Final";
             default:
                 return "";
+        }
+    }
+
+    getRoleLaberl(role) {
+        switch (role) {
+            case 'student':
+                return "Nisit";
+            case 'teacher':
+                return "Professor";
+            case 'admin':
+                return "Admin";
+            default:
+                return "Nisit";
         }
     }
 }
