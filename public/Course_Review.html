@@ -11,6 +11,8 @@
       font-family: sans-serif;
       background-color: #ffffff;
       height: 100%;
+      padding-top: 50px;
+      
 }
 /* LEFT NAVIGATION BAR */
 .left-nav {
@@ -42,6 +44,29 @@
       text-decoration: none;
       color: #000;
     }
+    
+    .left-nav ul li a {
+  display: block;
+  text-decoration: none;
+  color: black; /* Default text color */
+  transition: background 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.left-nav ul li a:hover {
+  background:#8E8E8E;
+}
+
+.left-nav ul li a:active {
+  color: black;
+  background:#8E8E8E;
+}
+
+/* If you want to highlight the active page */
+.left-nav ul li a.active {
+  background:#8E8E8E;
+  color: black;
+}
+
     
 /* TOP BAR */
 .top-bar {
@@ -164,7 +189,7 @@
     <ul>
       <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
       <li><a href="ooooooooo">รวมตารางสอบและข้อสอบ</a></li>
-      <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
+      <li><a href="Course_Review.html"class="active">รีวิวภาควิชา</a></li>
       <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
       <li><a href="oo">ช่องทางการติดต่ออาจารย์</a></li>
       <li><a href="oo">จองห้องและย้ายห้อง</a></li>
@@ -179,9 +204,10 @@
     </div>
   </div>
 
-    <h1>รายวิชาทั้งหมด</h1>
+   
 
     <!-- 🔎 Search Box -->
+    <h1></h1>
     <div class="search-container">
         <input type="text" id="search-input" placeholder="🔍 ค้นหาวิชา...">
         <button id="search-btn">ค้นหา</button>

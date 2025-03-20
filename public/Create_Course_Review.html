@@ -6,15 +6,17 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script type="module" src="Create_Course_Review.js"></script>
     <style>
-        body {
-            margin: 0;
+body {
+    margin: 0;
       padding: 0;
       font-family: sans-serif;
       background-color: #ffffff;
       height: 100%;
-        }
+      padding-top: 50px;
+      padding-left: 500px;
+}
         /* LEFT NAVIGATION BAR */
-    .left-nav {
+        .left-nav {
       position: fixed;
       top: 0;
       left: 0;
@@ -43,6 +45,27 @@
       text-decoration: none;
       color: #000;
     }
+    .left-nav ul li a {
+  display: block;
+  text-decoration: none;
+  color: black; /* Default text color */
+  transition: background 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.left-nav ul li a:hover {
+  background:#8E8E8E;
+}
+
+.left-nav ul li a:active {
+  color: black;
+  background:#8E8E8E;
+}
+
+/* If you want to highlight the active page */
+.left-nav ul li a.active {
+  background:#8E8E8E;
+  color: black;
+}
     /* TOP BAR */
 .top-bar {
       position: fixed;
@@ -200,6 +223,7 @@ fetch("/dashboard")
      }
    } else {
      console.error("User not authenticated");
+     window.location.href = "index.html"; 
    }
  })
  .catch(err => console.error(err));

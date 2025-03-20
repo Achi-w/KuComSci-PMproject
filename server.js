@@ -288,6 +288,22 @@ app.delete("/announcements/:id", (req, res) => {
 });
 
 //-------------------------------ming------------------------------
+app.get('/api/user/:USER_ID', (req, res) => {
+  const userId = req.params.USER_ID;
+  const query = `SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Year, USER_Contact_DETAIL  FROM user WHERE USER_ID = ?`;
+
+  db.query(query, [userId], (err, results) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Database query failed' });
+      }
+      if (results.length === 0) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+      res.json(results[0]); // Return user data
+  });
+});
+
 
 
 // ดึงข้อมูลรีวิวทั้งหมด
@@ -325,11 +341,15 @@ app.get('/api/course/:Course_ID', (req, res) => {
 // ดึงรีวิวของคอร์ส พร้อมคำนวณค่าเฉลี่ย Review_Course_Rate
 app.get('/api/course_review/:Course_ID', (req, res) => {
   const CId = req.params.Course_ID;
+
   const query = `
-  SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time,Course_Name
-  FROM course_review WHERE Course_ID = ? , [CId]
-`;
-  db.query(query , (err, results) => {
+      SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, 
+             Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name
+      FROM course_review 
+      WHERE Course_ID = ?
+  `;
+
+  db.query(query, [CId], (err, results) => {
       if (err) {
           console.error('Database error:', err);
           return res.status(500).json({ error: 'Database query failed' });
@@ -339,13 +359,14 @@ app.get('/api/course_review/:Course_ID', (req, res) => {
           return res.status(404).json({ error: 'No course_review data found' });
       }
 
-      // คำนวณค่าเฉลี่ย Review_Course_Rate
-      const totalScore = results.reduce((sum, row) => sum + row.Review_Course_Rate, 0);
+      // Calculate average rating
+      const totalScore = results.reduce((sum, row) => sum + (row.Review_Course_Rate || 0), 0);
       const avgScore = results.length > 0 ? totalScore / results.length : 0;
 
       res.json({ reviews: results, avgScore });
   });
 });
+
 
 // ดึงข้อมูลคอร์สทั้งหมดพร้อมกับค่าเฉลี่ยของ Review_Course_Rate
 app.get('/api/course', (req, res) => {

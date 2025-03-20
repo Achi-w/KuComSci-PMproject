@@ -57,6 +57,7 @@ const displayCourses = (courses) => {
      }
    } else {
      console.error("User not authenticated");
+     window.location.href = "index.html"; 
    }
  })
  .catch(err => console.error(err));

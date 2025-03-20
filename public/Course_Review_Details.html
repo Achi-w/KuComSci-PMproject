@@ -7,29 +7,68 @@
 <style>
 body {
     margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-    background-color: #ffffff;
-    height: 100%;
-    padding-left: 230px; /* Adjust this to match the width of the left-nav */
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #ffffff;
+      height: 100%;
+      padding-top: 50px;
 }
 /* LEFT NAVIGATION BAR */
 .left-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 215px;
-    background-color: #bababa;
-    padding: 20px;
-    box-sizing: border-box;
-    z-index: 500;
-    overflow-y: auto;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 215px;
+      background-color: #bababa;
+      padding: 20px;
+      box-sizing: border-box;
+      z-index: 500;
+      overflow-y: auto;
+    }
+    .left-nav img {
+      width: 80%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    .left-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .left-nav li {
+      margin: 10px 0;
+    }
+    .left-nav a {
+      text-decoration: none;
+      color: #000;
+    }
+    .left-nav ul li a {
+  display: block;
+  text-decoration: none;
+  color: black; /* Default text color */
+  transition: background 0.3s, color 0.3s; /* Smooth transition */
 }
-#course-details, #course-reviews, h3 {
+
+.left-nav ul li a:hover {
+  background:#8E8E8E;
+}
+
+.left-nav ul li a:active {
+  color: black;
+  background:#8E8E8E;
+}
+
+/* If you want to highlight the active page */
+.left-nav ul li a.active {
+  background:#8E8E8E;
+  color: black;
+}
+    #course-details, #course-reviews, h3 {
     margin-left: 230px; /* Ensures content starts after the left-nav */
-    padding: 20px; /* Adds spacing inside */
+    padding: 5px;
 }
+
     .top-bar {
     position: fixed;
     top: 0;
@@ -123,9 +162,10 @@ body {
     cursor: pointer;
     border-radius: 5px;
     position: fixed; /* This makes the button stay fixed on the screen */
-    top: 140px;
-    right: 20vw; /* 5% from the right edge of the screen */
+    top: 100px; /* Moves it below the top bar */
+    right: 30px; /* Keeps it near the right edge */
 }
+
 
 .create-btn:hover {
     background-color: darkgreen;
