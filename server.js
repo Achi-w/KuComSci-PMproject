@@ -974,6 +974,113 @@ app.use(expressLayouts);
 const roomBookingRouter = require('./routers/RoomBookingRouter.js');
 app.use('/roomBooking', roomBookingRouter);
 //-------------------------------Frame------------------------------
+//--- WiN
+const professorStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // เก็บไฟล์ในโฟลเดอร์ 'uploads'
+  },
+  filename: (req, file, cb) => {
+    cb(null, `professor_${Date.now()}_${file.originalname}`); // ตั้งชื่อไฟล์เป็น timestamp + ชื่อไฟล์เดิม
+  }
+});
+
+// กำหนดขีดจำกัดขนาดไฟล์ (10MB)
+const professorUpload = multer({ storage: professorStorage, limits: { fileSize: 10 * 1024 * 1024 } });
+
+// ใช้ CORS สำหรับการร้องขอจากเครื่องลูก
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/addProf', professorUpload.single('USER_Image'), (req, res) => {
+  const { USER_ID, USER_Name, USER_Surname, USER_Password, USER_Contact_DETAIL, USER_Room, USER_Role, USER_Year } = req.body;
+  const USER_Image = req.file ? req.file.filename : null; // รับชื่อไฟล์จาก multer
+
+  const sql = `INSERT INTO user (USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password, USER_Year, USER_Contact_DETAIL, USER_Room, USER_Image) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  db.query(sql, [USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password, USER_Year || 0, USER_Contact_DETAIL, USER_Room, USER_Image], (err, result) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Failed to add professor' });
+      }
+      res.status(201).json({ message: 'Professor added successfully', userId: result.insertId });
+  });
+});
+
+// PUT: อัปเดตข้อมูลอาจารย์
+app.put('/updateProf', professorUpload.single('USER_Image'), (req, res) => {
+  const { USER_ID, USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year } = req.body;
+  const USER_Image = req.file ? req.file.filename : null; // รับชื่อไฟล์จาก multer
+
+  const sql = `UPDATE user 
+               SET USER_Name = ?, USER_Surname = ?, USER_Contact_DETAIL = ?, USER_Room = ?, USER_Year = ?, USER_Image = ? 
+               WHERE USER_ID = ?`;
+
+  db.query(sql, [USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year, USER_Image, USER_ID], (err, result) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Failed to update professor' });
+      }
+      res.status(200).json({ message: 'Professor updated successfully' });
+  });
+});
+// GET: ดึงข้อมูลอาจารย์ทั้งหมด (พร้อมภาพ)
+app.get('/getProfessors', (req, res) => {
+  const sql = "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Contact_DETAIL, USER_Room, USER_Image FROM user WHERE USER_Role = 'Teacher'";
+
+  db.query(sql, (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Failed to fetch professors' });
+      }
+
+      const professors = results.map(prof => ({
+          ...prof,
+          USER_Image: prof.USER_Image ? `http://localhost:${PORT}/uploads/${prof.USER_Image}` : null
+      }));
+
+      res.json(professors);
+  });
+});
+
+// DELETE: ลบอาจารย์
+app.delete('/deleteProf/:USER_ID', (req, res) => {
+  const { USER_ID } = req.params;
+
+  const sql = `DELETE FROM user WHERE USER_ID = ?`;
+
+  db.query(sql, [USER_ID], (err, result) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Failed to delete professor' });
+      }
+      res.status(200).json({ message: 'Professor deleted successfully' });
+  });
+});
+
+// GET: ดึงข้อมูลอาจารย์โดยใช้ USER_ID
+app.get('/user/:USER_ID', (req, res) => {
+  const { USER_ID } = req.params;
+  const sql = `SELECT USER_ID, USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year 
+               FROM user WHERE USER_ID = ? AND USER_Role = 'Teacher'`;
+
+  db.query(sql, [USER_ID], (err, results) => {
+      if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+      }
+      if (results.length > 0) {
+          res.json(results[0]);
+      } else {
+          res.status(404).json({ error: 'Professor not found' });
+      }
+  });
+});
+
+// เสิร์ฟไฟล์ภาพจากโฟลเดอร์ uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+//--- WiN
 
 
 // -------------------------
