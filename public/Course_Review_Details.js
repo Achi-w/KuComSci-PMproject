@@ -26,13 +26,16 @@ fetch("/dashboard")
             switch (currentUser.USER_Role.toLowerCase()) {
                 case "student":
                     roleTitle.textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    createReviewButton.style.display = "block"; // Show button for students
                     break;
                 case "teacher":
                 case "professor":
                     roleTitle.textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    createReviewButton.style.display = "none"; // Hide button for teachers
                     break;
                 case "admin":
                     roleTitle.textContent = "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    createReviewButton.style.display = "none"; // Hide button for admins
                     break;
             }
         } else {
@@ -41,6 +44,7 @@ fetch("/dashboard")
         }
     })
     .catch(err => console.error(err));
+
 
 // Logout Button
 document.getElementById("logoutBtn").addEventListener("click", () => {
@@ -95,7 +99,7 @@ const fetchCourseDetails = async () => {
                 // Fetch User Info
                 const { data: user } = await axios.get(`http://localhost:3000/api/user/${review.USER_ID}`);
                 const formattedDate = formatDate(review.Review_Course_Date);
-
+        
                 // Create Review Element
                 const reviewDiv = document.createElement('div');
                 reviewDiv.classList.add('review-item');
@@ -107,16 +111,17 @@ const fetchCourseDetails = async () => {
                     </div>
                     <div class="review-content">${review.Review_Course_Details}</div>
                 `;
-
-                // Delete Button (Only for the review owner)
-                if (review.USER_ID === currentUser.USER_ID) {
+        
+                // Add delete button for students (own review) and admins (any review)
+                if (review.USER_ID === currentUser.USER_ID || currentUser.USER_Role.toLowerCase() === "admin") {
+                    console.log("Adding delete button...");
                     const deleteButton = document.createElement('button');
                     deleteButton.classList.add('delete-btn');
                     deleteButton.textContent = 'Delete Review';
                     deleteButton.addEventListener('click', () => deleteReview(review.Review_Course_ID));
                     reviewDiv.appendChild(deleteButton);
                 }
-
+        
                 courseReviewsElement.appendChild(reviewDiv);
             } catch (error) {
                 console.error('Error fetching user data:', error);
