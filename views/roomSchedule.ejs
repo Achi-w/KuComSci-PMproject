@@ -1,5 +1,11 @@
 <div class="content-area">
-    <h2 class="page-title">ตารางจองห้องเรียน/จองห้องสอบ</h2>
+    <h2 class="page-title">
+        <% if (isTeacher) {%>
+        ตารางจองห้องเรียน/จองห้องสอบ
+        <% } else {%>
+            ตารางเรียน/ตารางสอบ
+        <% } %>
+    </h2>
     <script>
         const bookType = `<%= bookType %>`;
     </script>
