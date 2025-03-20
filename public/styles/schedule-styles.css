@@ -17,31 +17,18 @@ body {
 
 /* Sidebar Styles */
 .sidebar {
-    background-color: #BABABA;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-    width: 25vw;
-    padding-top: 20px;
-    gap: 50px;
+    width: 215px;
+    background-color: #bababa;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 500;
+    overflow-y: auto;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-}
-
-.logo img {
-    width: 150px;
-    height: 130px;
-
-    @media screen and (max-width: 1280px){
-        width: 120px;
-        height: 100px;
-    }
+.sidebar img {
+    width: 80%;
+    height: auto;
+    margin-bottom: 20px;
 }
 
 .nav-menu {
@@ -49,34 +36,41 @@ body {
 }
 .nav-menu ul {
     list-style: none;
-    width: 100%;
-}
+    margin: 0;
+    padding: 0;
+  }
 
 .nav-menu li {
-    text-align: left;
-    padding-left: 10px;
-    width: 100%;
-    padding-left: 20px;
-    padding: 10px 0;
-    border: none;
-}
+    margin: 10px 0;
+  }
 
 .nav-menu a {
-    margin-left: 55px;
-    display: block;
-    color: black;
     text-decoration: none;
-    font-size: 1em;
+    color: #000;
 }
 
-.nav-menu li:hover, .nav-menu a.active {
-    background-color: #8E8E8E;
+.nav-menu ul li a {
+    display: block;
+    text-decoration: none;
+    color: black; /* Default text color */
+    transition: background 0.3s, color 0.3s; /* Smooth transition */
 }
 
-.nav-menu li.active {
-    background-color: #8E8E8E;
-}
 
+.nav-menu ul li a:hover {
+    background:#8E8E8E;
+  }
+  
+.nav-menu ul li a:active {
+    color: black;
+    background:#8E8E8E;
+  }
+  
+  /* If you want to highlight the active page */
+.nav-menu ul li a.active {
+    background:#8E8E8E;
+    color: black;
+  }
 /* Main Content Styles */
 .main-content {
     flex: 1;
