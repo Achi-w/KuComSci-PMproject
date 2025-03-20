@@ -60,8 +60,6 @@ db.connect((err) => {
 // -------------------------
 // Login / Dashboard / Logout Routes
 // -------------------------
-
-// Login Route – fetch full user record including USER_ID
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
   const query =
@@ -78,7 +76,6 @@ app.post("/login", (req, res) => {
     }
     const user = results[0];
     if (password === user.USER_Password) {
-      // Store the full user record in session
       req.session.user = user;
       return res.json({ success: true });
     } else {
@@ -89,15 +86,15 @@ app.post("/login", (req, res) => {
   });
 });
 
-// Dashboard Route – returns logged‑in user (as "user")
 app.get("/dashboard", (req, res) => {
   if (!req.session.user) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
+    return res
+      .status(401)
+      .json({ success: false, message: "Unauthorized" });
   }
   res.json({ success: true, user: req.session.user });
 });
 
-// Logout Route – destroys the session
 app.post("/logout", (req, res) => {
   req.session.destroy(() => {
     res.json({ success: true });
@@ -108,31 +105,9 @@ app.post("/logout", (req, res) => {
 // Announcement Endpoints
 // -------------------------
 
-// Configure Multer for image uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Ensure "uploads" folder exists
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage: storage });
-
-// GET /user/:id – used if needed by announcement.js
-app.get("/user/:id", (req, res) => {
-  const userId = req.params.id;
-  const sql = `
-    SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Year, USER_Contact_DETAIL 
-    FROM USER 
-    WHERE USER_ID = ?`;
-  db.query(sql, [userId], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (results.length === 0)
-      return res.status(404).json({ error: "User not found" });
-    res.json(results[0]);
-  });
-});
+// Configure Multer to use memory storage (for image Buffer)
+const memoryStorage = multer.memoryStorage();
+const uploadMemory = multer({ storage: memoryStorage });
 
 // GET /announcements – return all announcements sorted by date DESC
 app.get("/announcements", (req, res) => {
@@ -151,30 +126,6 @@ app.get("/announcements", (req, res) => {
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
-  });
-});
-
-// POST /upload – handle image upload
-app.post("/upload", upload.single("image"), (req, res) => {
-  if (!req.file)
-    return res.status(400).json({ error: "No file uploaded" });
-  const imageUrl = req.protocol + "://" + req.get("host") + "/uploads/" + req.file.filename;
-  res.json({ imageUrl });
-});
-
-// POST /deleteImage – delete an uploaded image file
-app.post("/deleteImage", (req, res) => {
-  const { imageUrl } = req.body;
-  if (!imageUrl)
-    return res.status(400).json({ error: "No image URL provided" });
-  const baseUrl = req.protocol + "://" + req.get("host") + "/";
-  const filePath = imageUrl.replace(baseUrl, "");
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.error("Error deleting file:", err);
-      return res.status(500).json({ error: "Error deleting file" });
-    }
-    res.json({ message: "File deleted successfully" });
   });
 });
 
@@ -212,7 +163,7 @@ app.post("/announcements", (req, res) => {
   });
 });
 
-// PUT /announcements/:id – update an announcement
+// PUT /announcements/:id – update an announcement (used to update details with image tags)
 app.put("/announcements/:id", (req, res) => {
   const id = req.params.id;
   const { headline, detail, currentUserId, currentUserRole } = req.body;
@@ -253,14 +204,58 @@ app.put("/announcements/:id", (req, res) => {
   });
 });
 
-// DELETE /announcements/:id – delete an announcement and its referenced images
+// POST /announcements/:id/uploadImage – upload an image for a given announcement (store binary data in DB)
+app.post('/announcements/:id/uploadImage', uploadMemory.single('image'), (req, res) => {
+  const announcementId = req.params.id;
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+  const imageBuffer = req.file.buffer;
+  const announcementImageId = uuidv4().replace(/-/g, "").substring(0, 20);
+  
+  const sqlInsert = `
+    INSERT INTO announcement_image (Announcement_IMAGE_ID, Announcement_ID, A_IMAGE)
+    VALUES (?, ?, ?)
+  `;
+  db.query(sqlInsert, [announcementImageId, announcementId, imageBuffer], (err, result) => {
+    if (err) {
+      console.error("Error inserting image into DB:", err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ message: "Image uploaded successfully", announcementImageId });
+  });
+});
+
+// GET /announcements/:announcementId/image/:imageId – serve an image from the DB
+app.get('/announcements/:announcementId/image/:imageId', (req, res) => {
+  const { announcementId, imageId } = req.params;
+  const sql = 'SELECT A_IMAGE FROM announcement_image WHERE Announcement_IMAGE_ID = ? AND Announcement_ID = ?';
+  db.query(sql, [imageId, announcementId], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: "Image not found" });
+    const imageBuffer = results[0].A_IMAGE;
+    res.writeHead(200, {
+      'Content-Type': 'image/jpeg',
+      'Content-Length': imageBuffer.length
+    });
+    res.end(imageBuffer);
+  });
+});
+
+// DELETE /announcements/:id – delete announcement and associated images from the DB
 app.delete("/announcements/:id", (req, res) => {
   const id = req.params.id;
   const { currentUserId, currentUserRole } = req.body;
+  
   if (currentUserRole.toLowerCase() === "student") {
     return res.status(403).json({ error: "Students are not allowed to delete announcements." });
   }
-  const sqlSelect = `SELECT USER_ID, Announcement_Detail as detail FROM announcement WHERE Announcement_ID = ?`;
+  
+  // First, verify that the announcement exists and is owned by the current user.
+  const sqlSelect = `
+    SELECT USER_ID 
+    FROM announcement 
+    WHERE Announcement_ID = ?`;
   db.query(sqlSelect, [id], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     if (rows.length === 0) return res.status(404).json({ error: "Announcement not found" });
@@ -268,21 +263,24 @@ app.delete("/announcements/:id", (req, res) => {
     if (currentUserId !== announcementUserId) {
       return res.status(403).json({ error: "Not authorized to delete this announcement" });
     }
-    const detail = rows[0].detail;
-    const regex = /<img\s+[^>]*src=['"]([^'"]+)['"]/gi;
-    let match;
-    while ((match = regex.exec(detail)) !== null) {
-      const imageUrl = match[1];
-      const filePath = imageUrl.replace(req.protocol + "://" + req.get("host") + "/", "");
-      fs.unlink(filePath, (err) => {
-        if (err) console.error("Error deleting file:", err);
+    
+    // Delete images associated with the announcement
+    const sqlDeleteImages = `DELETE FROM announcement_image WHERE Announcement_ID = ?`;
+    db.query(sqlDeleteImages, [id], (err) => {
+      if (err) {
+        console.error("Error deleting announcement images:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      // Now delete the announcement record.
+      const sqlDelete = `DELETE FROM announcement WHERE Announcement_ID = ?`;
+      db.query(sqlDelete, [id], (err, result) => {
+        if (err) {
+          console.error("Error deleting announcement:", err);
+          return res.status(500).json({ error: err.message });
+        }
+        if (result.affectedRows === 0) return res.status(404).json({ error: "Announcement not found" });
+        res.json({ message: "Announcement deleted successfully" });
       });
-    }
-    const sqlDelete = `DELETE FROM announcement WHERE Announcement_ID = ?`;
-    db.query(sqlDelete, [id], (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (result.affectedRows === 0) return res.status(404).json({ error: "Announcement not found" });
-      res.json({ message: "Announcement deleted successfully" });
     });
   });
 });

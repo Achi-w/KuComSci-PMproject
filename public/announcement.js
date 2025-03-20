@@ -1,45 +1,45 @@
-// Global array to store uploaded image URLs
-let uploadedImageUrls = [];
+// announcement.js
 
-// Helper function to strip HTML tags for search filtering
-function stripHTML(html) {
-  let tempDiv = document.createElement("div");
-  tempDiv.innerHTML = html;
-  return tempDiv.textContent || tempDiv.innerText || "";
-}
-
+// Global variables
+let selectedImageFiles = [];
 let announcements = [];
 let deleteId = null;
 let currentUser = {};
 
+// On page load, check session—if not authenticated, redirect to login page.
 document.addEventListener("DOMContentLoaded", () => {
-  // Fetch announcements and user data when the page loads
+  fetch("/dashboard")
+    .then(res => {
+      if (!res.ok) {
+        window.location.href = "/index.html";
+      }
+      return res.json();
+    })
+    .then(data => {
+      if (!data.success) {
+        window.location.href = "/index.html";
+      }
+      currentUser = data.user;
+      initializePage();
+    })
+    .catch(err => {
+      console.error("Session check failed:", err);
+      window.location.href = "/index.html";
+    });
+});
+
+function initializePage() {
   fetchAnnouncements();
 
   document.getElementById("searchBar").addEventListener("input", filterAnnouncements);
   document.getElementById("postBtn").addEventListener("click", openPostModal);
 
-  document.getElementById("cancelPost").addEventListener("click", function () {
-    // When cancelling, delete all uploaded images for this post.
-    if (uploadedImageUrls.length > 0) {
-      uploadedImageUrls.forEach(url => {
-        fetch("/deleteImage", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageUrl: url })
-        })
-          .then(res => res.json())
-          .then(() => {
-            console.log("Deleted image:", url);
-          })
-          .catch(err => console.error("Error deleting image:", err));
-      });
-      uploadedImageUrls = [];
-    }
+  document.getElementById("cancelPost").addEventListener("click", () => {
+    selectedImageFiles = [];
     closePostModal();
   });
 
-  document.getElementById("postNow").addEventListener("click", function () {
+  document.getElementById("postNow").addEventListener("click", () => {
     const headline = document.getElementById("postHeadline").value.trim();
     const detail = document.getElementById("postDetail").value.trim();
     if (!headline || !detail) {
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("confirmDelete").addEventListener("click", handleDelete);
   document.getElementById("confirmDeleteSuccess").addEventListener("click", closeDeleteSuccessModal);
 
-  // When Upload Image button is clicked, trigger file selection
+  // Set up file selection for image upload.
   const uploadBtn = document.getElementById("uploadImageBtn");
   if (uploadBtn) {
     uploadBtn.addEventListener("click", () => {
@@ -66,76 +66,35 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Upload Image button not found");
   }
 
-  // When a file is selected, upload it immediately and store its URL
+  // When a file is selected, queue it and insert a placeholder.
   const uploadInput = document.getElementById("uploadImageInput");
   if (uploadInput) {
     uploadInput.addEventListener("change", function () {
       const file = this.files[0];
       if (!file) return;
-      const formData = new FormData();
-      formData.append("image", file);
-      fetch("/upload", {
-        method: "POST",
-        body: formData,
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.imageUrl) {
-            uploadedImageUrls.push(data.imageUrl);
-            console.log("Image uploaded:", data.imageUrl);
-            const textarea = document.getElementById("postDetail");
-            textarea.value += "\n<img src='" + data.imageUrl + "' alt='Announcement Image'>";
-          }
-        })
-        .catch(err => console.error(err));
-      // Clear the file input so the same file can be reselected later.
+      selectedImageFiles.push(file);
+      const detailTextarea = document.getElementById("postDetail");
+      detailTextarea.value += " [[IMG]] ";
+      console.log("Image file queued and placeholder added:", file.name);
       this.value = "";
     });
   }
 
-  // Retrieve the logged-in user from the dashboard route
-  fetch("/dashboard")
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        currentUser = data.user;
-        document.getElementById("userName").textContent =
-          currentUser.USER_Name + " " + currentUser.USER_Surname;
-        if (currentUser.USER_Role.toLowerCase() === "student") {
-          document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-        } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
-          document.getElementById("roleTitle").textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-        } else if (currentUser.USER_Role.toLowerCase() === "admin") {
-          document.getElementById("roleTitle").textContent = "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
-        }
-        if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
-          document.getElementById("postBtn").style.display = "inline-block";
-        }
-      } else {
-        console.error("User not authenticated");
-      }
-    })
-    .catch(err => console.error(err));
-
-  // Logout button event – when clicked, call the logout route, clear local data, and redirect to login.
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    fetch("/logout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          currentUser = {};
-          announcements = [];
-          window.location.href = "index.html"; // redirect to login page
-        } else {
-          console.error("Logout failed.");
-        }
-      })
-      .catch(err => console.error("Error during logout:", err));
-  });
-});
+  // Populate user info on page.
+  document.getElementById("userName").textContent = currentUser.USER_Name + " " + currentUser.USER_Surname;
+  if (currentUser.USER_Role.toLowerCase() === "student") {
+    document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+    const bookingLink = document.getElementById("bookingLink");
+    if (bookingLink) bookingLink.textContent = "ห้องเรียนและห้องสอบ";
+  } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
+    document.getElementById("roleTitle").textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+  } else if (currentUser.USER_Role.toLowerCase() === "admin") {
+    document.getElementById("roleTitle").textContent = "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+  }
+  if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
+    document.getElementById("postBtn").style.display = "inline-block";
+  }
+}
 
 function openValidationModal() {
   document.getElementById("validationModal").style.display = "block";
@@ -203,16 +162,23 @@ function filterAnnouncements() {
   renderAnnouncements(filtered);
 }
 
+function stripHTML(html) {
+  let tempDiv = document.createElement("div");
+  tempDiv.innerHTML = html;
+  return tempDiv.textContent || tempDiv.innerText || "";
+}
+
 function openPostModal() {
-  // Clear fields when opening the modal
   document.getElementById("postHeadline").value = "";
   document.getElementById("postDetail").value = "";
-  uploadedImageUrls = [];
+  selectedImageFiles = [];
   document.getElementById("postAuthor").value = currentUser ? currentUser.USER_ID : "";
   document.getElementById("postRole").textContent = currentUser ? currentUser.USER_Role : "";
-  document.getElementById("postDate").value = new Date().toISOString().split("T")[0];
+  // Set the date using Thai time (only the date portion)
+  document.getElementById("postDate").value = getThaiDate();
   document.getElementById("postModal").style.display = "block";
 }
+
 function closePostModal() {
   document.getElementById("postModal").style.display = "none";
 }
@@ -270,12 +236,62 @@ function postAnnouncement(author, date, headline, detail) {
     .then(newAnnouncement => {
       announcements.push(newAnnouncement);
       renderAnnouncements(announcements);
-      openPostSuccessModal();
+      if (selectedImageFiles.length > 0) {
+        uploadImagesForAnnouncement(newAnnouncement.id)
+          .then(uploadResults => {
+            let updatedDetail = document.getElementById("postDetail").value;
+            uploadResults.forEach(result => {
+              const imgTag = `<img src="/announcements/${newAnnouncement.id}/image/${result.announcementImageId}" alt="Announcement Image">`;
+              updatedDetail = updatedDetail.replace('[[IMG]]', imgTag);
+            });
+            fetch(`/announcements/${newAnnouncement.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                headline: newAnnouncement.headline,
+                detail: updatedDetail,
+                currentUserId: currentUser.USER_ID,
+                currentUserRole: currentUser.USER_Role
+              })
+            })
+              .then(res => res.json())
+              .then(updatedAnnouncement => {
+                announcements = announcements.map(ann =>
+                  ann.id === updatedAnnouncement.id ? updatedAnnouncement : ann
+                );
+                renderAnnouncements(announcements);
+                openPostSuccessModal();
+              })
+              .catch(err => {
+                console.error("Error updating announcement detail:", err);
+                openPostSuccessModal();
+              });
+          })
+          .catch(err => {
+            console.error("Error uploading images:", err);
+            openPostSuccessModal();
+          });
+      } else {
+        openPostSuccessModal();
+      }
     })
     .catch(err => {
       console.error(err);
       alert("Error posting announcement.");
     });
+}
+
+function uploadImagesForAnnouncement(announcementId) {
+  let promises = selectedImageFiles.map(file => {
+    const formData = new FormData();
+    formData.append("image", file);
+    return fetch(`/announcements/${announcementId}/uploadImage`, {
+      method: "POST",
+      body: formData,
+    }).then(res => res.json());
+  });
+  selectedImageFiles = [];
+  return Promise.all(promises);
 }
 
 function handleDelete() {
@@ -295,4 +311,9 @@ function handleDelete() {
       openDeleteSuccessModal();
     })
     .catch(err => console.error(err));
+}
+
+// Helper function to get the current date in Thai time (Asia/Bangkok) in YYYY-MM-DD format.
+function getThaiDate() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' });
 }

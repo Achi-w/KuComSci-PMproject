@@ -42,6 +42,19 @@
       text-decoration: none;
       color: #000;
     }
+    /* Additional rules for hover and active highlight */
+    .left-nav ul li a {
+      display: block;
+      text-decoration: none;
+      color: black;
+      transition: background 0.3s, color 0.3s;
+    }
+    .left-nav ul li a:hover,
+    .left-nav ul li a:active,
+    .left-nav ul li a.active {
+      background: #8E8E8E;
+      color: black;
+    }
     /* TOP BAR */
     .top-bar {
       position: fixed;
@@ -60,12 +73,16 @@
     .top-bar .left {
       font-size: 1.2rem;
     }
+    .top-bar .right {
+      display: flex;
+      align-items: center;
+    }
     .top-bar .right span {
       margin-right: 10px;
     }
     /* MAIN CONTENT */
     .main-content {
-      margin-left: 200px;
+      margin-left: 215px;
       margin-top: 50px;
       min-height: calc(100vh - 50px);
       box-sizing: border-box;
@@ -191,31 +208,89 @@
       background-color: #58ff49;
     }
   </style>
+  <!-- Prevent caching -->
+  <meta http-equiv="Cache-Control" content="no-store" />
 </head>
 <body>
-  <!-- Top bar -->
+  <!-- Top bar (unchanged layout) -->
   <div class="top-bar">
     <div class="left" id="roleTitle"></div>
     <div class="right">
       <span id="userName"></span>
-      <button id="logoutBtn">Logout</button>
+      <!-- FRIEND'S LOGOUT CODE STARTS HERE -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+      <style>
+        .logout-button {
+          background: none;
+          border: none;
+          color: white;
+          margin-left: 10px;
+          cursor: pointer;
+          padding: 10px;
+        }
+        .logout-button:hover {
+          background-color: #8E8E8E;
+        }
+      </style>
+      <button id="logout-button" class="logout-button">
+        <i class="fa-solid fa-power-off power-icon"></i>
+      </button>
+      <link rel="stylesheet" href="/styles/dialog-styles.css">
+      <!-- Dialog Container (Hidden by default) -->
+      <div id="dialogContainer" class="dialog-container" style="display: none;">
+        <div class="dialog-backdrop"></div>
+        <div class="dialog-box">
+          <div class="dialog-content">
+            <p id="dialogMessage" style="color: black;">คุณต้องการออกจากระบบหรือไม่?</p>
+          </div>
+          <div class="dialog-actions" id="dialogActions">
+            <!-- Buttons will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+      <script src="/script/dialog-script.js"></script>
+      <script>
+        const logoutButton = document.getElementById('logout-button');
+        logoutButton.addEventListener('click', () => {
+          if (typeof DialogManager === "undefined") {
+            console.error("DialogManager is not defined. Check if dialog-script.js is loaded.");
+            return;
+          }
+          const dialogManager = new DialogManager();
+          dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+            fetch("/logout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                window.location.href = "/index.html";
+              } else {
+                console.error("Logout failed.");
+              }
+            })
+            .catch(err => console.error("Error during logout:", err));
+          }, null);
+        });
+      </script>
+      <!-- FRIEND'S LOGOUT CODE ENDS HERE -->
     </div>
   </div>
 
-  <!-- Left navigation menu -->
+  <!-- Left navigation menu (unchanged) -->
   <div class="left-nav">
     <img src="favicon.ico" alt="Logo" />
     <ul>
-      <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
-      <li><a href="ooooooooo">รวมตารางสอบและข้อสอบ</a></li>
+      <li><a href="announcement.html" class="active">ประกาศทางภาควิชา</a></li>
       <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
       <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
       <li><a href="profMain.html">ช่องทางการติดต่ออาจารย์</a></li>
-      <li><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+      <li><a href="/roomBooking/studyRoom" id="bookingLink">จองห้องและย้ายห้อง</a></li>
     </ul>
   </div>
 
-  <!-- Main content area -->
+  <!-- Main content area (unchanged) -->
   <div class="main-content">
     <div class="content-container">
       <!-- Search + Post button area -->
@@ -223,7 +298,6 @@
         <div class="search-container">
           <input type="text" id="searchBar" placeholder="ค้นหาโพสต์ " />
         </div>
-        <!-- Post button shown only for professors/admins -->
         <button id="postBtn">สร้างประกาศ</button>
       </div>
       <!-- Announcements list -->
@@ -231,14 +305,13 @@
     </div>
   </div>
 
-  <!-- Post Modal -->
+  <!-- Post Modal and other modals (unchanged) -->
   <div id="postModal" class="modal">
     <div class="modal-content">
       <h3>สร้างประกาศ</h3>
       <div style="color: #ffffff; margin-bottom: 8px;">
         <strong>Role:</strong> <span id="postRole"></span>
       </div>
-      <!-- Here we revert to showing the user ID (as a fallback) -->
       <input type="text" id="postAuthor" disabled placeholder="User ID" />
       <input type="text" id="postDate" disabled />
       <input type="text" id="postHeadline" placeholder="เพิ่มหัวเรื่อง" />
@@ -252,7 +325,6 @@
     </div>
   </div>
 
-  <!-- Post Confirmation Modal -->
   <div id="postConfirmModal" class="modal">
     <div class="modal-content">
       <p>คุณตกลงที่จะโพสต์หรือไม่?</p>
@@ -263,7 +335,6 @@
     </div>
   </div>
 
-  <!-- Validation Modal -->
   <div id="validationModal" class="modal">
     <div class="modal-content">
       <p>ไม่สามารถโพสต์ประกาศได้กรุณากรอกข้อมูลให้ครบ</p>
@@ -271,7 +342,6 @@
     </div>
   </div>
 
-  <!-- Post Success Modal -->
   <div id="postSuccessModal" class="modal">
     <div class="modal-content">
       <p>โพสต์ถูกอัปโหลดสำเร็จแล้ว</p>
@@ -279,7 +349,6 @@
     </div>
   </div>
 
-  <!-- Delete Confirmation Modal -->
   <div id="deleteConfirmModal" class="modal">
     <div class="modal-content">
       <h3>คุณตกลงที่จะลบโพสต์หรือไม่?</h3>
@@ -291,7 +360,6 @@
     </div>
   </div>
 
-  <!-- Delete Success Modal -->
   <div id="deleteSuccessModal" class="modal">
     <div class="modal-content">
       <p>โพสต์ถูกลบสำเร็จแล้ว</p>
