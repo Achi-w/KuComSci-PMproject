@@ -5,9 +5,9 @@
     </script>
     
     <div class="tabs">
-        <a href="/roomBooking/studyRoom" class="tab-link <%= (bookType === 'study_room' ? 'active' : '') %>" id="study-room-schedule">จองห้องเรียน</a>
-        <a href="/roomBooking/midtermRoom" class="tab-link <%= (bookType === 'midterm_room' ? 'active' : '') %>" id="midterm-exam-schedule">จองห้องสอบกลางภาค</a>
-        <a href="/roomBooking/finalRoom" class="tab-link <%= (bookType === 'final_room' ? 'active' : '') %>" id="final-exam-schedule">จองห้องสอบปลายภาค</a>
+        <a href="/roomBooking/studyRoom" class="tab-link <%= (bookType === 'study_room' ? 'active' : '') %>" id="study-room-schedule"><% if (isTeacher) {%>จอง<%}%>ห้องเรียน</a>
+        <a href="/roomBooking/midtermRoom" class="tab-link <%= (bookType === 'midterm_room' ? 'active' : '') %>" id="midterm-exam-schedule"><% if (isTeacher) {%>จอง<%}%>ห้องสอบกลางภาค</a>
+        <a href="/roomBooking/finalRoom" class="tab-link <%= (bookType === 'final_room' ? 'active' : '') %>" id="final-exam-schedule"><% if (isTeacher) {%>จอง<%}%>ห้องสอบปลายภาค</a>
         <% if (isTeacher) { %>
         <a href="#" class="tab-link reserve-room" id="to-book-form"> จอง<%= label %></a>
         <% } %>
