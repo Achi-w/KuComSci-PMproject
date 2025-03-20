@@ -1,0 +1,310 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;;
+}
+
+body {
+    background-color: white;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background-color: #BABABA;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    width: 25vw;
+    padding-top: 20px;
+    gap: 50px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.logo img {
+    width: 150px;
+    height: 130px;
+
+    @media screen and (max-width: 1280px){
+        width: 120px;
+        height: 100px;
+    }
+}
+
+.nav-menu {
+    width: 100%;
+}
+.nav-menu ul {
+    list-style: none;
+    width: 100%;
+}
+
+.nav-menu li {
+    text-align: left;
+    padding-left: 10px;
+    width: 100%;
+    padding-left: 20px;
+    padding: 10px 0;
+    border: none;
+}
+
+.nav-menu a {
+    margin-left: 55px;
+    display: block;
+    color: black;
+    text-decoration: none;
+    font-size: 1em;
+}
+
+.nav-menu li:hover, .nav-menu a.active {
+    background-color: #8E8E8E;
+}
+
+.nav-menu li.active {
+    background-color: #8E8E8E;
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+
+}
+
+.top-header {
+    top: 0;
+    position: sticky;
+    display: flex;
+    height: 50px;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #525252;
+    color: #ffffff;
+    padding: 0px 20px;
+}
+
+.site-title {
+    font-size: 1.2rem;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.logout-button:hover {
+    background-color: #8E8E8E;
+}
+
+.content-area {
+    padding: 20px;
+}
+
+.page-title {
+    margin: 1.6vh 5vw;
+    font-size: 1.7em;
+    font-weight: normal;
+}
+
+/* Tab Styles */
+.tabs {
+    display: flex;
+    width: 80%;
+    margin: 30px auto;
+}
+
+.tab-link {
+    font-size: 1.1em;
+    padding: 10px 25px;
+    margin-right: 10px;
+    background-color: #00B5C7;
+    color: black;
+    text-decoration: none;
+    border: solid 1px black;
+    transition: all 0.2s ease;
+}
+
+.tab-link.active {
+    background-color: #49EDFF; /* Even darker shade */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Reduced shadow */
+}
+
+.tab-link:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transform: translateY(-2px); /* Slight upward movement */
+}
+
+.tab-link.reserve-room {
+    background-color: #58FF49;
+    margin-left: auto;
+}
+
+/* Schedule Table Styles */
+.room-schedule {
+    height: 65vh;
+    width: 80%;
+    margin-right: auto;
+    margin-left: auto;
+    background-color: #D9D9D9;
+    border: 1px solid #787878;
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+/* Custom scrollbar styling */
+.room-schedule::-webkit-scrollbar {
+    width: 20px; /* Width of scrollbar */
+}
+
+.room-schedule::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Light gray track */
+}
+
+.room-schedule::-webkit-scrollbar-thumb {
+    background-image: url('/images/scrollbar.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #BCBABA;
+    border: solid 1px #565555;
+}
+
+
+
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    height: 100%;
+
+}
+
+.schedule-row {
+    display: flex;
+}
+
+.header-row {
+    background-color: #787878;
+    color: white;
+}
+
+.column {
+    padding: 10px;
+}
+
+.date-column {
+    width: 200px;
+    background-color: #787878;
+    color: white;
+}
+
+.course-column {
+    flex: 1;
+}
+
+.edit-column {
+    width: 100px;
+}
+
+.no-schedule {
+    text-align: center;
+    padding: 10px;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    font-size: 1.2rem;
+}
+
+
+.time-column {
+    width: 200px;
+    padding: 0 auto;
+}
+
+.details-column {
+    flex: 1;
+}
+
+.room-column {
+    width: 200px;
+}
+
+.room-row {    
+    border-bottom: solid 1px #787878;
+}
+
+.edit-btn {
+    background-color: #FF9B43;
+    border: solid 1px black;
+    padding: 8px 20px;
+    cursor: pointer;
+}
+
+.edit-btn:hover {
+    background-color: rgb(218, 119, 14);
+    
+}
+
+.course-id, .student-count, .instructor {
+    margin-bottom: 5px;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab-link {
+        margin-bottom: 5px;
+    }
+    
+    .schedule-row {
+        flex-wrap: wrap;
+    }
+    
+    .date-column, .time-column, .room-column {
+        width: 100%;
+    }
+
+    .tab-link.reserve-room {
+        margin-left: 0;
+    }
+}
+
+

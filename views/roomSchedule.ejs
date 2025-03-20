@@ -1,0 +1,53 @@
+<div class="content-area">
+    <h2 class="page-title">ตารางจองห้องเรียน/จองห้องสอบ</h2>
+    <script>
+        const bookType = `<%= bookType %>`;
+    </script>
+    
+    <div class="tabs">
+        <a href="/roomBooking/studyRoom" class="tab-link <%= (bookType === 'study_room' ? 'active' : '') %>" id="study-room-schedule">จองห้องเรียน</a>
+        <a href="/roomBooking/midtermRoom" class="tab-link <%= (bookType === 'midterm_room' ? 'active' : '') %>" id="midterm-exam-schedule">จองห้องสอบกลางภาค</a>
+        <a href="/roomBooking/finalRoom" class="tab-link <%= (bookType === 'final_room' ? 'active' : '') %>" id="final-exam-schedule">จองห้องสอบปลายภาค</a>
+        <% if (isTeacher) { %>
+        <a href="#" class="tab-link reserve-room" id="to-book-form"> จอง<%= label %></a>
+        <% } %>
+    </div>
+    
+    <div class="room-schedule">
+        <div class="schedule-table">
+            <% if (scheduleList && scheduleList.length > 0) { %>
+                <% scheduleList.forEach(function(schedule) { %>
+                    <div class="schedule-row header-row">
+                        <div class="column date-column" id="<%= schedule.room_schedule_id %>_date"><%= schedule.dateString %></div>
+                        <div class="column course-column" id="<%= schedule.room_schedule_id %>_coursename"><%= schedule.course_name %></div>
+                        <div class="column edit-column">
+                            <% if (isTeacher) { %>
+                            <button class="edit-btn" id="<%= schedule.room_schedule_id %>_edit">Edit</button>
+                            <% } %>
+                        </div>
+                        
+                    </div>
+                    <div class="schedule-row details-row">
+                        <div class="column time-column" id="<%= schedule.room_schedule_id %>_time"><%= schedule.timeString %></div>
+                        <div class="column details-column">
+                            <div class="course-id" id="<%= schedule.room_schedule_id %>_courseid">รหัสวิชา <%= schedule.course_id %></div>
+                            <div class="student-count" id="<%= schedule.room_schedule_id %>_studentcount">หมู่เรียน <%= schedule.sec_number %></div>
+                        </div>
+                    </div>
+                    <div class="schedule-row room-row">
+                        <div class="column room-column"><%= label %> <%= schedule.room_id %></div>
+                        <div class="column details-column">
+                            <div class="instructor">อ.ผู้สอน <%= schedule.full_name %></div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class ="no-schedule"> ไม่มีกำหนดการจองในขณะนี้ </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script src="/script/schedule-script.js"></script>
+
+

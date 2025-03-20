@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบตารางสอนและห้องสอบ - ภาควิชาวิทยาการคอมพิวเตอร์</title>
+    <link rel="stylesheet" href="/styles/schedule-styles.css">
+    <link rel="stylesheet" href="/styles/dialog-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="/favicon.ico" alt="CS KU Logo">
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="/announcement.html">ประกาศทางภาควิชา</a></li>
+                    <li><a href="#">รวมตารางสอบและห้องสอบ</a></li>
+                    <li><a href="#">รีวิวภาควิชา</a></li>
+                    <li><a href="/addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
+                    <li><a href="#">ช่องทางการติดต่ออาจารย์</a></li>
+                    <li class="active"><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main-content">
+            <header class="top-header">
+                <div class="site-title">Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์</div>
+                <div class="user-section">
+                    <span><%= user_full_name %></span>
+                    <button class="logout-button">
+                        <i class="fa-solid fa-power-off power-icon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main content will be inserted here -->
+            <%- body %>
+            
+        
+        </div>
+    </div>
+    
+    <!-- <script src="/js/main.js"></script> -->
+</body>
+</html>
+<%- include('../dialogComponent') %>
+<script src="/script/dialog-script.js"></script>
+
+<script>
+    const logoutButton = document.querySelector('.logout-button');
+    logoutButton.addEventListener('click', () => {
+        const dialogManager = new DialogManager();
+        dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+            fetch("/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                currentUser = {};
+                announcements = [];
+                window.location.href = "/index.html"; // redirect to login page
+                } else {
+                console.error("Logout failed.");
+                }
+            })
+            .catch(err => console.error("Error during logout:", err));
+            }, null);
+
+        });
+</script>

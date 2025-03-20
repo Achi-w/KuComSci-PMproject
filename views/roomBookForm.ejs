@@ -1,0 +1,98 @@
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/styles/booking-styles.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+
+
+<div class="booking-container">
+  
+    <script>
+    const bookType = `<%= bookType %>`;
+    const bookAction = `<%= bookAction %>`;
+
+    <% 
+    // Group sections by course
+    const courseMap = {};
+    courses.forEach(function(course) {
+      if (!courseMap[course.course_id]) {
+        courseMap[course.course_id] = {
+          course_id: course.course_id,
+          course_name: course.course_name,
+          sections: []
+        };
+      }
+      courseMap[course.course_id].sections.push(course.sec);
+    });
+    %>
+
+    const courseOptions = Object.values(<%- JSON.stringify(courseMap) %>);
+    
+    </script>
+    <div class="booking-form-card">
+      <h2 class="form-title"><% if (bookAction=='edit') {%>แก้ไข<% }%>ข้อมูลการจอง<%= label %></h2>
+      
+      <form id="roomBookingForm" action="/check-availability" method="POST">
+        <!-- Course Information Section -->
+        <div class="form-group">
+          <select id="courseSelect" class="form-control" required>
+            <option value="" disabled selected>เลือกรายวิชา</option>
+          </select>
+          <input type="hidden" id="courseCode" name="courseCode">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group half">
+            <select id="section" name="section" class="form-control" disabled required>
+              <option value="" disabled selected>เลือกหมู่เรียน</option>
+            </select>
+          </div>
+          <div class="form-group half">
+            <div class="input-with-icon">
+              <input type="text" id="bookingDate" name="bookingDate" class="form-control" placeholder="DD/MM/YY" required>
+              <span class="dropdown-icon">:</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Date and Time Selection Section -->
+        <div class="form-row">
+          <div class="form-group half">
+            <div class="input-with-icon">
+              <input type="text" id="startTime" name="startTime" class="form-control" placeholder="Start Time" required>
+              <span class="dropdown-icon">:</span>
+            </div>
+          </div>
+          <div class="form-group half">
+            <div class="input-with-icon">
+              <input type="text" id="endTime" name="endTime" class="form-control" placeholder="End Time" required>
+              <span class="dropdown-icon">:</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-cancel">ยกเลิก</button>
+          <button type="button" id="checkAvailability" class="btn btn-check">ตรวจสอบห้องว่าง</button>
+        </div>
+      </form>
+      
+      <!-- Available Rooms Section (Initially Hidden) -->
+      <div id="availableRoomsSection" class="available-rooms-section" style="display: none;">
+        <h3>ห้องว่างตามเวลาที่เลือก</h3>
+        <div class="room-list">
+          <!-- Room items will be dynamically added here -->
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" id="backToForm" class="btn btn-cancel">ย้อนกลับ</button>
+          <button type="button" id="confirmBooking" class="btn btn-submit">ยืนยันการจอง</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/script/booking-script.js"></script>
+

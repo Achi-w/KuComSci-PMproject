@@ -962,6 +962,19 @@ app.get('/api/reauth',(req,res)=>{
 })
 //-------------------------------harry------------------------------
 
+// -------------------------
+// Booking Layout Setup
+// -------------------------
+const expressLayouts = require('express-ejs-layouts');
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+app.set('layout', 'layouts/layout');
+app.use(expressLayouts);
+
+const roomBookingRouter = require('./routers/RoomBookingRouter.js');
+app.use('/roomBooking', roomBookingRouter);
+//-------------------------------Frame------------------------------
+
 
 // -------------------------
 // Start the Server
