@@ -17,11 +17,14 @@
             <nav class="nav-menu">
                 <ul>
                     <li><a href="/announcement.html">ประกาศทางภาควิชา</a></li>
-                    <li><a href="#">รวมตารางสอบและห้องสอบ</a></li>
-                    <li><a href="#">รีวิวภาควิชา</a></li>
+                    <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
                     <li><a href="/addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
                     <li><a href="#">ช่องทางการติดต่ออาจารย์</a></li>
-                    <li class="active"><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+                    <% if (isTeacher) { %>
+                        <li class="active"><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+                    <% }else  {%>
+                        <li class="active"><a href="/roomBooking/studyRoom">ห้องเรียนและห้องสอบ</a></li>
+                    <%} %>
                 </ul>
             </nav>
         </div>
