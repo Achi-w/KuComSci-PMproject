@@ -228,8 +228,12 @@ fetch("/dashboard")
        document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
      } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
        document.getElementById("roleTitle").textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+       alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
+       window.location.href = "index.html"; 
      } else if (currentUser.USER_Role.toLowerCase() === "admin") {
        document.getElementById("roleTitle").textContent = "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+       alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
+       window.location.href = "index.html"; 
      }
      if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
        document.getElementById("postBtn").style.display = "inline-block";
@@ -245,7 +249,7 @@ fetch("/dashboard")
 
 
         // ตรวจสอบค่า courseID และ userID
-        if (!courseID || !currentUser) {
+        if (!courseID || !currentUser || !currentUser.USER_Role.toLowerCase() === "student" ) {
             alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
             window.location.href = "index.html"; // กลับไปหน้าแรก
         }

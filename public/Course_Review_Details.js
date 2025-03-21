@@ -11,7 +11,7 @@ const createReviewButton = document.getElementById('create-review-btn');
 // Format date to YYYY-MM-DD
 const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0]; // Simpler way to get YYYY-MM-DD
+    return date.toISOString().split('T')[0]; 
 };
 
 // Fetch user data
@@ -127,7 +127,7 @@ const deleteReview = async (reviewID) => {
         try {
             await axios.delete(`http://localhost:3000/api/course_review/${reviewID}`);
             alert('ลบรีวิวสำเร็จ!');
-            fetchCourseDetails(); // Refresh data instead of reloading
+            fetchCourseDetails();
         } catch (error) {
             console.error('Error deleting review:', error);
         }
