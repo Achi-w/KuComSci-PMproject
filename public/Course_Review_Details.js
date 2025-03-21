@@ -46,19 +46,7 @@ fetch("/dashboard")
     .catch(err => console.error(err));
 
 
-// Logout Button
-document.getElementById("logoutBtn").addEventListener("click", () => {
-    fetch("/logout", { method: "POST", headers: { "Content-Type": "application/json" } })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = "index.html";
-            } else {
-                console.error("Logout failed.");
-            }
-        })
-        .catch(err => console.error("Error during logout:", err));
-});
+
 
 // Fetch Course and Reviews Data
 const fetchCourseDetails = async () => {

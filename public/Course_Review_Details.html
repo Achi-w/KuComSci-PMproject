@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> 
     <title>Course Review Details</title>
 <style>
 body {
@@ -67,6 +68,18 @@ body {
     #course-details, #course-reviews, h3 {
     margin-left: 230px; /* Ensures content starts after the left-nav */
     padding: 5px;
+}
+.logout-button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.logout-button:hover {
+    background-color: #8E8E8E;
 }
 
     .top-bar {
@@ -190,7 +203,9 @@ body {
     <div class="left" id="roleTitle"></div>
     <div class="right">
       <span id="userName"></span>
-      <button id="logoutBtn">Logout</button>
+      <button id="logout-button" class="logout-button">
+        <i class="fa-solid fa-power-off power-icon"></i>
+   </button>
     </div>
   </div>
     <div id="course-details">
@@ -204,6 +219,53 @@ body {
     <div class="review-actions">
         <button class="create-btn" id="create-review-btn">สร้างรีวิว</button>
     </div>
+
+
+    <link rel="stylesheet" href="/styles/dialog-styles.css">
+<!-- Dialog Container (Hidden by default) -->
+<div id="dialogContainer" class="dialog-container" style="display: none;">
+  <div class="dialog-backdrop"></div>
+  <div class="dialog-box">
+    <div class="dialog-content">
+      <p id="dialogMessage"></p>
+    </div>
+    <div class="dialog-actions" id="dialogActions">
+      <!-- Buttons will be dynamically inserted here -->
+    </div>
+  </div>
+</div>
+<script src="script/dialog-script.js"></script>
+
+    <script>
+      const logoutButton = document.getElementById('logout-button');
+      logoutButton.addEventListener('click', () => {
+        if (typeof DialogManager === "undefined") {
+            console.error("DialogManager is not defined. Check if dialog-script.js is loaded.");
+            return;
+          }
+    
+          const dialogManager = new DialogManager();
+    
+          dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+              fetch("/logout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (data.success) {
+                  currentUser = {};
+                  announcements = [];
+                  window.location.href = "/index.html"; // redirect to login page
+                  } else {
+                  console.error("Logout failed.");
+                  }
+              })
+              .catch(err => console.error("Error during logout:", err));
+              }, null);
+    
+          });
+    </script>
     
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

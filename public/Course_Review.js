@@ -62,24 +62,7 @@ const displayCourses = (courses) => {
  })
  .catch(err => console.error(err));
 
-// Logout button event – when clicked, call the logout route, clear local data, and redirect to login.
-document.getElementById("logoutBtn").addEventListener("click", () => {
- fetch("/logout", {
-   method: "POST",
-   headers: { "Content-Type": "application/json" }
- })
-   .then(res => res.json())
-   .then(data => {
-     if (data.success) {
-       currentUser = {};
-       announcements = [];
-       window.location.href = "index.html"; // redirect to login page
-     } else {
-       console.error("Logout failed.");
-     }
-   })
-   .catch(err => console.error("Error during logout:", err));
-});
+
 
 // ฟังก์ชันค้นหาคอร์ส
 const searchCourses = () => {

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script type="module" src="Create_Course_Review.js"></script>
     <style>
 body {
     margin: 0;
@@ -111,6 +111,18 @@ body {
             border-radius: 5px;
             margin: 5px;
         }
+        .logout-button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.logout-button:hover {
+    background-color: #8E8E8E;
+}
     
         button#submit-review:hover {
             background-color: #218838; /* สีเขียวเข้ม */
@@ -158,7 +170,9 @@ body {
     <div class="left" id="roleTitle"></div>
     <div class="right">
       <span id="userName"></span>
-      <button id="logoutBtn">Logout</button>
+      <button id="logout-button" class="logout-button">
+        <i class="fa-solid fa-power-off power-icon"></i>
+   </button>
     </div>
   </div>
         <!-- Course Details -->
@@ -227,24 +241,7 @@ fetch("/dashboard")
  })
  .catch(err => console.error(err));
 
-// Logout button event – when clicked, call the logout route, clear local data, and redirect to login.
-document.getElementById("logoutBtn").addEventListener("click", () => {
- fetch("/logout", {
-   method: "POST",
-   headers: { "Content-Type": "application/json" }
- })
-   .then(res => res.json())
-   .then(data => {
-     if (data.success) {
-       currentUser = {};
-       announcements = [];
-       window.location.href = "index.html"; // redirect to login page
-     } else {
-       console.error("Logout failed.");
-     }
-   })
-   .catch(err => console.error("Error during logout:", err));
-});
+
 
 
         // ตรวจสอบค่า courseID และ userID
@@ -332,6 +329,51 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 
         // โหลดรายละเอียดคอร์ส
         fetchCourseDetails();
+    </script>
+    <link rel="stylesheet" href="/styles/dialog-styles.css">
+    <!-- Dialog Container (Hidden by default) -->
+    <div id="dialogContainer" class="dialog-container" style="display: none;">
+      <div class="dialog-backdrop"></div>
+      <div class="dialog-box">
+        <div class="dialog-content">
+          <p id="dialogMessage"></p>
+        </div>
+        <div class="dialog-actions" id="dialogActions">
+          <!-- Buttons will be dynamically inserted here -->
+        </div>
+      </div>
+    </div>
+    <script src="script/dialog-script.js"></script>
+    
+    <script>
+      const logoutButton = document.getElementById('logout-button');
+      logoutButton.addEventListener('click', () => {
+        if (typeof DialogManager === "undefined") {
+            console.error("DialogManager is not defined. Check if dialog-script.js is loaded.");
+            return;
+          }
+    
+          const dialogManager = new DialogManager();
+    
+          dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+              fetch("/logout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (data.success) {
+                  currentUser = {};
+                  announcements = [];
+                  window.location.href = "/index.html"; // redirect to login page
+                  } else {
+                  console.error("Logout failed.");
+                  }
+              })
+              .catch(err => console.error("Error during logout:", err));
+              }, null);
+    
+          });
     </script>
 </body>
 </html>
