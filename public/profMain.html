@@ -5,13 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>profMain</title>
     <link rel="stylesheet" href="styles/profMain.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <div>
-        <input class="search" name="fsrch" id="fsrch" placeholder="Search">
-        <div class="button">
-            <div class="block1">รายชื่ออาจารย์ทั้งหมด</div>
+    <!-- Left navigation menu -->
+    <div class="left-nav">
+        <img src="favicon.ico" alt="Logo" />
+        <ul>
+            <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
+            <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
+            <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
+            <li><a href="profMain.html" class="active">ช่องทางการติดต่ออาจารย์</a></li>
+            <li><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+        </ul>
+    </div>
+    <!-- Top bar -->
+    <div class="top-bar">
+        <div class="left" id="roleTitle"></div>
+        <div class="right">
+            <span id="userName"></span>
+            <button id="logout-button" class="logout-button">
+                <i class="fa-solid fa-power-off power-icon"></i>
+            </button>
         </div>
+    </div>
+
+    <div class="content">
+        <!-- 🔎 Search Box -->
+        <div class="search-container">
+            <input class="search" name="fsrch" id="fsrch" placeholder="Search">
+        </div>
+
+        <!-- Container สำหรับแสดงข้อมูลอาจารย์ -->
         <div id="professor-list"></div> 
     </div>
 
@@ -25,16 +50,12 @@
                 const userData = await userResponse.json();
                 const user = userData.info;
 
-                console.log("User Role:", user);  // ดูค่าของ role
-
                 const professorList = document.getElementById('professor-list');
                 professorList.innerHTML = '';
 
                 data.forEach(prof => {
                     const isAdmin = user.USER_Role === "Admin";  // ถ้าเป็น Admin
                     const isOwner = user.USER_Role === "Teacher" && user.USER_ID === prof.USER_ID; // ถ้าเป็น Teacher และ USER_ID ตรงกัน
-                    console.log("Is Admin:", isAdmin);  // ตรวจสอบว่าเป็น Admin หรือไม่
-                    console.log("Is Owner:", isOwner);  // ตรวจสอบว่าเป็น Teacher และ USER_ID ตรงกัน
 
                     const professorCard = document.createElement('div');
                     professorCard.classList.add('card');
@@ -59,7 +80,36 @@
                 console.error('Error fetching professors:', error);
             }
         }
-        // เรียกใช้ฟังก์ชันเมื่อโหลดหน้าเว็บ
+        document.addEventListener("DOMContentLoaded", () => {
+  fetch("/dashboard")
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        currentUser = data.user;
+        document.getElementById("userName").textContent =
+          currentUser.USER_Name + " " + currentUser.USER_Surname;
+        if (currentUser.USER_Role.toLowerCase() === "student") {
+          document.getElementById("roleTitle").textContent =
+            "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+        } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
+          document.getElementById("roleTitle").textContent =
+            "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+        } else if (currentUser.USER_Role.toLowerCase() === "admin") {
+          document.getElementById("roleTitle").textContent =
+            "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+        }
+        const postBtn = document.getElementById("postBtn");
+        if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
+          postBtn.style.display = "inline-block";
+        }
+      } else {
+        console.error("User not authenticated");
+        window.location.href = "index.html";
+      }
+    })
+    .catch(err => console.error(err));
+});
+
         window.onload = fetchProfessors;
     </script>
 </body>

@@ -4,31 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Professor</title>
-    <link rel="stylesheet" href="profMain.css">
+    <link rel="stylesheet" href="styles/editProf.css">
 </head>
 <body>
-    <h1>Edit Professor</h1>
-    <form id="edit-form" enctype="multipart/form-data">
-        <label for="USER_Name">Name:</label>
-        <input type="text" id="USER_Name" name="USER_Name" required>
+    <!-- Left navigation menu -->
+    <div class="left-nav">
+        <img src="favicon.ico" alt="Logo" />
+        <ul>
+            <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
+            <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
+            <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
+            <li><a href="profMain.html" class="active">ช่องทางการติดต่ออาจารย์</a></li>
+            <li><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+        </ul>
+    </div>
 
-        <label for="USER_Surname">Surname:</label>
-        <input type="text" id="USER_Surname" name="USER_Surname" required>
+    <!-- Top bar -->
+    <div class="top-bar">
+        <div class="left" id="roleTitle"></div>
+        <div class="right">
+            <span id="userName"></span>
+            <button id="logout-button" class="logout-button">
+                <i class="fa-solid fa-power-off power-icon"></i>
+            </button>
+        </div>
+    </div>
 
-        <label for="USER_Contact_DETAIL">Contact Detail:</label>
-        <input type="text" id="USER_Contact_DETAIL" name="USER_Contact_DETAIL" required>
+    <!-- Main content -->
+    <div class="content">
+        <form id="edit-form" enctype="multipart/form-data">
+            <label for="USER_Name">Name:</label>
+            <input type="text" id="USER_Name" name="USER_Name" required>
 
-        <label for="USER_Room">Room:</label>
-        <input type="text" id="USER_Room" name="USER_Room" required>
+            <label for="USER_Surname">Surname:</label>
+            <input type="text" id="USER_Surname" name="USER_Surname" required>
 
-        <label for="USER_Year">Year:</label>
-        <input type="number" id="USER_Year" name="USER_Year">
+            <label for="USER_Contact_DETAIL">Contact Detail:</label>
+            <input type="text" id="USER_Contact_DETAIL" name="USER_Contact_DETAIL" required>
 
-        <label for="USER_Image">Profile Picture:</label>
-        <input type="file" id="USER_Image" name="USER_Image" accept="image/*">
+            <label for="USER_Room">Room:</label>
+            <input type="text" id="USER_Room" name="USER_Room" required>
 
-        <button type="submit">Update</button>
-    </form>
+            <label for="USER_Year">Year:</label>
+            <input type="number" id="USER_Year" name="USER_Year">
+
+            <label for="USER_Image">Profile Picture:</label>
+            <input type="file" id="USER_Image" name="USER_Image" accept="image/*">
+
+            <button type="submit">Update</button>
+        </form>
+    </div>
 
     <script>
         // ดึง USER_ID จาก URL
@@ -47,6 +72,7 @@
                 document.getElementById('USER_Contact_DETAIL').value = data.USER_Contact_DETAIL;
                 document.getElementById('USER_Room').value = data.USER_Room;
                 document.getElementById('USER_Year').value = data.USER_Year;
+
             } catch (error) {
                 console.error('Error fetching professor data:', error);
             }
@@ -85,6 +111,36 @@
                 console.error('Error updating professor:', error);
             }
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+  fetch("/dashboard")
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        currentUser = data.user;
+        document.getElementById("userName").textContent =
+          currentUser.USER_Name + " " + currentUser.USER_Surname;
+        if (currentUser.USER_Role.toLowerCase() === "student") {
+          document.getElementById("roleTitle").textContent =
+            "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+        } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
+          document.getElementById("roleTitle").textContent =
+            "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+        } else if (currentUser.USER_Role.toLowerCase() === "admin") {
+          document.getElementById("roleTitle").textContent =
+            "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+        }
+        const postBtn = document.getElementById("postBtn");
+        if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
+          postBtn.style.display = "inline-block";
+        }
+      } else {
+        console.error("User not authenticated");
+        window.location.href = "index.html";
+      }
+    })
+    .catch(err => console.error(err));
+});
 
         // เรียกใช้ฟังก์ชันเมื่อโหลดหน้าเว็บ
         window.onload = fetchProfessorData;

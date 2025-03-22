@@ -1,0 +1,128 @@
+/* Styling for Left Navigation */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.left-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 215px;
+    background-color: #bababa;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 500;
+    overflow-y: auto;
+}
+
+.left-nav img {
+    width: 80%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.left-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.left-nav li {
+    margin: 10px 0;
+}
+
+.left-nav a {
+    text-decoration: none;
+    color: #000;
+    display: block;
+    padding: 0px;
+    transition: background 0.3s, color 0.3s;
+}
+
+.left-nav a:hover {
+    background-color: #8E8E8E;
+}
+
+/* Styling for Top Bar */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 215px;
+    right: 0;
+    height: 50px;
+    background-color: #525252;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+}
+
+.top-bar h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+/* Content Styling */
+.content {
+    margin-left: 215px;
+    margin-top: 70px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 70px);
+    box-sizing: border-box;
+}
+
+/* Form Styling */
+form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form input[type="file"] {
+    padding: 0;
+}
+
+form button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #218838;
+}
+
+form input:focus {
+    border-color: #007BFF;
+    outline: none;
+}
