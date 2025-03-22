@@ -510,8 +510,11 @@ app.post('/api/sectionform',(req,res)=>{
               }
           )
       }else{
-
-          if(data.who  === 1){
+          console.log('-------------------------------------------------------------------');
+          console.log(data.who);
+          
+          
+          if(data.who){
             db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
           [idToinsertSec,data.courseId, data.userId,data.sec, userCurr,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
           (err,resutl,fields)=>{
@@ -668,7 +671,6 @@ app.put('/api/sectionform/add',(req,res)=>{
 app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
   console.log('user teacher call section');
   
-  const id = req.params.teacherId;
   if (!req.session.user){
     console.log('user have no right');
 
@@ -677,10 +679,46 @@ app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
       info:'you have no access'
     })
   }
+  
+  
   const teacherId = req.params.teacherId;
 
+  console.log(teacherId);
+  console.log('now go to where admin or teacher');
+  
+  
   if(teacherId == 'admin'){
+    console.log('go to admin');
+    
     db.query(`SELECT Section_Form_ID,Course_ID,SEC,Current_Nisit_Number,Section_Form_start_time,Section_Form_STATUS, Section_Form_Minimum_Nisit, Section_Form_Maximum_Nisit FROM Section_Form WHERE Section_Form_STATUS = 0`,
+    teacherId,(err,result,fields)=>{
+        if(err){
+            console.error(err);
+            return res.status(201).send(
+                {
+                    status:0,
+                    info:'error'
+                }
+            )
+        }else{
+          console.log('complete');
+          console.log(result);
+          
+          return res.status(200).send(
+              {
+                  status:1,
+                  info:result
+              }
+          )  
+        }
+    }
+    )
+  }else{
+    db.query(`SELECT sf.*
+      FROM section_form sf
+      JOIN course c ON sf.Course_ID = c.Course_ID
+      JOIN user_s_course usc ON c.Course_ID = usc.Course_ID
+      WHERE usc.USER_ID = ?`,
     teacherId,(err,result,fields)=>{
         if(err){
             console.error(err);
@@ -701,34 +739,9 @@ app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
         )
 
     }
-    )
+)
+
   }
-  db.query(`SELECT sf.*
-        FROM section_form sf
-        JOIN course c ON sf.Course_ID = c.Course_ID
-        JOIN user_s_course usc ON c.Course_ID = usc.Course_ID
-        WHERE usc.USER_ID = ?`,
-      teacherId,(err,result,fields)=>{
-          if(err){
-              console.error(err);
-              return res.status(201).send(
-                  {
-                      status:0,
-                      info:'error'
-                  }
-              )
-          }
-
-          console.log('complete');
-          return res.status(200).send(
-              {
-                  status:1,
-                  info:result
-              }
-          )
-
-      }
-  )
 
 })
 

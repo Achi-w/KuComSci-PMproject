@@ -27,11 +27,14 @@ const initial = async() =>{
 
     document.querySelector('#accept-btn').addEventListener('click',async()=>{
      
-        if(section.Current_Nisit_Number+1> section.Section_Form_Maximum_Nisit_Number){
+        console.log('find number',section.Current_Nisit_Number+1, section.Section_Form_Maximum_Nisit);
+        
+        if(section.Current_Nisit_Number+1> section.Section_Form_Maximum_Nisit){
             document.querySelector('.pop-up').style.display = 'block';
+            document.querySelector('.decline').style.display = 'none';
+
             document.querySelector('.message').innerHTML = `ขออภัยไม่สามารถลงทะเบียนได้เนื่องจากคนลงทะเบียนเกินจำนวน`;
-            
-            document.querySelector('.decline').addEventListener('click',async ()=>{
+            document.querySelector('.accept').addEventListener('click',async ()=>{
                 document.querySelector('.pop-up').style.display = 'none';
             })
     

@@ -135,7 +135,7 @@ const checkAuth = async()=>{
     const isAuth = await reauth(); 
 
     if(isAuth.status){
-        if(isAuth.info.USER_Role === 'Teacher' && isAuth.info.USER_Role === 'Admin'){
+        if(isAuth.info.USER_Role === 'Teacher' || isAuth.info.USER_Role === 'Admin'){
             if(isAuth.info.USER_Role === 'Teacher'){
                 document.querySelector('#info-header-title').innerHTML = 'Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
             }else{

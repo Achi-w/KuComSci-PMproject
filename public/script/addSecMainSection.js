@@ -11,6 +11,10 @@ let userID = 0;
 
 
 const checkRole = (id,status) =>{
+    console.log('check role');
+    console.log(id,status);
+    
+    
     //check role
     if(status=== 'Accept' || status === 'Decline'){
         return ``;
@@ -20,7 +24,7 @@ const checkRole = (id,status) =>{
         return `
         <a id='link' href='/addNameToSec.html?id=${id}'>
         `;
-    }else if(userRole ===1){
+    }else if(userRole ===1 || userRole ===2){
         return `
         <a id='link' href='/vertifyAddSec.html?id=${id}'>
         `;
@@ -43,10 +47,11 @@ const initial = async ()=>{
     }else{
         if(userRole === 2){
             sections = await fetchNotYetAcceptSectionForm('admin');
-        }
-        console.log('teacher');
+        }else{
+            console.log('teacher');
         
-        sections = await fetchNotYetAcceptSectionForm(userID); //use userid here for techer
+            sections = await fetchNotYetAcceptSectionForm(userID); //use userid here for techer    
+        }
     }
     
     console.log(sections);
@@ -66,8 +71,9 @@ const initial = async ()=>{
         console.log(course);
         
         let status = '';
+        console.log(section.Section_Form_STATUS === 'Open');
         
-        if(section.Section_Form_STATUS === '0'){
+        if(section.Section_Form_STATUS === '0' || section.Section_Form_STATUS === 'Open'){
             status = 'waiting for confirm';
         }else if(section.Section_Form_STATUS === '1'){
             status = 'Accept';

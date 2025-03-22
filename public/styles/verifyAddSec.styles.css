@@ -233,8 +233,8 @@ h1,p{
     display: none;
     position: fixed;
     top: 0%;
-    left: 25%;
-    width: 80%;
+    left: 215px;
+    width: 800%;
     height: 100%;
     z-index: 10;    
     background-color: rgba(0, 0, 0,0.5);
@@ -255,7 +255,6 @@ h1,p{
     z-index: 10;
     padding: 15px;
 }
-
 .accept{
     background-color: #58FF49;
 }
