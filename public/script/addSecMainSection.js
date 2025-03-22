@@ -119,13 +119,19 @@ const initial = async ()=>{
     document.querySelector('.allSubjectBtn').addEventListener('click',async ()=>{
         let html = '';
         let sections ='';
+        console.log('get all');
+        
         if(userRole === 0){
             sections = await fetchSectionForm();
         }else{
             if(userRole === 2){
+                console.log('sections enter admin');
+                
                 sections = await fetchNotYetAcceptSectionForm('admin');
+            }else{
+                sections = await fetchNotYetAcceptSectionForm(userID);
+
             }
-            sections = await fetchNotYetAcceptSectionForm(userID);
         }
 
         console.log(sections);
@@ -185,9 +191,14 @@ const initial = async ()=>{
         return curr.courseName === keyword
     }
 
-    document.querySelector('#search-btn').addEventListener('click',async()=>{
+    document.querySelector('#searchBar').addEventListener('input',async()=>{
         let htmlSearch = '';
+        console.log('serach keyword');
+        
+        
         const searchText = document.querySelector('#searchBar').value;
+        
+        console.log('keyword ', searchText);
         
         let sections ='';
         if(userRole === 0){
@@ -195,10 +206,13 @@ const initial = async ()=>{
         }else{
             if(userRole === 2){
                 sections = await fetchNotYetAcceptSectionForm('admin');
+            }else{
+                sections = await fetchNotYetAcceptSectionForm(userID);
             }
-            sections = await fetchNotYetAcceptSectionForm(userID);
         }
 
+        console.log(sections);
+        
         for(const section of sections){
             console.log(section.course_id);
             

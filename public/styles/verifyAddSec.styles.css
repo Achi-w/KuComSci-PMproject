@@ -1,6 +1,12 @@
 * {
     box-sizing: border-box;
 }
+
+p{
+    font-size: 1.2rem;
+}
+
+
 body{
     font-family: "Inter", sans-serif;
     margin: 0;
@@ -136,12 +142,14 @@ h1,p{
 .info-bar{
     background-color: #525252;
     color: #fff;
-    height: 50px;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
+
+    height: auto;
+    min-height: 50px;
 
    
 }
@@ -190,8 +198,10 @@ h1,p{
 .button-section{
     width: 100%;
     display: flex;
-    justify-content: end;
-    gap: 15px;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 20px 20px;
 }
 
 .name-list{
@@ -227,6 +237,7 @@ h1,p{
 
 #accept-btn,#decline-btn,#delete-btn{
     border: 0;
+    font-size: 1.2rem;
 }
 
 .pop-up{
@@ -253,13 +264,21 @@ h1,p{
     width: 25%;
     position: fixed;
     z-index: 10;
-    padding: 15px;
+    padding: 50px 30px;
+    border-radius: 5px;
+    gap: 20px;
+
 }
+
 .accept{
+    font-size: 1rem;
+    padding: 8px 20px;
     background-color: #58FF49;
 }
 
 .decline{
+    font-size: 1rem;
+    padding: 8px 20px;
     background-color: #FE1515;
 }
 
@@ -283,3 +302,4 @@ h1,p{
 .logout-button:hover {
     background-color: #8E8E8E;
 }
+
