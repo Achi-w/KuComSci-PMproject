@@ -1034,13 +1034,27 @@ app.post('/addProf', professorUpload.single('USER_Image'), (req, res) => {
 // PUT: อัปเดตข้อมูลอาจารย์
 app.put('/updateProf', professorUpload.single('USER_Image'), (req, res) => {
   const { USER_ID, USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year } = req.body;
-  const USER_Image = req.file ? req.file.filename : null; // รับชื่อไฟล์จาก multer
+  const USER_Image = req.file ? req.file.filename : null; // รับชื่อไฟล์ใหม่ (ถ้ามี)
 
-  const sql = `UPDATE user 
-               SET USER_Name = ?, USER_Surname = ?, USER_Contact_DETAIL = ?, USER_Room = ?, USER_Year = ?, USER_Image = ? 
-               WHERE USER_ID = ?`;
+  // ตรวจสอบว่ามีการอัปโหลดรูปภาพหรือไม่
+  let sql;
+  let params;
 
-  db.query(sql, [USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year, USER_Image, USER_ID], (err, result) => {
+  if (USER_Image) {
+      // ถ้ามีการอัปโหลดรูปภาพใหม่ ให้รวม USER_Image ในการอัปเดต
+      sql = `UPDATE user 
+             SET USER_Name = ?, USER_Surname = ?, USER_Contact_DETAIL = ?, USER_Room = ?, USER_Year = ?, USER_Image = ? 
+             WHERE USER_ID = ?`;
+      params = [USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year, USER_Image, USER_ID];
+  } else {
+      // ถ้าไม่มีการอัปโหลดรูปภาพใหม่ ไม่ต้องอัปเดต USER_Image
+      sql = `UPDATE user 
+             SET USER_Name = ?, USER_Surname = ?, USER_Contact_DETAIL = ?, USER_Room = ?, USER_Year = ? 
+             WHERE USER_ID = ?`;
+      params = [USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year, USER_ID];
+  }
+
+  db.query(sql, params, (err, result) => {
       if (err) {
           console.error(err);
           return res.status(500).json({ error: 'Failed to update professor' });
@@ -1048,6 +1062,7 @@ app.put('/updateProf', professorUpload.single('USER_Image'), (req, res) => {
       res.status(200).json({ message: 'Professor updated successfully' });
   });
 });
+
 // GET: ดึงข้อมูลอาจารย์ทั้งหมด (พร้อมภาพ)
 app.get('/getProfessors', (req, res) => {
   const sql = "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Contact_DETAIL, USER_Room, USER_Image FROM user WHERE USER_Role = 'Teacher'";

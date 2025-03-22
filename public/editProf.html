@@ -45,9 +45,6 @@
             <label for="USER_Room">Room:</label>
             <input type="text" id="USER_Room" name="USER_Room" required>
 
-            <label for="USER_Year">Year:</label>
-            <input type="number" id="USER_Year" name="USER_Year">
-
             <label for="USER_Image">Profile Picture:</label>
             <input type="file" id="USER_Image" name="USER_Image" accept="image/*">
 
@@ -71,7 +68,6 @@
                 document.getElementById('USER_Surname').value = data.USER_Surname;
                 document.getElementById('USER_Contact_DETAIL').value = data.USER_Contact_DETAIL;
                 document.getElementById('USER_Room').value = data.USER_Room;
-                document.getElementById('USER_Year').value = data.USER_Year;
 
             } catch (error) {
                 console.error('Error fetching professor data:', error);
@@ -89,7 +85,6 @@
             formData.append('USER_Surname', document.getElementById('USER_Surname').value);
             formData.append('USER_Contact_DETAIL', document.getElementById('USER_Contact_DETAIL').value);
             formData.append('USER_Room', document.getElementById('USER_Room').value);
-            formData.append('USER_Year', document.getElementById('USER_Year').value || 0);
 
             // ถ้ามีการเลือกไฟล์
             if (fileInput.files.length > 0) {
@@ -104,6 +99,7 @@
 
                 if (response.ok) {
                     alert('Professor updated successfully');
+                    window.location.href = "profMain.html";
                 } else {
                     alert('Failed to update professor');
                 }

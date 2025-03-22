@@ -81,34 +81,34 @@
             }
         }
         document.addEventListener("DOMContentLoaded", () => {
-  fetch("/dashboard")
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        currentUser = data.user;
-        document.getElementById("userName").textContent =
-          currentUser.USER_Name + " " + currentUser.USER_Surname;
-        if (currentUser.USER_Role.toLowerCase() === "student") {
-          document.getElementById("roleTitle").textContent =
-            "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-        } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
-          document.getElementById("roleTitle").textContent =
-            "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-        } else if (currentUser.USER_Role.toLowerCase() === "admin") {
-          document.getElementById("roleTitle").textContent =
-            "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
-        }
-        const postBtn = document.getElementById("postBtn");
-        if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
-          postBtn.style.display = "inline-block";
-        }
-      } else {
-        console.error("User not authenticated");
-        window.location.href = "index.html";
-      }
-    })
-    .catch(err => console.error(err));
-});
+            fetch("/dashboard")
+                .then(res => res.json())
+                .then(data => {
+                if (data.success) {
+                    currentUser = data.user;
+                    document.getElementById("userName").textContent =
+                    currentUser.USER_Name + " " + currentUser.USER_Surname;
+                    if (currentUser.USER_Role.toLowerCase() === "student") {
+                    document.getElementById("roleTitle").textContent =
+                        "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
+                    document.getElementById("roleTitle").textContent =
+                        "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    } else if (currentUser.USER_Role.toLowerCase() === "admin") {
+                    document.getElementById("roleTitle").textContent =
+                        "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    }
+                    const postBtn = document.getElementById("postBtn");
+                    if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
+                    postBtn.style.display = "inline-block";
+                    }
+                } else {
+                    console.error("User not authenticated");
+                    window.location.href = "index.html";
+                }
+                })
+                .catch(err => console.error(err));
+            });
 
         window.onload = fetchProfessors;
     </script>
