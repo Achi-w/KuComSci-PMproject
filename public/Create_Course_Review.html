@@ -224,6 +224,11 @@ fetch("/dashboard")
      currentUser = data.user;
      document.getElementById("userName").textContent =
        currentUser.USER_Name + " " + currentUser.USER_Surname;
+            // ตรวจสอบค่า courseID และ userID
+     if (!courseID || !currentUser || !currentUser.USER_Role.toLowerCase() === "student" ) {
+            alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
+            window.location.href = "index.html"; // กลับไปหน้าแรก
+        }
      if (currentUser.USER_Role.toLowerCase() === "student") {
        document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
      } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
@@ -248,11 +253,7 @@ fetch("/dashboard")
 
 
 
-        // ตรวจสอบค่า courseID และ userID
-        if (!courseID || !currentUser || !currentUser.USER_Role.toLowerCase() === "student" ) {
-            alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
-            window.location.href = "index.html"; // กลับไปหน้าแรก
-        }
+
 
         // Elements
         const courseTitleElement = document.getElementById('course-title');
