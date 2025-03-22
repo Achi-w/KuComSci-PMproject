@@ -126,3 +126,16 @@ form input:focus {
     border-color: #007BFF;
     outline: none;
 }
+.logout-button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.logout-button:hover {
+    background-color: #8E8E8E;
+    border-radius: 4px;
+}
