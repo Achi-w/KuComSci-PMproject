@@ -10,6 +10,7 @@ body {
 
 /* Left navigation menu */
 .left-nav {
+    
     position: fixed;
     top: 0;
     left: 0;
@@ -69,6 +70,11 @@ body {
     margin-left: 215px;
     margin-top: 70px;  /* to make space for the top bar */
     padding: 20px;
+    display: flex;
+    width: 80%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-container {
@@ -126,6 +132,7 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin: 10px 0;
+    background-color: #6e6e6e;
 }
 
 .card .row {
@@ -156,11 +163,13 @@ body {
 .detail {
     margin: 5px 0;
     font-size: 14px;
-    color: #555;
+    color: black;
+    padding: 5px;
+    background-color: rgb(201, 201, 201);
 }
 
 .edit, .delete {
-    background-color: #28a745;
+    background-color:rgb(0, 150, 0) ;
     text-align: center;
     height: 40px;
     width: 100px;
@@ -178,7 +187,7 @@ body {
 }
 
 .edit:hover {
-    background-color: rgb(255, 166, 0);
+    background-color: #28a745;
 }
 
 .delete:hover {
@@ -196,4 +205,8 @@ body {
 .logout-button:hover {
     background-color: #8E8E8E;
     border-radius: 4px;
+}
+
+.left{
+    font-size: 1.2rem;
 }

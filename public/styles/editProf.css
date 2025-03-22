@@ -3,6 +3,7 @@ body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
+    color: white;
 }
 .left-nav {
     position: fixed;
@@ -80,7 +81,7 @@ body {
 
 /* Form Styling */
 form {
-    background-color: white;
+    background-color: #6e6e6e;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -95,12 +96,14 @@ form label {
 }
 
 form input {
-    width: 100%;
+    width: 90%;
     padding: 10px;
     margin-bottom: 15px;
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    background-color: rgb(201, 201, 201);
+
 }
 
 form input[type="file"] {
@@ -138,4 +141,11 @@ form input:focus {
 .logout-button:hover {
     background-color: #8E8E8E;
     border-radius: 4px;
+}
+.left{
+    font-size: 1.2rem;
+}
+
+.USER_Image{
+    color: #000;
 }
