@@ -28,6 +28,49 @@
             <button id="logout-button" class="logout-button">
                 <i class="fa-solid fa-power-off power-icon"></i>
             </button>
+            <link rel="stylesheet" href="/styles/dialog-styles.css">
+
+            <!-- Dialog Container (Hidden by default) -->
+<div id="dialogContainer" class="dialog-container" style="display: none;">
+  <div class="dialog-backdrop"></div>
+  <div class="dialog-box">
+    <div class="dialog-content">
+      <p id="dialogMessage" style="color: black;">คุณต้องการออกจากระบบหรือไม่?</p>
+    </div>
+    <div class="dialog-actions" id="dialogActions">
+      <!-- Buttons will be dynamically inserted here -->
+    </div>
+  </div>
+</div>
+<script src="/script/dialog-script.js"></script>
+<script>
+  const logoutButton = document.getElementById('logout-button');
+  logoutButton.addEventListener('click', () => {
+    if (typeof DialogManager === "undefined") {
+      console.error("DialogManager is not defined. Check if dialog-script.js is loaded.");
+      return;
+    }
+    const dialogManager = new DialogManager();
+    dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+      fetch("/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = "/index.html";
+        } else {
+          console.error("Logout failed.");
+        }
+      })
+      .catch(err => console.error("Error during logout:", err));
+    }, null);
+  });
+</script>
+<!-- FRIEND'S LOGOUT CODE ENDS HERE -->
+
+
         </div>
     </div>
 
