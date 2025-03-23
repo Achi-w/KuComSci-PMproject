@@ -1,6 +1,6 @@
 const courseList = document.getElementById('course-item');
 const searchInput = document.getElementById('search-input');
-const searchBtn = document.getElementById('search-btn');
+
 
 let allCourses = []; // เก็บข้อมูลคอร์สทั้งหมด
 let currentUser = {};
@@ -20,7 +20,6 @@ const fetchCourses = async () => {
 const displayCourses = (courses) => {
     courseList.innerHTML = '';
     courses.forEach(course => {
-        console.log(course); // Debugging
         const courseDiv = document.createElement('div');
         courseDiv.classList.add('course-item');
 
@@ -38,58 +37,50 @@ const displayCourses = (courses) => {
 };
 
  // Retrieve the logged-in user from the dashboard route
- fetch("/dashboard")
- .then(res => res.json())
- .then(data => {
-   if (data.success) {
-     currentUser = data.user;
-     document.getElementById("userName").textContent =
-       currentUser.USER_Name + " " + currentUser.USER_Surname;
-     if (currentUser.USER_Role.toLowerCase() === "student") {
-       document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-     } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
-       document.getElementById("roleTitle").textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-     } else if (currentUser.USER_Role.toLowerCase() === "admin") {
-       document.getElementById("roleTitle").textContent = "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
-     }
-     if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
-       document.getElementById("postBtn").style.display = "inline-block";
-     }
-   } else {
-     console.error("User not authenticated");
-     window.location.href = "index.html"; 
-   }
- })
- .catch(err => console.error(err));
-
-// Logout button event – when clicked, call the logout route, clear local data, and redirect to login.
-document.getElementById("logoutBtn").addEventListener("click", () => {
- fetch("/logout", {
-   method: "POST",
-   headers: { "Content-Type": "application/json" }
- })
-   .then(res => res.json())
-   .then(data => {
-     if (data.success) {
-       currentUser = {};
-       announcements = [];
-       window.location.href = "index.html"; // redirect to login page
-     } else {
-       console.error("Logout failed.");
-     }
-   })
-   .catch(err => console.error("Error during logout:", err));
+ document.addEventListener("DOMContentLoaded", () => {
+  fetch("/dashboard")
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        currentUser = data.user;
+        document.getElementById("userName").textContent =
+          currentUser.USER_Name + " " + currentUser.USER_Surname;
+        if (currentUser.USER_Role.toLowerCase() === "student") {
+          document.getElementById("roleTitle").textContent =
+            "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+        } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
+          document.getElementById("roleTitle").textContent =
+            "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+        } else if (currentUser.USER_Role.toLowerCase() === "admin") {
+          document.getElementById("roleTitle").textContent =
+            "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+        }
+        const postBtn = document.getElementById("postBtn");
+        if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
+          postBtn.style.display = "inline-block";
+        }
+      } else {
+        console.error("User not authenticated");
+        window.location.href = "index.html";
+      }
+    })
+    .catch(err => console.error(err));
 });
 
-// ฟังก์ชันค้นหาคอร์ส
-const searchCourses = () => {
+
+
+
+
+
+searchInput.addEventListener("input", () => {
     const query = searchInput.value.trim().toLowerCase();
     const filteredCourses = allCourses.filter(course =>
         course.Course_Name.toLowerCase().includes(query) || 
         course.Course_ID.toLowerCase().includes(query)
     );
-    displayCourses(filteredCourses); // แสดงคอร์สที่กรองแล้ว
-};
+    displayCourses(filteredCourses); // Update displayed courses
+});
+
 
 // ฟังก์ชันไปยังหน้ารายละเอียดคอร์ส
 const goToDetails = (Cid) => {
@@ -97,7 +88,7 @@ const goToDetails = (Cid) => {
 };
 
 // ตั้งค่าการทำงานของปุ่มค้นหา
-searchBtn.addEventListener('click', searchCourses);
+
 searchInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') searchCourses();
 });

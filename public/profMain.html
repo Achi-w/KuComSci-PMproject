@@ -5,61 +5,198 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>profMain</title>
     <link rel="stylesheet" href="styles/profMain.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
 </head>
 <body>
-    <div>
-        <input class="search" name="fsrch" id="fsrch" placeholder="Search">
-        <div class="button">
-            <div class="block1">รายชื่ออาจารย์ทั้งหมด</div>
+    <!-- Left navigation menu -->
+    <div class="left-nav">
+        <img src="favicon.ico" alt="Logo" />
+        <ul>
+            <li><a href="announcement.html">ประกาศทางภาควิชา</a></li>
+            <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
+            <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
+            <li><a href="profMain.html" class="active">ช่องทางการติดต่ออาจารย์</a></li>
+            <li><a href="/roomBooking/studyRoom" id="roomBooking">จองห้องและย้ายห้อง</a></li>
+        </ul>
+    </div>
+    <!-- Top bar -->
+    <div class="top-bar">
+        <div class="left" id="roleTitle"></div>
+        <div class="right">
+            <span id="userName"></span>
+            <button id="logout-button" class="logout-button">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+    <link rel="stylesheet" href="/styles/dialog-styles.css">
+
+                  <!-- Dialog Container (Hidden by default) -->
+      <div id="dialogContainer" class="dialog-container" style="display: none;">
+        <div class="dialog-backdrop"></div>
+        <div class="dialog-box">
+          <div class="dialog-content">
+            <p id="dialogMessage" style="color: black;">คุณต้องการออกจากระบบหรือไม่?</p>
+          </div>
+          <div class="dialog-actions" id="dialogActions">
+            <!-- Buttons will be dynamically inserted here -->
+          </div>
         </div>
+      </div>
+      <script src="/script/dialog-script.js"></script>
+      <script>
+        const logoutButton = document.getElementById('logout-button');
+        logoutButton.addEventListener('click', () => {
+          if (typeof DialogManager === "undefined") {
+            console.error("DialogManager is not defined. Check if dialog-script.js is loaded.");
+            return;
+          }
+          const dialogManager = new DialogManager();
+          dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+            fetch("/logout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                window.location.href = "/index.html";
+              } else {
+                console.error("Logout failed.");
+              }
+            })
+            .catch(err => console.error("Error during logout:", err));
+          }, null);
+        });
+      </script>
+      <!-- FRIEND'S LOGOUT CODE ENDS HERE -->
+
+        </div>
+        
+    </div>
+
+    <div class="content">
+        <!-- 🔎 Search Box -->
+        <div class="search-container">
+          <input class="search" name="fsrch" id="fsrch" placeholder="Search" oninput="searchProfessors()">
+        </div>
+
+        <!-- Container สำหรับแสดงข้อมูลอาจารย์ -->
         <div id="professor-list"></div> 
     </div>
 
     <script>
-        async function fetchProfessors() {
-            try {
-                const response = await fetch('http://localhost:3000/getProfessors');
-                const data = await response.json();
-                
-                const userResponse = await fetch('http://localhost:3000/api/reauth');
-                const userData = await userResponse.json();
-                const user = userData.info;
+        let professorsData = []; // เก็บข้อมูลอาจารย์ที่ดึงมาไว้ในตัวแปร
 
-                console.log("User Role:", user);  // ดูค่าของ role
+async function fetchProfessors() {
+    try {
+        const response = await fetch('http://localhost:3000/getProfessors');
+        const data = await response.json();
+        
+        const userResponse = await fetch('http://localhost:3000/api/reauth');
+        const userData = await userResponse.json();
+        const user = userData.info;
 
-                const professorList = document.getElementById('professor-list');
-                professorList.innerHTML = '';
+        professorsData = data; // เก็บข้อมูลไว้ในตัวแปร
 
-                data.forEach(prof => {
-                    const isAdmin = user.USER_Role === "Admin";  // ถ้าเป็น Admin
-                    const isOwner = user.USER_Role === "Teacher" && user.USER_ID === prof.USER_ID; // ถ้าเป็น Teacher และ USER_ID ตรงกัน
-                    console.log("Is Admin:", isAdmin);  // ตรวจสอบว่าเป็น Admin หรือไม่
-                    console.log("Is Owner:", isOwner);  // ตรวจสอบว่าเป็น Teacher และ USER_ID ตรงกัน
+        const professorList = document.getElementById('professor-list');
+        professorList.innerHTML = '';
 
-                    const professorCard = document.createElement('div');
-                    professorCard.classList.add('card');
+        data.forEach(prof => {
+            const isAdmin = user.USER_Role === "Admin";  
+            const isOwner = user.USER_Role === "Teacher" && user.USER_ID === prof.USER_ID; 
 
-                    professorCard.innerHTML = `
-                        <p class="detail">${prof.USER_Name} ${prof.USER_Surname}</p>
-                        <div class="row">
-                            <img src="${prof.USER_Image || 'http://localhost:3000/uploads/default-image.jpg'}" alt="${prof.USER_Name}" />
-                            <div class="column">
-                                <p class="detail">รหัสอาจารย์: ${prof.USER_ID}</p>
-                                <p class="detail">ห้องทำงาน: ${prof.USER_Room}</p>
-                                <p class="detail">${prof.USER_Contact_DETAIL}</p>
-                            </div>
-                            <div class="column">
-                                ${isAdmin || isOwner ? `<a href="editProf.html?USER_ID=${prof.USER_ID}" class="edit">Edit</a>` : ''}
-                            </div>
-                        </div>
-                    `;
-                    professorList.appendChild(professorCard);
-                });
-            } catch (error) {
-                console.error('Error fetching professors:', error);
-            }
-        }
-        // เรียกใช้ฟังก์ชันเมื่อโหลดหน้าเว็บ
+            const professorCard = document.createElement('div');
+            professorCard.classList.add('card');
+
+            professorCard.innerHTML = `
+                <p class="detail">${prof.USER_Name} ${prof.USER_Surname}</p>
+                <div class="row">
+                    <img src="${prof.USER_Image || 'http://localhost:3000/uploads/default-image.jpg'}" alt="${prof.USER_Name}" />
+                    <div class="column">
+                        <p class="detail">รหัสอาจารย์: ${prof.USER_ID}</p>
+                        <p class="detail">ห้องทำงาน: ${prof.USER_Room}</p>
+                        <p class="detail">${prof.USER_Contact_DETAIL}</p>
+                    </div>
+                    <div class="column">
+                        ${isAdmin || isOwner ? `<a href="editProf.html?USER_ID=${prof.USER_ID}" class="edit">Edit</a>` : ''}
+                    </div>
+                </div>
+            `;
+            professorList.appendChild(professorCard);
+        });
+    } catch (error) {
+        console.error('Error fetching professors:', error);
+    }
+}
+
+function searchProfessors() {
+    const searchTerm = document.getElementById('fsrch').value.toLowerCase();
+
+    // กรองข้อมูลที่ตรงกับคำค้นหาจากชื่ออาจารย์
+    const filteredProfessors = professorsData.filter(prof => {
+        const fullName = `${prof.USER_Name} ${prof.USER_Surname}`.toLowerCase();
+        return fullName.includes(searchTerm);
+    });
+
+    const professorList = document.getElementById('professor-list');
+    professorList.innerHTML = '';
+
+    filteredProfessors.forEach(prof => {
+        const professorCard = document.createElement('div');
+        professorCard.classList.add('card');
+        professorCard.innerHTML = `
+            <p class="detail">${prof.USER_Name} ${prof.USER_Surname}</p>
+            <div class="row">
+                <img src="${prof.USER_Image || 'http://localhost:3000/uploads/default-image.jpg'}" alt="${prof.USER_Name}" />
+                <div class="column">
+                    <p class="detail">รหัสอาจารย์: ${prof.USER_ID}</p>
+                    <p class="detail">ห้องทำงาน: ${prof.USER_Room}</p>
+                    <p class="detail">${prof.USER_Contact_DETAIL}</p>
+                </div>
+                <div class="column">
+                    <a href="editProf.html?USER_ID=${prof.USER_ID}" class="edit">Edit</a>
+                </div>
+            </div>
+        `;
+        professorList.appendChild(professorCard);
+    });
+}
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("/dashboard")
+                .then(res => res.json())
+                .then(data => {
+                if (data.success) {
+                    currentUser = data.user;
+                    document.getElementById("userName").textContent =
+                    currentUser.USER_Name + " " + currentUser.USER_Surname;
+                    if (currentUser.USER_Role.toLowerCase() === "student") {
+                    document.getElementById("roleTitle").textContent =
+                        "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    document.getElementById("roomBooking").textContent = "ห้องเรียนและห้องสอบ";
+
+                    } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
+                    document.getElementById("roleTitle").textContent =
+                        "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
+
+                    } else if (currentUser.USER_Role.toLowerCase() === "admin") {
+                    document.getElementById("roleTitle").textContent =
+                        "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
+
+                    }
+                    const postBtn = document.getElementById("postBtn");
+                    if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
+                    postBtn.style.display = "inline-block";
+                    }
+                } else {
+                    console.error("User not authenticated");
+                    window.location.href = "index.html";
+                }
+                })
+                .catch(err => console.error(err));
+            });
+
         window.onload = fetchProfessors;
     </script>
 </body>

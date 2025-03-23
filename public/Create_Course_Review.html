@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script type="module" src="Create_Course_Review.js"></script>
     <style>
 body {
     margin: 0;
@@ -100,45 +100,115 @@ body {
             height: 150px;
         }
     
-        /* ปรับปุ่ม Submit ให้เป็นสีเขียว */
-        button#submit-review {
-            padding: 10px 15px;
-            background-color: #28a745; /* สีเขียว */
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
-            margin: 5px;
-        }
+        .logout-button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.logout-button:hover {
+    background-color: #8E8E8E;
+}
     
-        button#submit-review:hover {
-            background-color: #218838; /* สีเขียวเข้ม */
-        }
+
+
+
+.review-container {
+    max-width: 900px;
+    margin: 50px 0;
+    padding: 20px;
+    background-color: #787878;
+    border-radius: 0px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+
+.review-heading,.title {
+  background: #D3D3D3;
+    display: block;
+    width: fit-content;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+    text-align: start;
+    margin-left: 0; 
+}
+
+#review-text {
+    width: 98%;
+    height: 280px;
+    padding: 10px;
+    border-radius: 0px;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    background:#D3D3D3;
+    resize: none;
+}
+.score-container {
+    display: flex;
+    align-items: center; /* Aligns items vertically */
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    gap: 15px;
+}
+
+.score-heading {
+    font-size: 18px;
+    margin-top: 15px;
+    color: black;
+}
+
+#review-score {
+    width: 30%;
+    padding: 10px;
+    border-radius: 0px;
+    font-size: 16px;
+    background: #D3D3D3;
+    cursor: pointer;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-left: auto;
+}
+
+.btn-cancel {
+  background-color: red;
+  border: 1px solid #000;
+    color: black;
+    cursor: pointer;
+    border-radius: 0px;
+    padding: 8px ;
+    font-size: 16px;
     
-        /* ปรับปุ่ม Back ให้เป็นสีแดง */
-        button#back-btn {
-            padding: 10px 15px;
-            background-color: #dc3545; /* สีแดง */
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
-            margin: 5px;
-        }
-    
-        button#back-btn:hover {
-            background-color: #c82333; /* สีแดงเข้ม */
-        }
-    
-        /* สลับตำแหน่งของปุ่ม */
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
+}
+
+.btn-submit {
+  background-color: #58ff49;
+    border: 1px solid #000;
+    color: black;
+    cursor: pointer;
+    border-radius: 0px;
+    padding: 8px ;
+    font-size: 16px;
+}
+
+.btn-cancel:hover {
+  background-color: darkred;
+}
+
+.btn-submit:hover {
+  background-color: darkgreen;
+}
+
+
     </style>
     </head>
     <body>
@@ -150,7 +220,7 @@ body {
       <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
       <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
       <li><a href="profMain.html">ช่องทางการติดต่ออาจารย์</a></li>
-      <li><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+      <li><a href="/roomBooking/studyRoom">ห้องเรียนและห้องสอบ</a></li>
     </ul>
   </div>
               <!-- Top bar -->
@@ -158,41 +228,46 @@ body {
     <div class="left" id="roleTitle"></div>
     <div class="right">
       <span id="userName"></span>
-      <button id="logoutBtn">Logout</button>
+      <button id="logout-button" class="logout-button">
+        <i class="fa-solid fa-power-off power-icon"></i>
+   </button>
     </div>
   </div>
-        <!-- Course Details -->
-        <h2 id="course-title">Loading...</h2>
-        <p id="course-description">Fetching course details...</p>
+
+  <div class="review-container">
+    <div class="title"><h2 id="course-title">Loading...</h2></div>
+    <h2 class="review-heading">เขียนสิ่งที่อยากรีวิวเลย</h2>
+
+    <!-- Textbox for Writing a Review -->
+    <textarea id="review-text" placeholder="เขียนตรงนี้..."></textarea>
+
+    <!-- Dropdown for Selecting Score (1-10) -->
+    <div class="score-container">
+      <h3 class="score-heading">ให้คะแนนเท่าไหร่ดี :     </h3>
+      <select id="review-score">
+          <option value="">เลือกคะแนนที่นี่</option>
+          <option value="1">1 - ควรปรับปรุง</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5 - ปานกลาง</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10 - ดีมาก</option>
+      </select>
     
-        <h1>เขียนสิ่งที่อยากรีวิวเลย</h1>
-    
-        <!-- Textbox for Writing a Review -->
-        <textarea id="review-text" placeholder="Write your review here..."></textarea>
-    
-        <!-- Dropdown for Selecting Score (1-10) -->
-        <h3>ให้คะแนน</h3>
-        <select id="review-score">
-            <option value="">Select Score</option>
-            <option value="1">1 - Very Bad</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5 - Average</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10 - Excellent</option>
-        </select>
-    
-        <!-- Button Container for Submit and Back -->
-        <div class="button-container">
-            <!-- Submit Button -->
-            <button id="submit-review">Submit Review</button>
-    
-            <!-- Back Button -->
-            <button id="back-btn">Back to Review</button>
+      <div class="button-container">
+          <button id="back-btn" class="btn-cancel">ยกเลิก</button>
+          <button id="submit-review" class="btn-submit">โพสต์เลย</button>
+      </div>
+  </div>
+  
+  
+</div>
+
+
 
     <script>
         // ดึงค่า Course ID & User ID จาก URL
@@ -200,6 +275,25 @@ body {
         const courseID = urlParams.get('CID');
         let currentUser = {};
         let announcements = [];
+
+        document.getElementById("review-text").addEventListener("input", function () {
+    let maxCharsPerLine = 50; // Adjust based on width
+    let text = this.value;
+
+    // Split by existing newlines to process each line separately
+    let lines = text.split("\n").map(line => {
+        // Insert new line only if the text is too long
+        return line.length > maxCharsPerLine ? line.replace(new RegExp(`(.{${maxCharsPerLine}})(?!\n)`, "g"), "$1\n") : line;
+    });
+
+    // Join the lines back
+    let newText = lines.join("\n");
+
+    // Prevent cursor from jumping to the start
+    if (newText !== text) {
+        this.value = newText;
+    }
+});
 
 
 // Retrieve the logged-in user from the dashboard route
@@ -210,12 +304,21 @@ fetch("/dashboard")
      currentUser = data.user;
      document.getElementById("userName").textContent =
        currentUser.USER_Name + " " + currentUser.USER_Surname;
+            // ตรวจสอบค่า courseID และ userID
+     if (!courseID || !currentUser || !currentUser.USER_Role.toLowerCase() === "student" ) {
+            alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
+            window.location.href = "index.html"; // กลับไปหน้าแรก
+        }
      if (currentUser.USER_Role.toLowerCase() === "student") {
        document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
      } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
        document.getElementById("roleTitle").textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+       alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
+       window.location.href = "index.html"; 
      } else if (currentUser.USER_Role.toLowerCase() === "admin") {
        document.getElementById("roleTitle").textContent = "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+       alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
+       window.location.href = "index.html"; 
      }
      if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
        document.getElementById("postBtn").style.display = "inline-block";
@@ -227,35 +330,13 @@ fetch("/dashboard")
  })
  .catch(err => console.error(err));
 
-// Logout button event – when clicked, call the logout route, clear local data, and redirect to login.
-document.getElementById("logoutBtn").addEventListener("click", () => {
- fetch("/logout", {
-   method: "POST",
-   headers: { "Content-Type": "application/json" }
- })
-   .then(res => res.json())
-   .then(data => {
-     if (data.success) {
-       currentUser = {};
-       announcements = [];
-       window.location.href = "index.html"; // redirect to login page
-     } else {
-       console.error("Logout failed.");
-     }
-   })
-   .catch(err => console.error("Error during logout:", err));
-});
 
 
-        // ตรวจสอบค่า courseID และ userID
-        if (!courseID || !currentUser) {
-            alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
-            window.location.href = "index.html"; // กลับไปหน้าแรก
-        }
+
+
 
         // Elements
         const courseTitleElement = document.getElementById('course-title');
-        const courseDescriptionElement = document.getElementById('course-description');
 
         let courseName = ""; // ตัวแปรเก็บชื่อคอร์ส
 
@@ -265,12 +346,10 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
                 const response = await axios.get(`http://localhost:3000/api/course/${courseID}`);
                 const course = response.data;
                 courseTitleElement.textContent = `${course.Course_ID} - ${course.Course_Name}`;
-                courseDescriptionElement.textContent = course.Course_Detail;
                 courseName = course.Course_Name; // เก็บชื่อคอร์สไว้ใช้ตอน Submit Review
             } catch (error) {
                 console.error('Error fetching course:', error);
                 courseTitleElement.textContent = "Course not found!";
-                courseDescriptionElement.textContent = "Could not retrieve course details.";
             }
         };
 
@@ -278,39 +357,60 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
         document.getElementById('back-btn').addEventListener('click', () => {
             window.location.href = `Course_Review_Details.html?CID=${courseID}`;
         });
+        const checkExistingReview = async () => {
+    try {
+        const url = `http://localhost:3000/api/course_review?Course_ID=${courseID}&USER_ID=${currentUser.USER_ID}`;
+        const response = await axios.get(url);
+        const hasReview = response.data.some(review => 
+            review.USER_ID === currentUser.USER_ID && review.Course_ID === courseID
+        );
+
+        return hasReview;
+    } catch (error) {
+        console.error("Error checking existing reviews:", error);
+        return false;
+    }
+};
+
+
 
         // กดปุ่ม Submit Review
-        document.getElementById('submit-review').addEventListener('click', async () => {
-            const reviewText = document.getElementById('review-text').value.trim();
-            const reviewScore = document.getElementById('review-score').value;
+        document.getElementById("submit-review").addEventListener("click", async () => {
+    const reviewText = document.getElementById("review-text").value.trim();
+    const reviewScore = document.getElementById("review-score").value;
 
-            if (!reviewText) {
-                alert("กรุณาเขียนรีวิวก่อนโพสต์");
-                return;
-            }
+    if (!reviewText) {
+        showDialog("กรุณาเขียนรีวิวก่อนโพสต์");
+        return;
+    }
 
-            if (!reviewScore) {
-                alert("กรุณาให้คะแนนก่อนโพสต์");
-                return;
-            }
+    if (!reviewScore) {
+        showDialog("กรุณาให้คะแนนก่อนโพสต์");
+        return;
+    }
+    const hasReviewed = await checkExistingReview();
 
-            // 🛑 แสดงข้อความยืนยันก่อนโพสต์รีวิว
-            const confirmPost = confirm("คุณตกลงที่จะโพสต์รีวิวหรือไม่?");
-            if (!confirmPost) {
-                return; // ถ้ากด "ยกเลิก" จะไม่บันทึกข้อมูล
-            }
+    if (hasReviewed) {
+        showDialog("คุณเคยโพสต์รีวิววิชานี้แล้ว");
+        return;}
 
-            // สร้าง Review_Course_ID แบบสุ่ม
-            const reviewID = `R${Date.now()}`; 
 
-            // ดึงวันที่และเวลาปัจจุบัน
+
+    // 🛑 Show confirmation dialog only with "Cancel" if user entered both fields
+    showDialog(
+        "คุณตกลงที่จะโพสต์รีวิวหรือไม่?",
+        async () => {
+            // Generate a unique Review_Course_ID
+            const reviewID = `R${Date.now()}`;
+
+            // Get current date and time
             const now = new Date();
             const reviewDate = now.toISOString().split("T")[0]; // YYYY-MM-DD
             const reviewTime = now.toTimeString().split(" ")[0]; // HH:MM:SS
 
             try {
-                // ส่งข้อมูลไปยัง Database
-                await axios.post('http://localhost:3000/api/course_review', {
+                // Send data to the server
+                await axios.post("http://localhost:3000/api/course_review", {
                     Review_Course_ID: reviewID,
                     USER_ID: currentUser.USER_ID,
                     Course_ID: courseID,
@@ -321,17 +421,130 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
                     Course_Name: courseName
                 });
 
-                alert("รีวิวถูกโพสต์เรียบร้อย!");
-                window.location.href = `Course_Review_Details.html?CID=${courseID}`; // กลับไปหน้ารายละเอียดคอร์ส
-
+                // Show success message and refresh the page
+                showDialog("โพสต์ถูกอัปโหลดสำเร็จแล้ว", () => {
+                    window.location.href = `Course_Review_Details.html?CID=${courseID}`;
+                });
             } catch (error) {
-                console.error('เกิดข้อผิดพลาดในการโพสต์รีวิว:', error);
-                alert("เกิดข้อผิดพลาดในการโพสต์รีวิว กรุณาลองใหม่อีกครั้ง!");
+                console.error("เกิดข้อผิดพลาดในการโพสต์รีวิว:", error);
+                showDialog("เกิดข้อผิดพลาดในการโพสต์รีวิว กรุณาลองใหม่อีกครั้ง!");
             }
+        },
+        true // Show "ยกเลิก" button only if both fields are filled
+    );
+});
+    
+// Function to create and show a dialog
+function showDialog(message, confirmCallback, showCancel = false) {
+    // Remove any existing dialogs
+    const existingDialog = document.getElementById("custom-dialog");
+    if (existingDialog) existingDialog.remove();
+
+    // Create dialog container
+    const dialogContainer = document.createElement("div");
+    dialogContainer.id = "custom-dialog";
+    dialogContainer.className = "dialog-container";
+
+    // Create backdrop
+    const backdrop = document.createElement("div");
+    backdrop.className = "dialog-backdrop";
+
+    // Create dialog box
+    const dialogBox = document.createElement("div");
+    dialogBox.className = "dialog-box";
+
+    // Create content
+    const dialogContent = document.createElement("div");
+    dialogContent.className = "dialog-content";
+    const messageText = document.createElement("p");
+    messageText.textContent = message;
+    dialogContent.appendChild(messageText);
+
+    // Create button container
+    const dialogActions = document.createElement("div");
+    dialogActions.className = "dialog-actions";
+
+    // Cancel Button (ยกเลิก)
+    if (showCancel) {
+        const cancelButton = document.createElement("button");
+        cancelButton.className = "dialog-btn dialog-btn-cancel";
+        cancelButton.textContent = "ยกเลิก";
+        cancelButton.addEventListener("click", () => {
+            document.body.removeChild(dialogContainer);
         });
+
+        // Append Cancel Button FIRST (Swapped Order)
+        dialogActions.appendChild(cancelButton);
+    }
+
+    // Confirm Button (ยืนยัน)
+    const confirmButton = document.createElement("button");
+    confirmButton.className = "dialog-btn dialog-btn-confirm";
+    confirmButton.textContent = showCancel ? "ยืนยัน" : "OK"; // Change text based on context
+    confirmButton.addEventListener("click", () => {
+        document.body.removeChild(dialogContainer);
+        if (confirmCallback) confirmCallback();
+    });
+
+    // Append Confirm Button SECOND (Swapped Order)
+    dialogActions.appendChild(confirmButton);
+
+    // Append elements
+    dialogBox.appendChild(dialogContent);
+    dialogBox.appendChild(dialogActions);
+    dialogContainer.appendChild(backdrop);
+    dialogContainer.appendChild(dialogBox);
+    document.body.appendChild(dialogContainer);
+}
+
 
         // โหลดรายละเอียดคอร์ส
         fetchCourseDetails();
+    </script>
+    <link rel="stylesheet" href="/styles/dialog-styles.css">
+    <!-- Dialog Container (Hidden by default) -->
+    <div id="dialogContainer" class="dialog-container" style="display: none;">
+      <div class="dialog-backdrop"></div>
+      <div class="dialog-box">
+        <div class="dialog-content">
+          <p id="dialogMessage"></p>
+        </div>
+        <div class="dialog-actions" id="dialogActions">
+          <!-- Buttons will be dynamically inserted here -->
+        </div>
+      </div>
+    </div>
+    <script src="script/dialog-script.js"></script>
+    
+    <script>
+      const logoutButton = document.getElementById('logout-button');
+      logoutButton.addEventListener('click', () => {
+        if (typeof DialogManager === "undefined") {
+            console.error("DialogManager is not defined. Check if dialog-script.js is loaded.");
+            return;
+          }
+    
+          const dialogManager = new DialogManager();
+    
+          dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+              fetch("/logout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (data.success) {
+                  currentUser = {};
+                  announcements = [];
+                  window.location.href = "/index.html"; // redirect to login page
+                  } else {
+                  console.error("Logout failed.");
+                  }
+              })
+              .catch(err => console.error("Error during logout:", err));
+              }, null);
+    
+          });
     </script>
 </body>
 </html>

@@ -48,7 +48,6 @@ const db = mysql.createConnection({
   database: "pmdatabase4",
 });
 
-
 db.connect((err) => {
   if (err) {
     console.error("Database connection failed: " + err.message);
@@ -62,8 +61,9 @@ db.connect((err) => {
 // -------------------------
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
+  // Updated: include USER_Image field in the query.
   const query =
-    "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password FROM USER WHERE USER_ID = ?";
+    "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password, USER_Image FROM USER WHERE USER_ID = ?";
   db.query(query, [username], (err, results) => {
     if (err) {
       console.error("Database query error: " + err.message);
@@ -92,6 +92,7 @@ app.get("/dashboard", (req, res) => {
       .status(401)
       .json({ success: false, message: "Unauthorized" });
   }
+  // The session user now includes USER_Image.
   res.json({ success: true, user: req.session.user });
 });
 
@@ -110,19 +111,22 @@ const memoryStorage = multer.memoryStorage();
 const uploadMemory = multer({ storage: memoryStorage });
 
 // GET /announcements – return all announcements sorted by date DESC
+// Updated to join with the user table so that each announcement includes user_image.
 app.get("/announcements", (req, res) => {
   const sql = `
     SELECT 
-      Announcement_ID as id,
-      USER_ID as user_id,
-      USER_Name as first_name,
-      USER_Surname as last_name,
-      USER_Role as role,
-      Announcement_Detail as detail,
-      DATE_FORMAT(Announcement_Start_Date, '%Y-%m-%d') as date,
-      Announcement_Headline as headline
-    FROM announcement
-    ORDER BY Announcement_Start_Date DESC`;
+      a.Announcement_ID as id,
+      a.USER_ID as user_id,
+      a.USER_Name as first_name,
+      a.USER_Surname as last_name,
+      a.USER_Role as role,
+      a.Announcement_Detail as detail,
+      DATE_FORMAT(a.Announcement_Start_Date, '%Y-%m-%d') as date,
+      a.Announcement_Headline as headline,
+      u.USER_Image as user_image
+    FROM announcement a
+    JOIN user u ON a.USER_ID = u.USER_ID
+    ORDER BY a.Announcement_Start_Date DESC`;
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
@@ -335,6 +339,32 @@ app.get('/api/course/:Course_ID', (req, res) => {
       }
   });
 });
+app.get('/api/course_review', (req, res) => {
+  const { Course_ID, USER_ID } = req.query;
+
+
+  if (!Course_ID || !USER_ID) {
+      return res.status(400).json({ error: "Course_ID and USER_ID are required" });
+  }
+
+  const query = `
+      SELECT Review_Course_ID FROM course_review
+      WHERE Course_ID = ? AND USER_ID = ?
+  `;
+
+  db.query(query, [Course_ID, USER_ID], (err, results) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Database query failed' });
+      }
+      if (results.length > 0) {
+          return res.json({ hasReviewed: true, review: results });
+      } else {
+          return res.json({ hasReviewed: false });
+      }
+  });
+});
+
 
 // ดึงรีวิวของคอร์ส พร้อมคำนวณค่าเฉลี่ย Review_Course_Rate
 app.get('/api/course_review/:Course_ID', (req, res) => {
@@ -510,8 +540,11 @@ app.post('/api/sectionform',(req,res)=>{
               }
           )
       }else{
-
-          if(data.who  === 1){
+          console.log('-------------------------------------------------------------------');
+          console.log(data.who);
+          
+          
+          if(data.who){
             db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
           [idToinsertSec,data.courseId, data.userId,data.sec, userCurr,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
           (err,resutl,fields)=>{
@@ -668,7 +701,6 @@ app.put('/api/sectionform/add',(req,res)=>{
 app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
   console.log('user teacher call section');
   
-  const id = req.params.teacherId;
   if (!req.session.user){
     console.log('user have no right');
 
@@ -677,10 +709,46 @@ app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
       info:'you have no access'
     })
   }
+  
+  
   const teacherId = req.params.teacherId;
 
+  console.log(teacherId);
+  console.log('now go to where admin or teacher');
+  
+  
   if(teacherId == 'admin'){
+    console.log('go to admin');
+    
     db.query(`SELECT Section_Form_ID,Course_ID,SEC,Current_Nisit_Number,Section_Form_start_time,Section_Form_STATUS, Section_Form_Minimum_Nisit, Section_Form_Maximum_Nisit FROM Section_Form WHERE Section_Form_STATUS = 0`,
+    teacherId,(err,result,fields)=>{
+        if(err){
+            console.error(err);
+            return res.status(201).send(
+                {
+                    status:0,
+                    info:'error'
+                }
+            )
+        }else{
+          console.log('complete');
+          console.log(result);
+          
+          return res.status(200).send(
+              {
+                  status:1,
+                  info:result
+              }
+          )  
+        }
+    }
+    )
+  }else{
+    db.query(`SELECT sf.*
+      FROM section_form sf
+      JOIN course c ON sf.Course_ID = c.Course_ID
+      JOIN user_s_course usc ON c.Course_ID = usc.Course_ID
+      WHERE usc.USER_ID = ?`,
     teacherId,(err,result,fields)=>{
         if(err){
             console.error(err);
@@ -701,34 +769,9 @@ app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
         )
 
     }
-    )
+)
+
   }
-  db.query(`SELECT sf.*
-        FROM section_form sf
-        JOIN course c ON sf.Course_ID = c.Course_ID
-        JOIN user_s_course usc ON c.Course_ID = usc.Course_ID
-        WHERE usc.USER_ID = ?`,
-      teacherId,(err,result,fields)=>{
-          if(err){
-              console.error(err);
-              return res.status(201).send(
-                  {
-                      status:0,
-                      info:'error'
-                  }
-              )
-          }
-
-          console.log('complete');
-          return res.status(200).send(
-              {
-                  status:1,
-                  info:result
-              }
-          )
-
-      }
-  )
 
 })
 
@@ -1034,13 +1077,27 @@ app.post('/addProf', professorUpload.single('USER_Image'), (req, res) => {
 // PUT: อัปเดตข้อมูลอาจารย์
 app.put('/updateProf', professorUpload.single('USER_Image'), (req, res) => {
   const { USER_ID, USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year } = req.body;
-  const USER_Image = req.file ? req.file.filename : null; // รับชื่อไฟล์จาก multer
+  const USER_Image = req.file ? req.file.filename : null; // รับชื่อไฟล์ใหม่ (ถ้ามี)
 
-  const sql = `UPDATE user 
-               SET USER_Name = ?, USER_Surname = ?, USER_Contact_DETAIL = ?, USER_Room = ?, USER_Year = ?, USER_Image = ? 
-               WHERE USER_ID = ?`;
+  // ตรวจสอบว่ามีการอัปโหลดรูปภาพหรือไม่
+  let sql;
+  let params;
 
-  db.query(sql, [USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year, USER_Image, USER_ID], (err, result) => {
+  if (USER_Image) {
+      // ถ้ามีการอัปโหลดรูปภาพใหม่ ให้รวม USER_Image ในการอัปเดต
+      sql = `UPDATE user 
+             SET USER_Name = ?, USER_Surname = ?, USER_Contact_DETAIL = ?, USER_Room = ?, USER_Year = ?, USER_Image = ? 
+             WHERE USER_ID = ?`;
+      params = [USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year, USER_Image, USER_ID];
+  } else {
+      // ถ้าไม่มีการอัปโหลดรูปภาพใหม่ ไม่ต้องอัปเดต USER_Image
+      sql = `UPDATE user 
+             SET USER_Name = ?, USER_Surname = ?, USER_Contact_DETAIL = ?, USER_Room = ?, USER_Year = ? 
+             WHERE USER_ID = ?`;
+      params = [USER_Name, USER_Surname, USER_Contact_DETAIL, USER_Room, USER_Year, USER_ID];
+  }
+
+  db.query(sql, params, (err, result) => {
       if (err) {
           console.error(err);
           return res.status(500).json({ error: 'Failed to update professor' });
@@ -1048,6 +1105,7 @@ app.put('/updateProf', professorUpload.single('USER_Image'), (req, res) => {
       res.status(200).json({ message: 'Professor updated successfully' });
   });
 });
+
 // GET: ดึงข้อมูลอาจารย์ทั้งหมด (พร้อมภาพ)
 app.get('/getProfessors', (req, res) => {
   const sql = "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Contact_DETAIL, USER_Room, USER_Image FROM user WHERE USER_Role = 'Teacher'";

@@ -1,21 +1,87 @@
+/* Global styles (common to both left-nav and top-bar) */
 body {
     font-family: 'Arial', sans-serif;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
-    height: 100vh;
     margin: 0;
-    padding: 20px;
-    background-color: #f4f4f9; /* เพิ่มพื้นหลังให้ดูสบายตา */
+    padding: 0;
 }
 
-div {
-    display: flex;
-    flex-direction: column;
+/* Left navigation menu */
+.left-nav {
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 215px;
+    background-color: #bababa;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 500;
+    overflow-y: auto;
+}
+.left-nav img {
     width: 80%;
-    max-width: 1200px; /* จำกัดขนาดให้เหมาะสมกับหน้าจอใหญ่ */
-    height: 60%;
-    gap: 20px;
+    height: auto;
+    margin-bottom: 20px;
+}
+.left-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.left-nav li {
+    margin: 10px 0;
+}
+.left-nav a {
+    text-decoration: none;
+    color: #000;
+}
+.left-nav ul li a {
+  display: block;
+  text-decoration: none;
+  color: black;
+  transition: background 0.3s, color 0.3s;
+}
+.left-nav ul li a:hover {
+  background:#8E8E8E;
+}
+
+/* Top bar */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 215px;
+    right: 0;
+    height: 50px;
+    background-color: #525252;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+}
+
+/* Content section styles */
+.content {
+    margin-left: 215px;
+    margin-top: 70px;  /* to make space for the top bar */
+    padding: 20px;
+    display: flex;
+    width: 80%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 .search {
@@ -24,9 +90,8 @@ div {
     border: 1px solid #ccc;
     border-radius: 5px;
     width: 100%;
-    box-sizing: border-box; /* เพื่อไม่ให้มีการหักล้างกับ padding */
+    box-sizing: border-box;
     outline: none;
-    transition: border-color 0.3s ease;
 }
 
 .search:focus {
@@ -37,9 +102,7 @@ div {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
     width: 100%;
-    gap: 20px;
 }
 
 .block1 {
@@ -57,7 +120,7 @@ div {
 }
 
 .block1:hover {
-    background-color: #f0c06f; /* เพิ่มเอฟเฟ็กต์ hover */
+    background-color: #f0c06f;
 }
 
 .card {
@@ -66,23 +129,23 @@ div {
     flex-direction: column;
     width: 100%;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เพิ่มเงาให้กับการ์ด */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin: 10px 0;
+    background-color: #6e6e6e;
 }
 
 .card .row {
     display: flex;
-    align-items: center;  /* จัดแนวให้ทุกองค์ประกอบอยู่ตรงกลางในแนวตั้ง */
+    align-items: center;
     gap: 20px;
-    flex-wrap: wrap; /* ทำให้ข้อมูลไม่เบียดกันถ้าไม่พอพื้นที่ */
 }
 
 .card img {
     width: 150px;
     height: 150px;
     border-radius: 8px;
-    object-fit: cover; /* ให้รูปภาพไม่เสียสัดส่วน */
+    object-fit: cover;
 }
 
 .card .column {
@@ -100,11 +163,13 @@ div {
 .detail {
     margin: 5px 0;
     font-size: 14px;
-    color: #555;
+    color: black;
+    padding: 5px;
+    background-color: rgb(201, 201, 201);
 }
 
 .edit, .delete {
-    background-color: #28a745;
+    background-color:rgb(0, 150, 0) ;
     text-align: center;
     height: 40px;
     width: 100px;
@@ -114,19 +179,34 @@ div {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-top: 10px; /* เพิ่มช่องว่างระหว่างปุ่ม */
+    margin-top: 10px;
 }
 
 .delete {
     background-color: #dc3545;
 }
-.edit {
-    background-color: rgb(237, 185, 87); /* เพิ่มเอฟเฟ็กต์ hover */
-}
+
 .edit:hover {
-    background-color: rgb(255, 166, 0); /* เพิ่มเอฟเฟ็กต์ hover */
+    background-color: #28a745;
 }
 
 .delete:hover {
-    background-color: #c82333; /* เพิ่มเอฟเฟ็กต์ hover */
+    background-color: #c82333;
+}
+.logout-button {
+    background: none;
+    border: none;
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.logout-button:hover {
+    background-color: #8E8E8E;
+    border-radius: 4px;
+}
+
+.left{
+    font-size: 1.2rem;
 }

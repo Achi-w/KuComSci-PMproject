@@ -11,6 +11,10 @@ let userID = 0;
 
 
 const checkRole = (id,status) =>{
+    console.log('check role');
+    console.log(id,status);
+    
+    
     //check role
     if(status=== 'Accept' || status === 'Decline'){
         return ``;
@@ -20,7 +24,7 @@ const checkRole = (id,status) =>{
         return `
         <a id='link' href='/addNameToSec.html?id=${id}'>
         `;
-    }else if(userRole ===1){
+    }else if(userRole ===1 || userRole ===2){
         return `
         <a id='link' href='/vertifyAddSec.html?id=${id}'>
         `;
@@ -43,10 +47,11 @@ const initial = async ()=>{
     }else{
         if(userRole === 2){
             sections = await fetchNotYetAcceptSectionForm('admin');
-        }
-        console.log('teacher');
+        }else{
+            console.log('teacher');
         
-        sections = await fetchNotYetAcceptSectionForm(userID); //use userid here for techer
+            sections = await fetchNotYetAcceptSectionForm(userID); //use userid here for techer    
+        }
     }
     
     console.log(sections);
@@ -66,8 +71,9 @@ const initial = async ()=>{
         console.log(course);
         
         let status = '';
+        console.log(section.Section_Form_STATUS === 'Open');
         
-        if(section.Section_Form_STATUS === '0'){
+        if(section.Section_Form_STATUS === '0' || section.Section_Form_STATUS === 'Open'){
             status = 'waiting for confirm';
         }else if(section.Section_Form_STATUS === '1'){
             status = 'Accept';
@@ -113,13 +119,19 @@ const initial = async ()=>{
     document.querySelector('.allSubjectBtn').addEventListener('click',async ()=>{
         let html = '';
         let sections ='';
+        console.log('get all');
+        
         if(userRole === 0){
             sections = await fetchSectionForm();
         }else{
             if(userRole === 2){
+                console.log('sections enter admin');
+                
                 sections = await fetchNotYetAcceptSectionForm('admin');
+            }else{
+                sections = await fetchNotYetAcceptSectionForm(userID);
+
             }
-            sections = await fetchNotYetAcceptSectionForm(userID);
         }
 
         console.log(sections);
@@ -179,9 +191,14 @@ const initial = async ()=>{
         return curr.courseName === keyword
     }
 
-    document.querySelector('#search-btn').addEventListener('click',async()=>{
+    document.querySelector('#searchBar').addEventListener('input',async()=>{
         let htmlSearch = '';
+        console.log('serach keyword');
+        
+        
         const searchText = document.querySelector('#searchBar').value;
+        
+        console.log('keyword ', searchText);
         
         let sections ='';
         if(userRole === 0){
@@ -189,10 +206,13 @@ const initial = async ()=>{
         }else{
             if(userRole === 2){
                 sections = await fetchNotYetAcceptSectionForm('admin');
+            }else{
+                sections = await fetchNotYetAcceptSectionForm(userID);
             }
-            sections = await fetchNotYetAcceptSectionForm(userID);
         }
 
+        console.log(sections);
+        
         for(const section of sections){
             console.log(section.course_id);
             
