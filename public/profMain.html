@@ -77,7 +77,7 @@
     <div class="content">
         <!-- 🔎 Search Box -->
         <div class="search-container">
-            <input class="search" name="fsrch" id="fsrch" placeholder="Search">
+          <input class="search" name="fsrch" id="fsrch" placeholder="Search" oninput="searchProfessors()">
         </div>
 
         <!-- Container สำหรับแสดงข้อมูลอาจารย์ -->
@@ -85,45 +85,82 @@
     </div>
 
     <script>
-        async function fetchProfessors() {
-            try {
-                const response = await fetch('http://localhost:3000/getProfessors');
-                const data = await response.json();
-                
-                const userResponse = await fetch('http://localhost:3000/api/reauth');
-                const userData = await userResponse.json();
-                const user = userData.info;
+        let professorsData = []; // เก็บข้อมูลอาจารย์ที่ดึงมาไว้ในตัวแปร
 
-                const professorList = document.getElementById('professor-list');
-                professorList.innerHTML = '';
+async function fetchProfessors() {
+    try {
+        const response = await fetch('http://localhost:3000/getProfessors');
+        const data = await response.json();
+        
+        const userResponse = await fetch('http://localhost:3000/api/reauth');
+        const userData = await userResponse.json();
+        const user = userData.info;
 
-                data.forEach(prof => {
-                    const isAdmin = user.USER_Role === "Admin";  // ถ้าเป็น Admin
-                    const isOwner = user.USER_Role === "Teacher" && user.USER_ID === prof.USER_ID; // ถ้าเป็น Teacher และ USER_ID ตรงกัน
+        professorsData = data; // เก็บข้อมูลไว้ในตัวแปร
 
-                    const professorCard = document.createElement('div');
-                    professorCard.classList.add('card');
+        const professorList = document.getElementById('professor-list');
+        professorList.innerHTML = '';
 
-                    professorCard.innerHTML = `
-                        <p class="detail">${prof.USER_Name} ${prof.USER_Surname}</p>
-                        <div class="row">
-                            <img src="${prof.USER_Image || 'http://localhost:3000/uploads/default-image.jpg'}" alt="${prof.USER_Name}" />
-                            <div class="column">
-                                <p class="detail">รหัสอาจารย์: ${prof.USER_ID}</p>
-                                <p class="detail">ห้องทำงาน: ${prof.USER_Room}</p>
-                                <p class="detail">${prof.USER_Contact_DETAIL}</p>
-                            </div>
-                            <div class="column">
-                                ${isAdmin || isOwner ? `<a href="editProf.html?USER_ID=${prof.USER_ID}" class="edit">Edit</a>` : ''}
-                            </div>
-                        </div>
-                    `;
-                    professorList.appendChild(professorCard);
-                });
-            } catch (error) {
-                console.error('Error fetching professors:', error);
-            }
-        }
+        data.forEach(prof => {
+            const isAdmin = user.USER_Role === "Admin";  
+            const isOwner = user.USER_Role === "Teacher" && user.USER_ID === prof.USER_ID; 
+
+            const professorCard = document.createElement('div');
+            professorCard.classList.add('card');
+
+            professorCard.innerHTML = `
+                <p class="detail">${prof.USER_Name} ${prof.USER_Surname}</p>
+                <div class="row">
+                    <img src="${prof.USER_Image || 'http://localhost:3000/uploads/default-image.jpg'}" alt="${prof.USER_Name}" />
+                    <div class="column">
+                        <p class="detail">รหัสอาจารย์: ${prof.USER_ID}</p>
+                        <p class="detail">ห้องทำงาน: ${prof.USER_Room}</p>
+                        <p class="detail">${prof.USER_Contact_DETAIL}</p>
+                    </div>
+                    <div class="column">
+                        ${isAdmin || isOwner ? `<a href="editProf.html?USER_ID=${prof.USER_ID}" class="edit">Edit</a>` : ''}
+                    </div>
+                </div>
+            `;
+            professorList.appendChild(professorCard);
+        });
+    } catch (error) {
+        console.error('Error fetching professors:', error);
+    }
+}
+
+function searchProfessors() {
+    const searchTerm = document.getElementById('fsrch').value.toLowerCase();
+
+    // กรองข้อมูลที่ตรงกับคำค้นหาจากชื่ออาจารย์
+    const filteredProfessors = professorsData.filter(prof => {
+        const fullName = `${prof.USER_Name} ${prof.USER_Surname}`.toLowerCase();
+        return fullName.includes(searchTerm);
+    });
+
+    const professorList = document.getElementById('professor-list');
+    professorList.innerHTML = '';
+
+    filteredProfessors.forEach(prof => {
+        const professorCard = document.createElement('div');
+        professorCard.classList.add('card');
+        professorCard.innerHTML = `
+            <p class="detail">${prof.USER_Name} ${prof.USER_Surname}</p>
+            <div class="row">
+                <img src="${prof.USER_Image || 'http://localhost:3000/uploads/default-image.jpg'}" alt="${prof.USER_Name}" />
+                <div class="column">
+                    <p class="detail">รหัสอาจารย์: ${prof.USER_ID}</p>
+                    <p class="detail">ห้องทำงาน: ${prof.USER_Room}</p>
+                    <p class="detail">${prof.USER_Contact_DETAIL}</p>
+                </div>
+                <div class="column">
+                    <a href="editProf.html?USER_ID=${prof.USER_ID}" class="edit">Edit</a>
+                </div>
+            </div>
+        `;
+        professorList.appendChild(professorCard);
+    });
+}
         document.addEventListener("DOMContentLoaded", () => {
             fetch("/dashboard")
                 .then(res => res.json())
