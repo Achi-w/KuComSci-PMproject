@@ -30,7 +30,59 @@
             </button>
         </div>
     </div>
+    <link rel="stylesheet" href="/styles/dialog-styles.css">
 
+                  <!-- Dialog Container (Hidden by default) -->
+                  <div id="dialogContainer" class="dialog-container" style="display: none;">
+                    <div class="dialog-backdrop"></div>
+                    <div class="dialog-box">
+                      <div class="dialog-content">
+                        <p id="dialogMessage" style="color: black;">คุณต้องการออกจากระบบหรือไม่?</p>
+                      </div>
+                      <div class="dialog-actions" id="dialogActions">
+                        <!-- Buttons will be dynamically inserted here -->
+                      </div>
+                    </div>
+                  </div>
+                  <script src="/script/dialog-script.js"></script>
+                  <script>
+                    const logoutButton = document.getElementById('logout-button');
+                    logoutButton.addEventListener('click', () => {
+                      if (typeof DialogManager === "undefined") {
+                        console.error("DialogManager is not defined. Check if dialog-script.js is loaded.");
+                        return;
+                      }
+                      const dialogManager = new DialogManager();
+                      dialogManager.showConfirmDialog('คุณต้องการออกจากระบบหรือไม่?', () => {
+                        fetch("/logout", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                          if (data.success) {
+                            window.location.href = "/index.html";
+                          } else {
+                            console.error("Logout failed.");
+                          }
+                        })
+                        .catch(err => console.error("Error during logout:", err));
+                      }, null);
+                    });
+                  </script>
+                  <!-- FRIEND'S LOGOUT CODE ENDS HERE -->
+            
+                    </div>
+                    
+                </div>
+            
+              <div id="postSuccessModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <p>แก้ไขข้อมูลเรียบร้อย</p>
+                    <button id="confirmPostSuccess" class="popup-button confirm-button">ยืนยัน</button>
+                </div>
+            </div>
+              
     <!-- Main content -->
     <div class="content">
         <form id="edit-form" enctype="multipart/form-data">
@@ -63,7 +115,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // ดึง USER_ID จาก URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -88,94 +139,93 @@
 
         // ฟังก์ชันอัปเดตอาจารย์
         async function updateProfessor() {
-            const fileInput = document.getElementById('USER_Image');
-            const formData = new FormData();
+    const fileInput = document.getElementById('USER_Image');
+    const formData = new FormData();
 
-            formData.append('USER_ID', userId);
-            formData.append('USER_Name', document.getElementById('USER_Name').value);
-            formData.append('USER_Surname', document.getElementById('USER_Surname').value);
-            formData.append('USER_Contact_DETAIL', document.getElementById('USER_Contact_DETAIL').value);
-            formData.append('USER_Room', document.getElementById('USER_Room').value);
+    formData.append('USER_ID', userId);
+    formData.append('USER_Name', document.getElementById('USER_Name').value);
+    formData.append('USER_Surname', document.getElementById('USER_Surname').value);
+    formData.append('USER_Contact_DETAIL', document.getElementById('USER_Contact_DETAIL').value);
+    formData.append('USER_Room', document.getElementById('USER_Room').value);
 
-            if (fileInput.files.length > 0) {
-                formData.append('USER_Image', fileInput.files[0]);
-            }
+    if (fileInput.files.length > 0) {
+        formData.append('USER_Image', fileInput.files[0]);
+    }
 
-            try {
-                const response = await fetch('http://localhost:3000/updateProf', {
-                    method: 'PUT',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    alert('Professor updated successfully');
-                    window.location.href = "profMain.html";
-                } else {
-                    alert('Failed to update professor');
-                }
-            } catch (error) {
-                console.error('Error updating professor:', error);
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            fetchProfessorData();
-
-            // ควบคุม Modal
-            const updateButton = document.getElementById("updateButton");
-            const modal = document.getElementById("postConfirmModal");
-            const cancelPostConfirm = document.getElementById("cancelPostConfirm");
-            const confirmPost = document.getElementById("confirmPost");
-
-            updateButton.addEventListener("click", () => {
-                modal.style.display = "block";
-            });
-
-            cancelPostConfirm.addEventListener("click", () => {
-                modal.style.display = "none";
-            });
-
-            confirmPost.addEventListener("click", () => {
-                modal.style.display = "none";
-                updateProfessor();
-            });
+    try {
+        const response = await fetch('http://localhost:3000/updateProf', {
+            method: 'PUT',
+            body: formData
         });
-        document.addEventListener("DOMContentLoaded", () => {
-            fetch("/dashboard")
-                .then(res => res.json())
-                .then(data => {
+
+        if (response.ok) {
+            // Show success modal after successful update
+            document.getElementById("postSuccessModal").style.display = "flex"; 
+            // Redirect after a short delay, allowing the user to see the success message
+        } else {
+            alert('Failed to update professor');
+        }
+    } catch (error) {
+        console.error('Error updating professor:', error);
+    }
+}
+document.addEventListener("DOMContentLoaded", () => {
+        fetchProfessorData();
+
+        const updateButton = document.getElementById("updateButton");
+        const modal = document.getElementById("postConfirmModal");
+        const cancelPostConfirm = document.getElementById("cancelPostConfirm");
+        const confirmPost = document.getElementById("confirmPost");
+
+        updateButton.addEventListener("click", () => {
+            modal.style.display = "block";
+        });
+
+        cancelPostConfirm.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        confirmPost.addEventListener("click", () => {
+            modal.style.display = "none";
+            updateProfessor();
+        });
+
+        document.getElementById("confirmPostSuccess").addEventListener("click", function() {
+            document.getElementById("postSuccessModal").style.display = "none";
+            window.location.href = "profMain.html";
+        });
+
+        fetch("/dashboard")
+            .then(res => res.json())
+            .then(data => {
                 if (data.success) {
                     currentUser = data.user;
                     document.getElementById("userName").textContent =
-                    currentUser.USER_Name + " " + currentUser.USER_Surname;
+                        currentUser.USER_Name + " " + currentUser.USER_Surname;
                     if (currentUser.USER_Role.toLowerCase() === "student") {
-                    document.getElementById("roleTitle").textContent =
-                        "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-                    document.getElementById("roomBooking").textContent = "ห้องเรียนและห้องสอบ";
-
+                        document.getElementById("roleTitle").textContent =
+                            "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                        document.getElementById("roomBooking").textContent = "ห้องเรียนและห้องสอบ";
                     } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
-                    document.getElementById("roleTitle").textContent =
-                        "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-                    document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
-
+                        document.getElementById("roleTitle").textContent =
+                            "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                        document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
                     } else if (currentUser.USER_Role.toLowerCase() === "admin") {
-                    document.getElementById("roleTitle").textContent =
-                        "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
-                    document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
-
+                        document.getElementById("roleTitle").textContent =
+                            "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+                        document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
                     }
                     const postBtn = document.getElementById("postBtn");
                     if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
-                    postBtn.style.display = "inline-block";
+                        postBtn.style.display = "inline-block";
                     }
                 } else {
                     console.error("User not authenticated");
                     window.location.href = "index.html";
                 }
-                })
-                .catch(err => console.error(err));
-            });
-
-    </script>
+            })
+            .catch(err => console.error(err));
+    });
+</script>
 </body>
 </html>
