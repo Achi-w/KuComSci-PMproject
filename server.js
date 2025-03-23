@@ -48,7 +48,6 @@ const db = mysql.createConnection({
   database: "pmdatabase4",
 });
 
-
 db.connect((err) => {
   if (err) {
     console.error("Database connection failed: " + err.message);
@@ -62,8 +61,9 @@ db.connect((err) => {
 // -------------------------
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
+  // Updated: include USER_Image field in the query.
   const query =
-    "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password FROM USER WHERE USER_ID = ?";
+    "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password, USER_Image FROM USER WHERE USER_ID = ?";
   db.query(query, [username], (err, results) => {
     if (err) {
       console.error("Database query error: " + err.message);
@@ -92,6 +92,7 @@ app.get("/dashboard", (req, res) => {
       .status(401)
       .json({ success: false, message: "Unauthorized" });
   }
+  // The session user now includes USER_Image.
   res.json({ success: true, user: req.session.user });
 });
 
@@ -110,19 +111,22 @@ const memoryStorage = multer.memoryStorage();
 const uploadMemory = multer({ storage: memoryStorage });
 
 // GET /announcements – return all announcements sorted by date DESC
+// Updated to join with the user table so that each announcement includes user_image.
 app.get("/announcements", (req, res) => {
   const sql = `
     SELECT 
-      Announcement_ID as id,
-      USER_ID as user_id,
-      USER_Name as first_name,
-      USER_Surname as last_name,
-      USER_Role as role,
-      Announcement_Detail as detail,
-      DATE_FORMAT(Announcement_Start_Date, '%Y-%m-%d') as date,
-      Announcement_Headline as headline
-    FROM announcement
-    ORDER BY Announcement_Start_Date DESC`;
+      a.Announcement_ID as id,
+      a.USER_ID as user_id,
+      a.USER_Name as first_name,
+      a.USER_Surname as last_name,
+      a.USER_Role as role,
+      a.Announcement_Detail as detail,
+      DATE_FORMAT(a.Announcement_Start_Date, '%Y-%m-%d') as date,
+      a.Announcement_Headline as headline,
+      u.USER_Image as user_image
+    FROM announcement a
+    JOIN user u ON a.USER_ID = u.USER_ID
+    ORDER BY a.Announcement_Start_Date DESC`;
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
