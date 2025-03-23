@@ -6,14 +6,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> 
     <title>Course List</title>
     <style>
-        body {
-            margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      background-color: #ffffff;
-      height: 100%;
-      padding-top: 50px;
-      
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #ffffff;
+    padding-top: 50px;
+    height: 100%;
 }
 /* LEFT NAVIGATION BAR */
 .left-nav {
@@ -90,51 +87,38 @@
     .top-bar .right span {
       margin-right: 10px;
     }
-/* 🔎 Search Bar */
-.search-container {
+
+    .search-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
+    width: 100%;
 }
+
 
 #search-input {
-    width: 300px; 
-    max-width: 100%; 
-    padding: 8px;
+    width: 100%;
+    padding: 10px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#search-btn {
-    padding: 8px 12px;
-    background-color: #007bff;
-    color: white;
     border: none;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
-    margin-left: 5px;
+    background: #D3D3D3; /* Light gray */
+    color: #333;
+    outline: none;
 }
 
-#search-btn:hover {
-    background-color: #0056b3;
+#search-input::placeholder {
+    color: #666;
+    font-size: 14px;
 }
+
+#search-input:focus {
+    background: #C0C0C0;
+}
+
+
+
+
 
 /* 📜 Container for Course Items (scrollable) */
-.course-container {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    max-height: 600px;
-    padding: 10px;
-    gap: 20px;
-    margin-bottom: 40px;
-    width: 300px; 
-    max-width: 100%; 
-    margin: 0 auto;
-}
+
 .logout-button {
     background: none;
     border: none;
@@ -147,50 +131,114 @@
 .logout-button:hover {
     background-color: #8E8E8E;
 }
-.course-item {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    height: 180px;
-    transition: all 0.3s ease;
+
+
+
+.course-name, .course-rating {
+    padding: 10px 10px;        
+    border-radius: 0px;    
+    background-color: #D3D3D3; 
+
 }
 
-.course-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
 
-.course-name {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.course-rating {
-    font-size: 16px;
-    font-weight: bold;
-    color: #ff6600; /* เปลี่ยนสีให้เด่น */
-}
-
-.course-description {
-    flex-grow: 1;
-    font-size: 14px;
-    color: #666;
-    margin-top: 10px;
-    text-align: justify;
-}
 
 /* Style when hovering over the course box */
 .course-item:hover {
     background-color: #f8f8f8;
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
+.course-container {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 650px;
+    padding: 10px;
+    gap: 10px;
+    background: #5e5e5e; /* Dark gray */
+    width: 660px; /* Fixed width */
+    margin: 0 auto; 
+    padding: 20px;
+}
+
+/* 🎓 Course Item */
+.course-item {
+    padding: 5px;
+    border-radius: 0; /* Boxy */
+    color: black;
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Ensure it fills the container */
+}
+
+
+.course-header {
+    display: flex;            /* Use flexbox to arrange elements horizontally */
+    justify-content: space-between; /* Space them apart */
+    align-items: center;      /* Align them vertically at the center */
+}
+
+/* 🏷 Course Description */
+.course-description {
+    background: #D3D3D3;
+    color: black;
+    padding: 20px;
+    margin-top: 5px;
+}
+.title-container{
+  display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 650px;
+    padding: 10px;
+    gap: 10px;
+    width: 700px;
+    max-width: 100%;
+    margin: 0 auto; 
+    padding: 20px;
+}
+
+.course-title {
+    background: #D3D3D3;
+    display: block;
+    width: fit-content;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    text-align: start;
+    margin-left: 0; 
+}
+
+
+    /* Webkit-based browsers (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+        width: 12px; /* Set width for the vertical scrollbar */
+        height: 12px; /* Set height for the horizontal scrollbar */
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: #d3d3d3; /* Light gray track */
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #888; /* Dark gray thumb */
+        border-radius: 10px;
+        border: 2px solid #d3d3d3; /* White border around thumb */
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #555; /* Darker when hovered */
+    }
+
+    /* Firefox */
+    html {
+        scrollbar-width: thin; /* Thin scrollbar */
+        scrollbar-color: #888 #d3d3d3; /* Thumb color and track color */
+    }
 
     </style>
 </head>
@@ -203,7 +251,7 @@
       <li><a href="Course_Review.html"class="active">รีวิวภาควิชา</a></li>
       <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
       <li><a href="profMain.html">ช่องทางการติดต่ออาจารย์</a></li>
-      <li><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+      <li><a href="/roomBooking/studyRoom">ห้องเรียนและห้องสอบ</a></li>
     </ul>
   </div>
       <!-- Top bar -->
@@ -221,13 +269,18 @@
 
     <!-- 🔎 Search Box -->
     <h1></h1>
-    <div class="search-container">
-        <input type="text" id="search-input" placeholder="🔍 ค้นหาวิชา...">
-        <button id="search-btn">ค้นหา</button>
+
+
+    <div class="title-container">
+      <div class="search-container">
+        <input type="text" id="search-input" placeholder="ค้นหาวิชา...">
+    </div>
+      <h1 class="course-title">รายวิชาทั้งหมด</h1>
+      <div class="course-container">
+        <div id="course-item"></div>
+      </div>
     </div>
 
-    <!-- Container สำหรับแสดงข้อมูลคอร์ส -->
-    <div class="course-container" id="course-item"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script type="module" src="Course_Review.js"></script>
@@ -279,6 +332,8 @@
               }, null);
     
           });
+
+
     </script>
     
 </body>

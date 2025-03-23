@@ -1,6 +1,6 @@
 const courseList = document.getElementById('course-item');
 const searchInput = document.getElementById('search-input');
-const searchBtn = document.getElementById('search-btn');
+
 
 let allCourses = []; // เก็บข้อมูลคอร์สทั้งหมด
 let currentUser = {};
@@ -20,7 +20,6 @@ const fetchCourses = async () => {
 const displayCourses = (courses) => {
     courseList.innerHTML = '';
     courses.forEach(course => {
-        console.log(course); // Debugging
         const courseDiv = document.createElement('div');
         courseDiv.classList.add('course-item');
 
@@ -69,15 +68,19 @@ const displayCourses = (courses) => {
 });
 
 
-// ฟังก์ชันค้นหาคอร์ส
-const searchCourses = () => {
+
+
+
+
+searchInput.addEventListener("input", () => {
     const query = searchInput.value.trim().toLowerCase();
     const filteredCourses = allCourses.filter(course =>
         course.Course_Name.toLowerCase().includes(query) || 
         course.Course_ID.toLowerCase().includes(query)
     );
-    displayCourses(filteredCourses); // แสดงคอร์สที่กรองแล้ว
-};
+    displayCourses(filteredCourses); // Update displayed courses
+});
+
 
 // ฟังก์ชันไปยังหน้ารายละเอียดคอร์ส
 const goToDetails = (Cid) => {
@@ -85,7 +88,7 @@ const goToDetails = (Cid) => {
 };
 
 // ตั้งค่าการทำงานของปุ่มค้นหา
-searchBtn.addEventListener('click', searchCourses);
+
 searchInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') searchCourses();
 });

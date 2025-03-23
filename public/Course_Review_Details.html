@@ -7,12 +7,11 @@
     <title>Course Review Details</title>
 <style>
 body {
+  font-family: 'Arial', sans-serif;
+    background-color: #ffffff;
     margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      background-color: #ffffff;
-      height: 100%;
-      padding-top: 50px;
+    padding: 0;
+    padding-top: 50px;
 }
 /* LEFT NAVIGATION BAR */
 .left-nav {
@@ -65,9 +64,55 @@ body {
   background:#8E8E8E;
   color: black;
 }
-    #course-details, #course-reviews, h3 {
-    margin-left: 230px; 
-    padding: 5px;
+
+#course-name, #course-description{
+  background: #D3D3D3; 
+    display: block; 
+    width: fit-content; 
+
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    text-align: start;
+}
+.avg-rating {
+    background: #D3D3D3;
+    color: black;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 0px;
+    border: 0px;
+    width: fit-content;
+}
+.title-rating-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;   
+  
+}
+
+.review-body {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 10px; 
+}
+
+ #course-reviews {
+  background: #5e5e5e; 
+    display: block; 
+    width: 100%; /* Takes full width */
+    max-width: 900px; /* Limits to 800px */
+    margin-left: 0 auto; 
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    text-align: start;
 }
 .logout-button {
     background: none;
@@ -83,68 +128,98 @@ body {
 }
 
     .top-bar {
-    position: fixed;
-    top: 0;
-    left: 215px;
-    right: 0;
-    height: 50px;
-    background-color: #525252;
-    color: #ffffff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    z-index: 1000;
-}
+      position: fixed;
+      top: 0;
+      left: 215px;
+      right: 0;
+      height: 50px;
+      background-color: #525252;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 1000;
+    }
+    .top-bar .left {
+      font-size: 1.2rem;
+    }
+    .top-bar .right span {
+      margin-right: 10px;
+    }
 /* Container for Course Information and Reviews */
 .course-info-container {
     display: flex;
     justify-content: center; 
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+.review-section {
+    background: #505050;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    max-width: 80%;
+    margin: 10px auto;
+}
+.reviews-container {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 800px;
+    
+    background: #5e5e5e; /* Dark gray */
+    
+    width: 100%; /* Takes full width */
+
 }
 
 /* Styling for Reviews */
 .review-item {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 5px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    max-width: 50%;  
-    box-sizing: border-box;
-    margin-left: 25%;
-    word-wrap: break-word; 
-    word-break: break-word; 
-    overflow-wrap: break-word;
+  padding: 5px;
+    border-radius: 0; /* Boxy */
+    color: black;
+    display: flex;
+    flex-direction: column;
 }
-
-.review-content {
-    white-space: pre-wrap; 
-    word-wrap: break-word;  
-    word-break: break-word; 
-    padding: 10px;         
-    font-size: 1rem;      
-    max-width: 70%;    
-    margin: 0 auto;       
-    text-align: left;     
-}
-
-
 
 
 .review-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
+  display: flex;            /* Use flexbox to arrange elements horizontally */
+    justify-content: space-between; /* Space them apart */
+    align-items: center;      /* Align them vertically at the center */
 }
 
 .review-username {
-    font-weight: bold;
+    width: 150px; /* Set a fixed width */
+    display: inline-block; /* Ensure it respects width */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Add "..." if text is too long */
+    white-space: nowrap; /* Prevent wrapping */
+    padding: 10px 10px;        
+    justify-content: space-between; 
+    border-radius: 0px;    
+    background-color: #D3D3D3; 
+    color: black;
+}
+.review-rating,
+.review-date {
+  padding: 10px 10px;        
+    justify-content: space-between; 
+    border-radius: 0px;    
+    background-color: #D3D3D3; 
+    color: black;
 }
 
-.review-rating {
-    color: #ff9900;
+.review-content {
+    flex-grow: 1; /* Allows content to take up space */
+    background: #D3D3D3;
+    color: black;
+    width: 100%; /* Takes full width */
+    max-width: 800px; /* Limits to 800px */
+    padding: 20px;
+    margin-top: 5px;
 }
 
 .review-actions {
@@ -153,34 +228,201 @@ body {
     
 }
 
+
 .delete-btn {
-    color: white;
     background-color: red;
+    color: black;
     border: none;
-    padding: 5px 10px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 0px;
+    padding: 20px 20px;
+    font-size: 18px;
 }
 
 .delete-btn:hover {
     background-color: darkred;
 }
 
-.create-btn {
-    color: white;
-    background-color: green;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
+
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-box {
+  position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #D9D9D9;
     border-radius: 5px;
-    position: fixed; /* This makes the button stay fixed on the screen */
-    top: 100px; /* Moves it below the top bar */
-    right: 30px; /* Keeps it near the right edge */
+    min-width: 300px;
+    max-width: 600px;
+    padding: 50px 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-box p {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    display: block; 
+    margin: 5px 0; 
+}
+#delete-message {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#delete-message2 {
+    font-size: 18px;
+    font-weight: normal; /* Adjust weight if needed */
+    text-align: center;
+}
+
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 24px
+}
+
+.btn-cancel {
+  background-color: #FE1515;
+}
+
+.btn-cancel:hover {
+    background: darkgray;
+    cursor: pointer;
+}
+
+.btn-delete {
+  background-color: #58FF49;
+}
+
+.btn-delete:hover {
+    background: darkgray;
+    cursor: pointer;
+}
+.btn-cancel, .btn-delete {
+  border: solid 1px black;
+    padding: 12px 24px; 
+    border-radius: 0px;
+    font-size: 16px; 
+    cursor: pointer;
+    width: 90px; 
+    transition: 0.2s;
+}
+
+
+.create-btn {
+    background-color: #58ff49;
+    border: 1px solid #000;
+    color: black;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 0px;
+    font-size: 18px;
 }
 
 
 .create-btn:hover {
     background-color: darkgreen;
+}
+
+.course-title {
+    background: #D3D3D3;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    width: fit-content;
+}
+
+    /* Webkit-based browsers (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+        width: 12px; /* Set width for the vertical scrollbar */
+        height: 12px; /* Set height for the horizontal scrollbar */
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: #d3d3d3; /* Light gray track */
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #888; /* Dark gray thumb */
+        border-radius: 10px;
+        border: 2px solid #d3d3d3; /* White border around thumb */
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #555; /* Darker when hovered */
+    }
+
+    /* Firefox */
+    html {
+        scrollbar-width: thin; /* Thin scrollbar */
+        scrollbar-color: #888 #d3d3d3; /* Thumb color and track color */
+    }
+.All{
+  display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 750px;
+    padding: 10px;
+    gap: 10px;
+    width: 100%;
+    max-width: 950px;
+    margin: 0 auto; 
+    padding: 20px;
+}
+
+/* Success Modal */
+.success-modal {
+  position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #D9D9D9;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    display: none; /* Initially hidden */
+    border-radius: 5px;
+    min-width: 300px;
+    max-width: 600px;
+    padding: 50px 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: 0.2s;
+}
+
+/* Success Modal Button */
+.success-modal button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 18px;
+    background: #58ff49;
+    color: black;
+    border: 1px solid #000;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 0px;
+}
+
+.success-modal button:hover {
+    background: #f1f1f1;
 }
 
 </style>
@@ -194,7 +436,7 @@ body {
       <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
       <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
       <li><a href="profMain.html">ช่องทางการติดต่ออาจารย์</a></li>
-      <li><a href="/roomBooking/studyRoom">จองห้องและย้ายห้อง</a></li>
+      <li><a href="/roomBooking/studyRoom">ห้องเรียนและห้องสอบ</a></li>
     </ul>
   </div>
           <!-- Top bar -->
@@ -207,17 +449,44 @@ body {
    </button>
     </div>
   </div>
-    <div id="course-details">
-        <h2 id="course-name"></h2>
-        <p id="course-description"></p>
+
+<div id="delete-confirmation" class="modal-container">
+  <div class="modal-box">
+    <p id="delete-message">คุณต้องการลบรีวิวนี้หรือไม่?</p>
+    <p id="delete-message2">หากลบแล้วจะไม่สามารถกู้คืนได้!</p> 
+    <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeDeleteModal()">ยกเลิก</button>
+        <button class="btn-delete" id="confirm-delete">ยืนยัน</button>
     </div>
+</div>
 
-    <h3>รีวิวทั้งหมด</h3>
-    <div id="course-reviews"></div>
+  </div>
+</div>
 
-    <div class="review-actions">
+<div id="success-modal" class="success-modal">
+  <p>โพสต์ถูกลบสำเร็จแล้ว</p>
+  <button onclick="closeSuccessModal()">ยืนยัน</button>
+</div>
+
+
+        
+ 
+ <div class="All">
+    <h2 id="course-name"></h2>
+    <p id="course-description"></p>
+    <div class="title-rating-container">
+      <h1 class="course-title">รีวิวทั้งหมด</h1>
+      <div id="rating-container"></div>
+      <div class="review-actions">
         <button class="create-btn" id="create-review-btn">สร้างรีวิว</button>
     </div>
+  </div>
+
+  <div class="reviews-container" id="course-reviews"></div>
+   
+    
+  </div>
+
 
 
     <link rel="stylesheet" href="/styles/dialog-styles.css">

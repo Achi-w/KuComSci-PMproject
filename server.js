@@ -335,6 +335,32 @@ app.get('/api/course/:Course_ID', (req, res) => {
       }
   });
 });
+app.get('/api/course_review', (req, res) => {
+  const { Course_ID, USER_ID } = req.query;
+
+
+  if (!Course_ID || !USER_ID) {
+      return res.status(400).json({ error: "Course_ID and USER_ID are required" });
+  }
+
+  const query = `
+      SELECT Review_Course_ID FROM course_review
+      WHERE Course_ID = ? AND USER_ID = ?
+  `;
+
+  db.query(query, [Course_ID, USER_ID], (err, results) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: 'Database query failed' });
+      }
+      if (results.length > 0) {
+          return res.json({ hasReviewed: true, review: results });
+      } else {
+          return res.json({ hasReviewed: false });
+      }
+  });
+});
+
 
 // ดึงรีวิวของคอร์ส พร้อมคำนวณค่าเฉลี่ย Review_Course_Rate
 app.get('/api/course_review/:Course_ID', (req, res) => {
