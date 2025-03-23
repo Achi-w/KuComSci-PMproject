@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
   $("#courseSelect").on('change', function() {
     const selectedCourseId = $(this).val();
     const courseData = courseOptions.find(course => course.course_id === selectedCourseId);
-    
     $("#courseCode").val(selectedCourseId);
     
     if (selectedCourseId) {
@@ -54,19 +53,46 @@ document.addEventListener('DOMContentLoaded', function() {
     dateFormat: 'dd/mm/yy'
   });
 
+
+  // Prevent user input
+  const inputDate = document.getElementById("bookingDate");
+  const inputStartTime = document.getElementById("startTime");
+  const inputEndTime = document.getElementById("endTime");
+
+  // Date
+  inputDate.addEventListener("keydown", function (e) {e.preventDefault();});
+  inputDate.addEventListener('paste', function(event) {event.preventDefault(); return false;});
+  inputDate.setAttribute('autocomplete', 'off');
+  inputDate.addEventListener('focus', function() {inputDate.blur();});
+
+  // Start Time
+  inputStartTime.addEventListener("keydown", function (e) {e.preventDefault();});
+  inputStartTime.addEventListener('paste', function(event) {event.preventDefault(); return false;});
+  inputStartTime.setAttribute('autocomplete', 'off');
+  inputStartTime.addEventListener('focus', function() { setTimeout(() => {this.blur(); }, 100);}); 
+
+  // End Time
+  inputEndTime.addEventListener("keydown", function (e) {e.preventDefault();});
+  inputEndTime.addEventListener('paste', function(event) {event.preventDefault(); return false;});
+  inputEndTime.setAttribute('autocomplete', 'off');
+  inputEndTime.addEventListener('focus', function() { setTimeout(() => {this.blur(); }, 100);});
+
+
+
   //initialize selected schedule data
   if (bookAction == 'edit') {
     const scheduleData = JSON.parse(decodeURIComponent(window.location.search.split('data=')[1]));
     if (scheduleData) {
-      // Select the course first (need to update for combobox)
+      // Select the course first
       const courseOption = $(`#courseSelect option[value="${scheduleData.courseId}"]`);
       if (courseOption.length) {
         // Set the value of the select
         $("#courseSelect").val(scheduleData.courseId).trigger('change');
-        
-        // Also set the text in the combobox input
+
+        // Also set the text in the combobox input and trigger change to update stored value
         const courseText = courseOption.text();
         $(".ui-combobox-input").val(courseText).trigger('change');
+        $(".ui-combobox-input").data('selectedValue', courseText);
         
         // Set the hidden course code
         $("#courseCode").val(scheduleData.courseId);
@@ -435,6 +461,12 @@ function setupSearchableDropdown(selectElement) {
     .attr("placeholder", "เลือกรายวิชา")
     .insertAfter(select);
   
+  console.log(input);
+  console.log(input.val());
+  // Variables to track dropdown and editing state
+  let isDropdownOpen = false;
+  let isEditing = false;
+  
   // Hide the original select
   select.hide();
   
@@ -445,78 +477,211 @@ function setupSearchableDropdown(selectElement) {
   const initialOption = select.find("option:selected");
   if (initialOption.val()) {
     input.val(initialOption.text());
+    // Store the selected value for reference
+    input.data('selectedValue', initialOption.text());
+  } else {
+    input.data('selectedValue', '');
   }
   
-  // Setup autocomplete
-  input.autocomplete({
-    delay: 0,
-    minLength: 0,
-    source: function(request, response) {
-      const matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
-      response(select.children("option").map(function() {
-        const text = $(this).text();
-        const value = $(this).val();
-        if (this.value && (!request.term || matcher.test(text)))
-          return {
-            label: text,
-            value: text,
-            option: this
-          };
-      }).get());
-    },
-    select: function(event, ui) {
-      ui.item.option.selected = true;
-      select.val(ui.item.option.value);
-      select.trigger("change");
-      
-      // Display the selected text in the input field 
-      input.val(ui.item.label);
-      return false;
-    }
-  }).addClass("ui-widget ui-widget-content ui-corner-left");
+  // Create dropdown element that will stay in the DOM
+  const dropdownMenu = $("<div>")
+    .addClass("ui-combobox-dropdown")
+    .css({
+      "position": "absolute",
+      "z-index": "1000",
+      "background": "white",
+      "border": "1px solid #ccc",
+      "max-height": "300px",
+      "overflow-y": "auto",
+      "display": "none"
+    })
+    .insertAfter(input);
   
-  // Add dropdown button
-  $("<button>")
-    .attr("tabIndex", -1)
-    .attr("type", "button")
-    .addClass("ui-combobox-toggle")
-    .html("&#9662;") // Down arrow character
-    .insertAfter(input)
-    .on("click", function() {
-      // Toggle dropdown
-      if (input.autocomplete("widget").is(":visible")) {
-        input.autocomplete("close");
-        return;
+  // Function to position dropdown
+  function positionDropdown() {
+    dropdownMenu.css({
+      "width": input.outerWidth(),
+      "top": input.position().top + input.outerHeight(),
+      "left": input.position().left
+    });
+  }
+  
+  // Function to populate dropdown based on search term
+  function populateDropdown(searchTerm) {
+    dropdownMenu.empty();
+    
+    const matcher = new RegExp($.ui.autocomplete.escapeRegex(searchTerm), "i");
+    let matchFound = false;
+    
+    select.children("option").each(function() {
+      if (this.value && (!searchTerm || matcher.test($(this).text()))) {
+        const optionText = $(this).text();
+        const optionValue = $(this).val();
+        
+        const option = $("<div>")
+          .addClass("ui-combobox-item")
+          .css({
+            "padding": "8px 12px",
+            "cursor": "pointer"
+          })
+          .text(optionText)
+          .hover(
+            function() { $(this).css("background-color", "#f0f0f0"); },
+            function() { $(this).css("background-color", ""); }
+          )
+          .on("click", function() {
+            // Update the input value
+            input.val(optionText);
+            
+            // Store the selected value
+            input.data('selectedValue', optionText);
+            
+            // Update the select value
+            select.val(optionValue);
+            select.trigger("change");
+            
+            // Exit edit mode and hide dropdown
+            isEditing = false;
+            closeDropdown();
+            
+            // Blur the input
+            input.blur();
+            
+          });
+        
+        dropdownMenu.append(option);
+        matchFound = true;
       }
-      
-      input.autocomplete("search", "");
-      input.focus();
     });
     
+    // If no matches found, show a message
+    if (!matchFound && searchTerm) {
+      const noMatch = $("<div>")
+        .addClass("ui-combobox-no-match")
+        .css({
+          "padding": "8px 12px",
+          "color": "#999",
+          "font-style": "italic"
+        })
+        .text("ไม่พบรายวิชาที่ตรงกับคําค้นหา");
+      
+      dropdownMenu.append(noMatch);
+    }
+    
+    // Show dropdown if it's supposed to be open
+    if (isDropdownOpen) {
+      positionDropdown();
+      dropdownMenu.show();
+    }
+  }
   
-  // Add clear button if there's text in the input
-  const clearButton = $("<button>")
-    .attr("type", "button")
-    .addClass("ui-combobox-clear")
-    .html("&times;") // × character
-    .insertAfter(input)
-    .on("click", function() {
-      input.val("");
-      select.val("");
-      select.trigger("change");
-      $(this).hide();
-      return false;
-    })
-    .hide();
+  // Function to open dropdown and enter edit mode
+  function openDropdown() {
+    isDropdownOpen = true;
+    isEditing = true;
+    
+    // Clear the input field but keep the value as placeholder
+    if (input.val()) {
+      input.attr('placeholder', input.val());
+      input.val('');
+    }
+    
+    positionDropdown();
+    dropdownMenu.show();
+    populateDropdown('');
+  }
   
-  // Show/hide clear button based on input content
-  input.on("input change", function() {
-    if ($(this).val()) {
-      clearButton.show();
+  // Function to close dropdown
+  function closeDropdown() {
+    isDropdownOpen = false;
+    dropdownMenu.hide();
+    
+    // If we're still in edit mode, revert to previous selection
+    if (isEditing) {
+      restorePreviousSelection();
+    }
+  }
+  
+  // Function to restore previous selection
+  function restorePreviousSelection() {
+    // If we have a previously selected value, restore it
+    if (input.data('selectedValue')) {
+      input.val(input.data('selectedValue'));
     } else {
-      clearButton.hide();
+      input.val('');
+    }
+    isEditing = false;
+  }
+  
+  // Handle input changes for searching
+  input.on("input", function() {
+    if (!isDropdownOpen) {
+      openDropdown();
+    } else {
+      populateDropdown($(this).val());
     }
   });
-  input.trigger("change");
   
+  // Handle focus on input
+  input.on("focus", function() {
+    if (!isEditing) {
+      openDropdown();
+    }
+  });
+  
+  // Handle click on input - start editing and show all options
+  input.on("click", function(e) {
+    e.stopPropagation();
+    if (!isEditing) {
+      openDropdown();
+    }
+  });
+  
+  // When input loses focus
+  input.on("blur", function() {
+    // Don't restore selection immediately as it might be a click on the dropdown
+    setTimeout(function() {
+      // If dropdown is now closed and we were still editing, restore selection
+      if (!isDropdownOpen && isEditing) {
+        restorePreviousSelection();
+      }
+    }, 200);
+  });
+  
+  // Close dropdown when clicking outside
+  $(document).on("click", function(e) {
+    if (!$(e.target).is(input) && 
+        !$(e.target).is(dropdownMenu) && 
+        !dropdownMenu.has(e.target).length && 
+        !$(e.target).is('.ui-combobox-toggle')) {
+      closeDropdown();
+    }
+  });
+  
+  // Handle keyboard navigation
+  input.on("keydown", function(e) {
+    // Escape key
+    if (e.keyCode === 27) {
+      closeDropdown();
+    }
+    // Enter key
+    else if (e.keyCode === 13 || e.keyCode === 9) {
+      e.preventDefault();
+      // Select the first matching item if available
+      const firstItem = dropdownMenu.find(".ui-combobox-item").first();
+      if (firstItem.length) {
+        firstItem.click();
+      } else {
+        // No matches, revert to previous selection
+        closeDropdown();
+      }
+    }
+  });
+  
+  // Handle window resize to reposition dropdown
+  $(window).resize(function() {
+    if (isDropdownOpen) {
+      positionDropdown();
+    }
+  });
 }

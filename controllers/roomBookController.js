@@ -148,6 +148,10 @@ log
         const [end_hours, end_minutes, end_seconds] = end_time.split(":");
         const endDateTime = new Date(year, month - 1, day, end_hours, end_minutes, end_seconds);
 
+        if (!this.validateDate(date) || !this.validateTime(start_time) || !this.validateTime(end_time)) {
+            return false;
+        }
+
         if (startDateTime < now) {
             return false;
         }
@@ -184,6 +188,76 @@ log
                 return "Nisit";
         }
     }
+
+    validateDate(dateString) {
+        // Check if the format matches dd/mm/yyyy pattern
+        const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        if (!regex.test(dateString)) {
+          return false;
+        }
+      
+        // Extract day, month, and year
+        const parts = dateString.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10);
+        const year = parseInt(parts[2], 10);
+      
+        // Check year range (adjust as needed)
+        if (year < 2000 || year > 2100) {
+          return false;
+        }
+      
+        // Check month range
+        if (month < 1 || month > 12) {
+          return false;
+        }
+      
+        // Check day range based on month
+        const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        
+        // Adjust February for leap years
+        if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) {
+          daysInMonth[1] = 29;
+        }
+      
+        return day > 0 && day <= daysInMonth[month - 1];
+      }
+
+
+      validateTime(timeString) {
+        // Check if the format matches HH:mm:ss pattern
+        const regex = /^(\d{2}):(\d{2}):(\d{2})$/;
+        if (!regex.test(timeString)) {
+          return false;
+        }
+      
+        // Extract hours, minutes, and seconds
+        const parts = timeString.split(':');
+        const hours = parseInt(parts[0], 10);
+        const minutes = parseInt(parts[1], 10);
+        const seconds = parseInt(parts[2], 10);
+      
+        // Check hours range (8-20)
+        if (hours < 8 || hours > 21) {
+          return false;
+        }
+      
+        // Check minutes range (0 and 30 only)
+        if (minutes !== 0 && minutes !== 30) {
+          return false;
+        }
+      
+        // Check seconds range (0 only)
+        if (seconds !== 0) {
+          return false;
+        }
+
+        if (hours === 21 && minutes !== 0) {
+            return false;
+        }
+      
+        return true;
+      }
 }
 
 module.exports = StudyBookController;
