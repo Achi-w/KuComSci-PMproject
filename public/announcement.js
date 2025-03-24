@@ -64,7 +64,7 @@ function initializePage() {
       openValidationModal();
     } else if (
       headline.length > MAX_HEADLINE_LENGTH ||
-      getEffectiveTextLength() > MAX_TEXT_LENGTH || // Changed: using > instead of >=
+      getEffectiveTextLength() > MAX_TEXT_LENGTH || // using > instead of >=
       selectedImageFiles.length > MAX_IMAGES
     ) {
       openLimitExceededModal();
@@ -135,19 +135,20 @@ function initializePage() {
   // Populate user info.
   document.getElementById("userName").textContent =
     currentUser.USER_Name + " " + currentUser.USER_Surname;
-  if (currentUser.USER_Role.toLowerCase() === "student") {
-    document.getElementById("roleTitle").textContent =
-      "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+  // Updated condition: if role is "student" or "admin", then change booking link text.
+  const role = currentUser.USER_Role.toLowerCase();
+  if (role === "student" || role === "admin") {
+    if (role === "admin") {
+      document.getElementById("roleTitle").textContent = "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+    } else {
+      document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+    }
     const bookingLink = document.getElementById("bookingLink");
     if (bookingLink) bookingLink.textContent = "ห้องเรียนและห้องสอบ";
-  } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
-    document.getElementById("roleTitle").textContent =
-      "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-  } else if (currentUser.USER_Role.toLowerCase() === "admin") {
-    document.getElementById("roleTitle").textContent =
-      "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+  } else if (role === "teacher" || role === "professor") {
+    document.getElementById("roleTitle").textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
   }
-  if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
+  if (["teacher", "professor", "admin"].includes(role)) {
     document.getElementById("postBtn").style.display = "inline-block";
   }
 }
@@ -333,36 +334,15 @@ function renderAnnouncements(list) {
     const div = document.createElement("div");
     div.className = "announcement";
 
-    // Create poster icon image element.
-    const iconImg = document.createElement("img");
-    iconImg.style.width = "40px";
-    iconImg.style.height = "40px";
-    iconImg.style.borderRadius = "50%";
-    iconImg.style.marginRight = "8px";
-    // Use the announcement object's user_image if available.
-    if (a.user_image && a.user_image.data) {
-      const base64String = convertImageDataToBase64(a.user_image.data);
-      iconImg.src = "data:image/jpeg;base64," + base64String;
-    } else if (a.user_image) {
-      iconImg.src = a.user_image;
-    } else {
-      iconImg.src = "default-user-icon.png";
-    }
-    // Wrap the icon and header in a container for better layout.
-    const headerContainer = document.createElement("div");
-    headerContainer.style.display = "flex";
-    headerContainer.style.alignItems = "center";
-
-    headerContainer.appendChild(iconImg);
-
+    // Removed the icon image creation to no longer display an icon.
+    // Instead, simply create a header element.
     const header = document.createElement("div");
     header.className = "announcement-header";
     header.innerHTML = `
       <p><strong>${a.first_name} ${a.last_name} (${a.role})</strong> | ${a.date}</p>
       <h4>${a.headline}</h4>
     `;
-    headerContainer.appendChild(header);
-    div.appendChild(headerContainer);
+    div.appendChild(header);
 
     const detailContainer = document.createElement("div");
     detailContainer.className = "announcement-detail";
@@ -370,7 +350,7 @@ function renderAnnouncements(list) {
     detailContainer.innerHTML = `<p>${a.detail}</p>`;
     div.appendChild(detailContainer);
 
-    headerContainer.addEventListener("click", () => {
+    header.addEventListener("click", () => {
       detailContainer.style.display = (detailContainer.style.display === "none") ? "block" : "none";
     });
 
@@ -419,12 +399,11 @@ function openPostModal() {
   document.getElementById("postRole").textContent = currentUser ? currentUser.USER_Role : "";
   document.getElementById("postDate").value = getThaiDate();
 
-  // Set the user icon for the post modal.
-  if (currentUser && currentUser.USER_Image && currentUser.USER_Image.data) {
-    const base64String = convertImageDataToBase64(currentUser.USER_Image.data);
-    document.getElementById("postUserImage").src = "data:image/jpeg;base64," + base64String;
-  } else {
-    document.getElementById("postUserImage").src = "default-user-icon.png";
+  // Removed user icon display in the post modal.
+  // Optionally, you can hide the image element:
+  const postUserImage = document.getElementById("postUserImage");
+  if (postUserImage) {
+    postUserImage.style.display = "none";
   }
   document.getElementById("postModal").style.display = "flex";
 }
@@ -507,8 +486,7 @@ function postAnnouncement(author, date, headline, detail) {
   })
     .then(res => res.json())
     .then(newAnnouncement => {
-      // Add the current user's image to the new announcement so it shows immediately.
-      newAnnouncement.user_image = currentUser.USER_Image;
+      // We no longer add user_image since icons are removed.
       announcements.push(newAnnouncement);
       renderAnnouncements(announcements);
       if (selectedImageFiles.length > 0) {
@@ -532,8 +510,6 @@ function postAnnouncement(author, date, headline, detail) {
             })
               .then(res => res.json())
               .then(updatedAnnouncement => {
-                // Ensure the updated announcement retains the user_image.
-                updatedAnnouncement.user_image = currentUser.USER_Image;
                 announcements = announcements.map(ann =>
                   ann.id === updatedAnnouncement.id ? updatedAnnouncement : ann
                 );
