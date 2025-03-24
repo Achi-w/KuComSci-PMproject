@@ -84,6 +84,10 @@ body {
     .top-bar .left {
       font-size: 1.2rem;
     }
+    .top-bar .right {
+      display: flex;
+      align-items: center;
+    }
     .top-bar .right span {
       margin-right: 10px;
     }
@@ -220,7 +224,7 @@ body {
       <li><a href="Course_Review.html">รีวิวภาควิชา</a></li>
       <li><a href="addSecMain.html">ลงชื่อเปิดเซ็คเพิ่ม</a></li>
       <li><a href="profMain.html">ช่องทางการติดต่ออาจารย์</a></li>
-      <li><a href="/roomBooking/studyRoom">ห้องเรียนและห้องสอบ</a></li>
+      <li><a href="/roomBooking/studyRoom" id="bookingLink">ห้องเรียนและห้องสอบ</a></li>
     </ul>
   </div>
               <!-- Top bar -->
@@ -306,18 +310,16 @@ fetch("/dashboard")
        currentUser.USER_Name + " " + currentUser.USER_Surname;
             // ตรวจสอบค่า courseID และ userID
      if (!courseID || !currentUser || !currentUser.USER_Role.toLowerCase() === "student" ) {
-            alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
             window.location.href = "index.html"; // กลับไปหน้าแรก
         }
      if (currentUser.USER_Role.toLowerCase() === "student") {
        document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
      } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
        document.getElementById("roleTitle").textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-       alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
+       document.getElementById("bookingLink").textContent = "จองห้องและย้ายห้อง"
        window.location.href = "index.html"; 
      } else if (currentUser.USER_Role.toLowerCase() === "admin") {
        document.getElementById("roleTitle").textContent = "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
-       alert("เกิดข้อผิดพลาด: ไม่พบข้อมูล Course หรือ User!");
        window.location.href = "index.html"; 
      }
      if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
