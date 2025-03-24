@@ -323,21 +323,7 @@ app.get('/api/user/:USER_ID', (req, res) => {
 
 
 
-// ดึงข้อมูลรีวิวทั้งหมด
-app.get('/api/course_review', (req, res) => {
-  const query = `
-      SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time,Course_Name
-      FROM course_review
-  `;
-  db.query(query , (err, results) => {
-      if (err) {
-          console.error(err);
-          res.status(500).json({ error: 'Database query failed' });
-      } else {
-          res.json(results);
-      }
-  });
-});
+
 
 
 // ดึงข้อมูลคอร์สจาก Course_ID
@@ -387,7 +373,7 @@ app.get('/api/course_review/:Course_ID', (req, res) => {
 
   const query = `
       SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, 
-             Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name
+             Review_Course_Rate, Review_Course_Date, Review_Course_Time
       FROM course_review 
       WHERE Course_ID = ?
   `;
@@ -440,9 +426,9 @@ app.post('/api/course_review', async (req, res) => {
           return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      const sql = `INSERT INTO course_review (Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+      const sql = `INSERT INTO course_review (Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-      db.query(sql, [Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name]);
+      db.query(sql, [Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time]);
 
       res.status(201).json({ message: 'Review added successfully' });
   } catch (error) {
