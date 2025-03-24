@@ -135,19 +135,20 @@ function initializePage() {
   // Populate user info.
   document.getElementById("userName").textContent =
     currentUser.USER_Name + " " + currentUser.USER_Surname;
-  if (currentUser.USER_Role.toLowerCase() === "student") {
-    document.getElementById("roleTitle").textContent =
-      "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+  // Updated condition: if role is "student" or "admin", then change booking link text.
+  const role = currentUser.USER_Role.toLowerCase();
+  if (role === "student" || role === "admin") {
+    if (role === "admin") {
+      document.getElementById("roleTitle").textContent = "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+    } else {
+      document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+    }
     const bookingLink = document.getElementById("bookingLink");
     if (bookingLink) bookingLink.textContent = "ห้องเรียนและห้องสอบ";
-  } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
-    document.getElementById("roleTitle").textContent =
-      "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-  } else if (currentUser.USER_Role.toLowerCase() === "admin") {
-    document.getElementById("roleTitle").textContent =
-      "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+  } else if (role === "teacher" || role === "professor") {
+    document.getElementById("roleTitle").textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
   }
-  if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {
+  if (["teacher", "professor", "admin"].includes(role)) {
     document.getElementById("postBtn").style.display = "inline-block";
   }
 }
@@ -334,7 +335,6 @@ function renderAnnouncements(list) {
     div.className = "announcement";
 
     // Removed the icon image creation to no longer display an icon.
-
     // Instead, simply create a header element.
     const header = document.createElement("div");
     header.className = "announcement-header";
