@@ -61,7 +61,7 @@ db.connect((err) => {
 // -------------------------
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
-  // Updated: include USER_Image field in the query.
+  // Include USER_Image field in the query.
   const query =
     "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Password, USER_Image FROM USER WHERE USER_ID = ?";
   db.query(query, [username], (err, results) => {
@@ -111,18 +111,18 @@ const memoryStorage = multer.memoryStorage();
 const uploadMemory = multer({ storage: memoryStorage });
 
 // GET /announcements – return all announcements sorted by date DESC
-// Updated to join with the user table so that each announcement includes user_image.
+// Now pulling user info from the user table using the foreign key USER_ID.
 app.get("/announcements", (req, res) => {
   const sql = `
     SELECT 
       a.Announcement_ID as id,
       a.USER_ID as user_id,
-      a.USER_Name as first_name,
-      a.USER_Surname as last_name,
-      a.USER_Role as role,
       a.Announcement_Detail as detail,
       DATE_FORMAT(a.Announcement_Start_Date, '%Y-%m-%d') as date,
       a.Announcement_Headline as headline,
+      u.USER_Name as first_name,
+      u.USER_Surname as last_name,
+      u.USER_Role as role,
       u.USER_Image as user_image
     FROM announcement a
     JOIN user u ON a.USER_ID = u.USER_ID
@@ -134,30 +134,34 @@ app.get("/announcements", (req, res) => {
 });
 
 // POST /announcements – create a new announcement
+// The announcement table now only stores the foreign key and announcement data.
 app.post("/announcements", (req, res) => {
-  const { author, user_name, user_surname, user_role, date, headline, detail } = req.body;
+  const { author, date, headline, detail, user_role } = req.body;
   if (user_role.toLowerCase() === "student") {
     return res.status(403).json({ error: "Students are not allowed to create announcements." });
   }
   const announcementId = uuidv4().replace(/-/g, "").substring(0, 20);
   const sqlInsert = `
     INSERT INTO announcement 
-      (Announcement_ID, USER_ID, USER_Name, USER_Surname, USER_Role, Announcement_Detail, Announcement_Start_Date, Announcement_Headline)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-  db.query(sqlInsert, [announcementId, author, user_name, user_surname, user_role, detail, date, headline], (err, result) => {
+      (Announcement_ID, USER_ID, Announcement_Detail, Announcement_Start_Date, Announcement_Headline)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+  db.query(sqlInsert, [announcementId, author, detail, date, headline], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     const sqlSelect = `
       SELECT 
-        Announcement_ID as id,
-        USER_ID as user_id,
-        USER_Name as first_name,
-        USER_Surname as last_name,
-        USER_Role as role,
-        Announcement_Detail as detail,
-        DATE_FORMAT(Announcement_Start_Date, '%Y-%m-%d') as date,
-        Announcement_Headline as headline
-      FROM announcement
-      WHERE Announcement_ID = ?`;
+        a.Announcement_ID as id,
+        a.USER_ID as user_id,
+        a.Announcement_Detail as detail,
+        DATE_FORMAT(a.Announcement_Start_Date, '%Y-%m-%d') as date,
+        a.Announcement_Headline as headline,
+        u.USER_Name as first_name,
+        u.USER_Surname as last_name,
+        u.USER_Role as role
+      FROM announcement a
+      JOIN user u ON a.USER_ID = u.USER_ID
+      WHERE a.Announcement_ID = ?
+    `;
     db.query(sqlSelect, [announcementId], (err, rows) => {
       if (err) return res.status(500).json({ error: err.message });
       if (rows.length === 0)
@@ -189,16 +193,18 @@ app.put("/announcements/:id", (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
       const sqlSelect = `
         SELECT 
-          Announcement_ID as id,
-          USER_ID as user_id,
-          USER_Name as first_name,
-          USER_Surname as last_name,
-          USER_Role as role,
-          Announcement_Detail as detail,
-          DATE_FORMAT(Announcement_Start_Date, '%Y-%m-%d') as date,
-          Announcement_Headline as headline
-        FROM announcement
-        WHERE Announcement_ID = ?`;
+          a.Announcement_ID as id,
+          a.USER_ID as user_id,
+          a.Announcement_Detail as detail,
+          DATE_FORMAT(a.Announcement_Start_Date, '%Y-%m-%d') as date,
+          a.Announcement_Headline as headline,
+          u.USER_Name as first_name,
+          u.USER_Surname as last_name,
+          u.USER_Role as role
+        FROM announcement a
+        JOIN user u ON a.USER_ID = u.USER_ID
+        WHERE a.Announcement_ID = ?
+      `;
       db.query(sqlSelect, [id], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         if (rows.length === 0) return res.status(404).json({ error: "Announcement not found" });
