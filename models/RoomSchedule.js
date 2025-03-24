@@ -136,16 +136,23 @@ class RoomSchedule{
         return { dateString, timeString };
       }
 
-    async getRoomSchedule(user_id, book_type, isTeacher = null){
+    async getRoomSchedule(user_id, book_type, isTeacher = null, isAdmin = null){
         try {
             const now = this.getCurrentDateTime();
             let user_course_subquery = '';
+            let extraCond = '';
+            let params = [user_id, book_type,  now];
             if (isTeacher) {
                 user_course_subquery = 'SELECT course_id, sec, user_id FROM section_form WHERE user_id = ?';
-            } else {
+            } else if (isAdmin){
+                user_course_subquery = 'SELECT course_id, sec, user_id FROM section_form';
+                extraCond = `AND YEARWEEK(reserve_start_time, 1) = YEARWEEK('${now}', 1)`;
+                params = [book_type, now];
+            }
+            else {
                 user_course_subquery = 'SELECT course_id, sec, user_id FROM section_form WHERE section_form_id IN (SELECT section_form_id FROM `section_form_nisit_list` WHERE user_id = ?)';
             }
-            const [rows, fields] = await this.pool.query(`SELECT room_schedule_id, room_id, room_schedule.course_id, reserve_date, reserve_start_time, reserve_end_time, course_name, sec_number, CONCAT(user_name, ' ', user_surname) AS full_name  FROM room_schedule JOIN (${user_course_subquery}) as user_course ON room_schedule.course_id = user_course.course_id AND room_schedule.sec_number = user_course.sec JOIN course ON room_schedule.course_id = course.course_id JOIN user ON user_course.user_id = user.user_id WHERE book_type = ? AND reserve_end_time >= ? ORDER BY reserve_start_time`, [user_id,book_type,  now]); 
+            const [rows, fields] = await this.pool.query(`SELECT room_schedule_id, room_id, room_schedule.course_id, reserve_date, reserve_start_time, reserve_end_time, course_name, sec_number, CONCAT(user_name, ' ', user_surname) AS full_name  FROM room_schedule JOIN (${user_course_subquery}) as user_course ON room_schedule.course_id = user_course.course_id AND room_schedule.sec_number = user_course.sec JOIN course ON room_schedule.course_id = course.course_id JOIN user ON user_course.user_id = user.user_id WHERE book_type = ? AND reserve_end_time >= ? ${extraCond} ORDER BY reserve_start_time`, params); 
             const scheduleList = rows.map(row => ({...row, ...this.formatDateDisplay(row.reserve_start_time, row.reserve_end_time)}));
             return scheduleList;
         } catch (error) {
@@ -165,9 +172,17 @@ class RoomSchedule{
         }
     }
 
-    async getCourseList(user_id){
+    async getCourseList(user_id, isTeacher, isAdmin){
+        let query = '';
+        let params = [];
+        if (isTeacher){
+            query = 'SELECT course.course_name, section_form.course_id, sec FROM section_form JOIN course ON section_form.course_id = course.course_id WHERE section_form.user_id = ?';
+            params = [user_id];
+        } else if (isAdmin) {
+            query = 'SELECT course.course_name, section_form.course_id, sec FROM section_form JOIN course ON section_form.course_id = course.course_id';
+        }
         try {
-            const [rows, fields] = await this.pool.query('SELECT course.course_name, section_form.course_id, sec FROM section_form JOIN course ON section_form.course_id = course.course_id WHERE section_form.user_id = ?', [user_id]);
+            const [rows, fields] = await this.pool.query(query, params);
             return rows;
         } catch (error) {
             console.error('Error checking course list:', error);

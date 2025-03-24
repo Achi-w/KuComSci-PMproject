@@ -30,12 +30,21 @@ document.addEventListener('DOMContentLoaded', function() {
  
 
   // Initialize date picker for date input
+  var currentDate = new Date();
+
   $('#bookingDate').datepicker({
     format: 'dd/mm/yy',
+    minDate: currentDate,
     changeMonth: true,
     changeYear: true,
     autoclose: true
   });
+
+  if (isAdmin){
+    maxDate = getLastDateWeekRange();
+    console.log(maxDate);
+    $('#bookingDate').datepicker("option", "maxDate", maxDate);
+  }
   
   // Initialize time pickers
   $('#startTime, #endTime').timepicker({
@@ -131,16 +140,23 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('roomBookingForm').style.display = 'block';
       document.getElementById('availableRoomsSection').style.display = 'none';
     });
+
+    let typeNotice = '';
+    let backUrl = '';
+    if (bookType == 'study_room'){
+      typeNotice = 'ห้องเรียน';
+      backUrl = 'studyRoom'
+    } else if (bookType == 'midterm_room'){
+      typeNotice = 'ห้องสอบ'
+      backUrl = 'midtermRoom'
+    } else {
+      typeNotice = 'ห้องสอบ'
+      backUrl = 'finalRoom'
+    }
     
     // Confirm booking button click handler
     document.getElementById('confirmBooking').addEventListener('click', async function() {
       const selectedRoom = document.querySelector('.room-select.room-selected');
-      let typeNotice = '';
-      if (bookType == 'study_room'){
-        typeNotice = 'ห้องเรียน'
-      } else{
-        typeNotice = 'ห้องสอบ'
-      }
       
       if (!selectedRoom) {
         window.dialogManager.showNotificationDialog('กรุณาเลือกห้องก่อนยืนยันการจอง');
@@ -155,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const roomId = selectedRoom.getAttribute('data-room-id');
       window.dialogManager.showConfirmDialog(
         dialogMessage,
-        bookRoom.bind(null,roomId, typeNotice),
+        bookRoom.bind(null,roomId, typeNotice, backUrl),
         null
       );
       
@@ -169,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'คุณต้องการยกเลิกการจองใช่หรือไม่?',
             function() {
               // redirect to roomBooking
-              window.location.href = '/roomBooking';
+              window.location.href = `/roomBooking/${backUrl}`;
             },
             null
           );
@@ -343,7 +359,7 @@ async function checkAvailableRooms() {
 
 
 
-async function bookRoom(roomId, typeNotice) {
+async function bookRoom(roomId, typeNotice, backUrl) {
   // Get form data
   const courseCode = document.getElementById('courseCode').value;
   const section = document.getElementById('section').value;
@@ -390,7 +406,7 @@ async function bookRoom(roomId, typeNotice) {
         window.dialogManager.showNotificationDialog(
           `ข้อมูลการจอง${typeNotice}ได้ถูกเพิ่มแล้ว`,
           function() {
-            document.location.href = '/roomBooking';
+            document.location.href = `/roomBooking/${backUrl}`;
           }
         );
       } else {
@@ -438,7 +454,7 @@ async function bookRoom(roomId, typeNotice) {
           window.dialogManager.showNotificationDialog(
             `แก้ไขข้อมูลการจอง${typeNotice}สำเร็จแล้ว`,
             function() {
-              document.location.href = '/roomBooking';
+              document.location.href = `/roomBooking/${backUrl}`;
             }
           );
         } else {
@@ -684,4 +700,21 @@ function setupSearchableDropdown(selectElement) {
       positionDropdown();
     }
   });
+}
+
+function getLastDateWeekRange(){
+   // Get current date
+  var currentDate = new Date();
+  
+  // Calculate first day (Monday) of current week
+  var firstDay = new Date(currentDate);
+  var day = currentDate.getDay();
+  var diff = day === 0 ? -6 : 1 - day; 
+  firstDay.setDate(currentDate.getDate() + diff);
+  
+  // Calculate last day (Sunday) of current week
+  var lastDay = new Date(firstDay);
+  lastDay.setDate(firstDay.getDate() + 6);
+
+  return lastDay;
 }

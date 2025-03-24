@@ -14,21 +14,24 @@ log
             res.redirect('/index.html');
             return;
         }
+
         const user_id = user.USER_ID;
         const user_full_name = user.USER_Name + ' ' + user.USER_Surname;
-        const role = this.getRoleLaberl(user.USER_Role.toLowerCase());
+        const role = this.getRoleLabel(user.USER_Role.toLowerCase());
         
         let scheduleList;
         const isTeacher = (user.USER_Role.toLowerCase() == 'teacher');
+        const isAdmin = (user.USER_Role.toLowerCase() == 'admin');
+        
         if (cond == 0) {
-            scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('study_room'), isTeacher);
-            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'study_room', label:'ห้องเรียน', isTeacher: isTeacher, user_full_name: user_full_name, role: role});
+            scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('study_room'), isTeacher, isAdmin);
+            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'study_room', label:'ห้องเรียน', isTeacher: isTeacher, user_full_name: user_full_name, role: role, isAdmin: isAdmin});
         } else if (cond == 1) {
-            scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('midterm_room'), isTeacher);
-            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'midterm_room', label:'ห้องสอบ', isTeacher: isTeacher, user_full_name: user_full_name, role: role});
+            scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('midterm_room'), isTeacher, isAdmin);
+            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'midterm_room', label:'ห้องสอบ', isTeacher: isTeacher, user_full_name: user_full_name, role: role, isAdmin: isAdmin});
         } else if (cond == 2) {
-            scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('final_room'), isTeacher);
-            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'final_room', label: 'ห้องสอบ', isTeacher: isTeacher, user_full_name: user_full_name, role: role});
+            scheduleList = await this.schedule.getRoomSchedule(user_id, this.convertBooktypeLabel('final_room'), isTeacher, isAdmin);
+            res.render('roomSchedule', {scheduleList: scheduleList, bookType: 'final_room', label: 'ห้องสอบ', isTeacher: isTeacher, user_full_name: user_full_name, role: role, isAdmin: isAdmin});
         }
     }
 
@@ -42,21 +45,23 @@ log
         const user_full_name = user.USER_Name + ' ' + user.USER_Surname;
         
         const isTeacher = (user.USER_Role.toLowerCase() == 'teacher');
-        if (!isTeacher) {
+        const isAdmin = (user.USER_Role.toLowerCase() == 'admin');
+
+        if (!isTeacher && !isAdmin) {
             res.redirect('/roomBooking/studyRoom');
         }
 
-        const role = this.getRoleLaberl(user.USER_Role.toLowerCase());
+        const role = this.getRoleLabel(user.USER_Role.toLowerCase());
         
         let courses;
         if (cond == 0) {
-            courses = await this.schedule.getCourseList(user_id);
+            courses = await this.schedule.getCourseList(user_id, isTeacher, isAdmin);
             res.render('roomBookForm', {bookType: 'study_room', bookAction: action, label: 'ห้องเรียน', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher, role: role});
         } else if (cond == 1) {
-            courses = await this.schedule.getCourseList(user_id);
+            courses = await this.schedule.getCourseList(user_id, isTeacher, isAdmin);
             res.render('roomBookForm', {bookType: 'midterm_room', bookAction: action, label: 'ห้องสอบ', courses: courses, user_full_name: user_full_name, isTeacher: isTeacher, role: role})
         } else if (cond == 2) {
-            courses = await this.schedule.getCourseList(user_id);
+            courses = await this.schedule.getCourseList(user_id, isTeacher, isAdmin);
             res.render('roomBookForm', {bookType: 'final_room', bookAction: action, label: 'ห้องสอบ', courses: courses,  user_full_name: user_full_name, isTeacher: isTeacher, role: role})
         }
     }
@@ -77,7 +82,11 @@ log
             startTime, 
             endTime
         } = req.body
-        const timeValidity = this.checkTime(date, startTime, endTime)
+
+        const user_role = req.session.user.USER_Role;
+        const isAdmin = (user_role.toLowerCase() == 'admin');
+
+        const timeValidity = this.checkTime(date, startTime, endTime, isAdmin)
         if (!timeValidity) {
             return res.status(400).json({ 
             error: 'Invalid time',
@@ -139,7 +148,7 @@ log
         
     }
 
-    checkTime(date, start_time, end_time){
+    checkTime(date, start_time, end_time, isAdmin){
         const now = new Date();
         const [day, month, year] = date.split("/");
         const [start_hours, start_minutes, start_seconds] = start_time.split(":");
@@ -160,6 +169,24 @@ log
             return false;
         }
 
+        if (isAdmin){
+            const reserve_date = new Date(year, month - 1, day)
+            const currentDay = now.getDay();
+            const diff = currentDay === 0 ? -6 : 1 - currentDay;
+
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() + diff);
+
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            weekEnd.setHours(23, 59, 59, 999);
+
+            if (reserve_date > weekEnd){
+                return false;
+            }
+
+        }
+
         return true;
     }
 
@@ -176,7 +203,7 @@ log
         }
     }
 
-    getRoleLaberl(role) {
+    getRoleLabel(role) {
         switch (role) {
             case 'student':
                 return "Nisit";
