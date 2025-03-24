@@ -322,6 +322,25 @@ app.get('/api/user/:USER_ID', (req, res) => {
 });
 
 
+app.get('/api/course_review', async (req, res) => {
+  try {
+      const { Course_ID, USER_ID } = req.query;
+      const sql = `SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time FROM course_review WHERE Course_ID = ? AND USER_ID = ?`;
+
+      db.query(sql, [Course_ID, USER_ID], (err, results) => {
+          if (err) {
+              console.error("Database error:", err);
+              return res.status(500).json({ message: "Internal Server Error" });
+          }
+
+          // ✅ Always return an array
+          res.json(results.length ? results : []);
+      });
+  } catch (error) {
+      console.error("Error fetching course reviews:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
 
 
@@ -420,7 +439,7 @@ app.get('/api/course', (req, res) => {
 });
 app.post('/api/course_review', async (req, res) => {
   try {
-      const { Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name } = req.body;
+      const { Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time} = req.body;
 
       if (!USER_ID || !Course_ID) {
           return res.status(400).json({ message: 'Missing required fields' });
