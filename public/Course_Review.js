@@ -51,6 +51,7 @@ const displayCourses = (courses) => {
         } else if (["teacher", "professor"].includes(currentUser.USER_Role.toLowerCase())) {
           document.getElementById("roleTitle").textContent =
             "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+            document.getElementById("bookingLink").textContent = "จองห้องและย้ายห้อง"
         } else if (currentUser.USER_Role.toLowerCase() === "admin") {
           document.getElementById("roleTitle").textContent =
             "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";

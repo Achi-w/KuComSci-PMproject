@@ -28,6 +28,7 @@ fetch("/dashboard")
                 case "teacher":
                 case "professor":
                     roleTitle.textContent = "Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    document.getElementById("bookingLink").textContent = "จองห้องและย้ายห้อง"
                     createReviewButton.style.display = "none"; // Hide button for teachers
                     break;
                 case "admin":
