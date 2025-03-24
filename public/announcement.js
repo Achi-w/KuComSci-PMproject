@@ -326,7 +326,10 @@ function fetchAnnouncements() {
     .catch(err => console.error(err));
 }
 
-function renderAnnouncements(list) {
+async function renderAnnouncements(list) {
+  const response = await fetch('http://localhost:3000/getProfessors');
+  const professors = await response.json(); // ดึงข้อมูลเป็น JSON
+
   const container = document.getElementById("announcementsContainer");
   container.innerHTML = "";
   list.forEach(a => {
@@ -340,6 +343,10 @@ function renderAnnouncements(list) {
     iconImg.style.borderRadius = "50%";
     iconImg.style.marginRight = "8px";
     // Use the announcement object's user_image if available.
+    const professor = professors.find(b => b.USER_ID === a.user_id);
+    if (professor) {
+      a.user_image = professor.USER_Image; // ใช้ USER_Image จากข้อมูลที่ดึงมา
+    }
     if (a.user_image && a.user_image.data) {
       const base64String = convertImageDataToBase64(a.user_image.data);
       iconImg.src = "data:image/jpeg;base64," + base64String;
