@@ -64,7 +64,7 @@ function initializePage() {
       openValidationModal();
     } else if (
       headline.length > MAX_HEADLINE_LENGTH ||
-      getEffectiveTextLength() > MAX_TEXT_LENGTH || // Changed: using > instead of >=
+      getEffectiveTextLength() > MAX_TEXT_LENGTH || // using > instead of >=
       selectedImageFiles.length > MAX_IMAGES
     ) {
       openLimitExceededModal();
@@ -326,50 +326,23 @@ function fetchAnnouncements() {
     .catch(err => console.error(err));
 }
 
-async function renderAnnouncements(list) {
-  const response = await fetch('http://localhost:3000/getProfessors');
-  const professors = await response.json(); // ดึงข้อมูลเป็น JSON
-
+function renderAnnouncements(list) {
   const container = document.getElementById("announcementsContainer");
   container.innerHTML = "";
   list.forEach(a => {
     const div = document.createElement("div");
     div.className = "announcement";
 
-    // Create poster icon image element.
-    const iconImg = document.createElement("img");
-    iconImg.style.width = "40px";
-    iconImg.style.height = "40px";
-    iconImg.style.borderRadius = "50%";
-    iconImg.style.marginRight = "8px";
-    // Use the announcement object's user_image if available.
-    const professor = professors.find(b => b.USER_ID === a.user_id);
-    if (professor) {
-      a.user_image = professor.USER_Image; // ใช้ USER_Image จากข้อมูลที่ดึงมา
-    }
-    if (a.user_image && a.user_image.data) {
-      const base64String = convertImageDataToBase64(a.user_image.data);
-      iconImg.src = "data:image/jpeg;base64," + base64String;
-    } else if (a.user_image) {
-      iconImg.src = a.user_image;
-    } else {
-      iconImg.src = "default-user-icon.png";
-    }
-    // Wrap the icon and header in a container for better layout.
-    const headerContainer = document.createElement("div");
-    headerContainer.style.display = "flex";
-    headerContainer.style.alignItems = "center";
+    // Removed the icon image creation to no longer display an icon.
 
-    headerContainer.appendChild(iconImg);
-
+    // Instead, simply create a header element.
     const header = document.createElement("div");
     header.className = "announcement-header";
     header.innerHTML = `
       <p><strong>${a.first_name} ${a.last_name} (${a.role})</strong> | ${a.date}</p>
       <h4>${a.headline}</h4>
     `;
-    headerContainer.appendChild(header);
-    div.appendChild(headerContainer);
+    div.appendChild(header);
 
     const detailContainer = document.createElement("div");
     detailContainer.className = "announcement-detail";
@@ -377,7 +350,7 @@ async function renderAnnouncements(list) {
     detailContainer.innerHTML = `<p>${a.detail}</p>`;
     div.appendChild(detailContainer);
 
-    headerContainer.addEventListener("click", () => {
+    header.addEventListener("click", () => {
       detailContainer.style.display = (detailContainer.style.display === "none") ? "block" : "none";
     });
 
@@ -426,12 +399,11 @@ function openPostModal() {
   document.getElementById("postRole").textContent = currentUser ? currentUser.USER_Role : "";
   document.getElementById("postDate").value = getThaiDate();
 
-  // Set the user icon for the post modal.
-  if (currentUser && currentUser.USER_Image && currentUser.USER_Image.data) {
-    const base64String = convertImageDataToBase64(currentUser.USER_Image.data);
-    document.getElementById("postUserImage").src = "data:image/jpeg;base64," + base64String;
-  } else {
-    document.getElementById("postUserImage").src = "default-user-icon.png";
+  // Removed user icon display in the post modal.
+  // Optionally, you can hide the image element:
+  const postUserImage = document.getElementById("postUserImage");
+  if (postUserImage) {
+    postUserImage.style.display = "none";
   }
   document.getElementById("postModal").style.display = "flex";
 }
@@ -514,8 +486,7 @@ function postAnnouncement(author, date, headline, detail) {
   })
     .then(res => res.json())
     .then(newAnnouncement => {
-      // Add the current user's image to the new announcement so it shows immediately.
-      newAnnouncement.user_image = currentUser.USER_Image;
+      // We no longer add user_image since icons are removed.
       announcements.push(newAnnouncement);
       renderAnnouncements(announcements);
       if (selectedImageFiles.length > 0) {
@@ -539,8 +510,6 @@ function postAnnouncement(author, date, headline, detail) {
             })
               .then(res => res.json())
               .then(updatedAnnouncement => {
-                // Ensure the updated announcement retains the user_image.
-                updatedAnnouncement.user_image = currentUser.USER_Image;
                 announcements = announcements.map(ann =>
                   ann.id === updatedAnnouncement.id ? updatedAnnouncement : ann
                 );
