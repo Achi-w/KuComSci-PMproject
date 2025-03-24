@@ -27,7 +27,7 @@
                         <div class="column date-column" id="<%= schedule.room_schedule_id %>_date"><%= schedule.dateString %></div>
                         <div class="column course-column" id="<%= schedule.room_schedule_id %>_coursename"><%= schedule.course_name %></div>
                         <div class="column edit-column">
-                            <% if (isTeacher) { %>
+                            <% if (isTeacher || isAdmin) { %>
                             <button class="edit-btn" id="<%= schedule.room_schedule_id %>_edit">Edit</button>
                             <% } %>
                         </div>

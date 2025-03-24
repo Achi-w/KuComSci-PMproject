@@ -1,17 +1,21 @@
-document.getElementById("to-book-form").addEventListener("click", function() {
-    // Redirect to the room booking page
+const toBookFormButton = document.getElementById("to-book-form")
 
-    if (bookType == 'study_room') {
-        document.location.href = "/roomBooking/bookStudyRoom";
-        console.log("Study Room Booking");
-    }
-    else if (bookType == 'midterm_room') {
-        document.location.href = "/roomBooking/bookMidtermRoom";
-    }
-    else if (bookType == 'final_room') {
-        document.location.href = "/roomBooking/bookFinalRoom";
-    }
-});
+if (toBookFormButton) {
+    toBookFormButton.addEventListener("click", function() {
+        // Redirect to the room booking page
+
+        if (bookType == 'study_room') {
+            document.location.href = "/roomBooking/bookStudyRoom";
+            console.log("Study Room Booking");
+        }
+        else if (bookType == 'midterm_room') {
+            document.location.href = "/roomBooking/bookMidtermRoom";
+        }
+        else if (bookType == 'final_room') {
+            document.location.href = "/roomBooking/bookFinalRoom";
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     const editButtons = document.querySelectorAll('.edit-btn');

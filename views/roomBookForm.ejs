@@ -11,20 +11,23 @@
     <script>
     const bookType = `<%= bookType %>`;
     const bookAction = `<%= bookAction %>`;
+    const isAdmin = <%= !isTeacher%>
 
     <% 
     // Group sections by course
     const courseMap = {};
-    courses.forEach(function(course) {
-      if (!courseMap[course.course_id]) {
-        courseMap[course.course_id] = {
-          course_id: course.course_id,
-          course_name: course.course_name,
-          sections: []
-        };
-      }
-      courseMap[course.course_id].sections.push(course.sec);
-    });
+    if (courses !== null && courses.length > 0) {
+      courses.forEach(function(course) {
+        if (!courseMap[course.course_id]) {
+          courseMap[course.course_id] = {
+            course_id: course.course_id,
+            course_name: course.course_name,
+            sections: []
+          };
+        }
+        courseMap[course.course_id].sections.push(course.sec);
+      });
+    }
     %>
 
     const courseOptions = Object.values(<%- JSON.stringify(courseMap) %>);

@@ -103,7 +103,7 @@ body {
     background: none;
     border: none;
     color: white;
-    margin-left: 10px;
+    margin-left: 20px;
     cursor: pointer;
     padding: 10px;
 }
@@ -168,15 +168,15 @@ body {
 }
 
 /* Custom scrollbar styling */
-.room-schedule::-webkit-scrollbar {
+*::-webkit-scrollbar {
     width: 20px; /* Width of scrollbar */
 }
 
-.room-schedule::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
     background: #f0f0f0; /* Light gray track */
 }
 
-.room-schedule::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
     background-image: url('/images/scrollbar.jpg');
     background-size: contain;
     background-repeat: no-repeat;
