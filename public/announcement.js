@@ -22,8 +22,36 @@ function convertImageDataToBase64(imageData) {
   return window.btoa(binary);
 }
 
+/* --- NEW: Refresh user data from the database using user id --- */
+function refreshUserInfo() {
+  // Instead of using session data, query the user table by user id
+  if (!currentUser || !currentUser.USER_ID) return;
+  fetch(`/user/${currentUser.USER_ID}`)
+    .then(res => res.json())
+    .then(data => {
+      // Update currentUser with the fresh values
+      currentUser = data;
+      updateUserDisplay();
+    })
+    .catch(err => console.error("Error refreshing user info:", err));
+}
+
+function updateUserDisplay() {
+  // Update top bar display
+  const userNameEl = document.getElementById("userName");
+  if (userNameEl && currentUser) {
+    userNameEl.textContent = currentUser.USER_Name + " " + currentUser.USER_Surname;
+  }
+  // Update post modal display for author
+  const postAuthorEl = document.getElementById("postAuthor");
+  if (postAuthorEl && currentUser) {
+    postAuthorEl.value = currentUser.USER_Name + " " + currentUser.USER_Surname;
+  }
+}
+/* --------------------------------------------------------- */
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Check session—if not authenticated, redirect to login page.
+  // Use session data only for the user id.
   fetch("/dashboard")
     .then(res => {
       if (!res.ok) {
@@ -35,7 +63,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!data.success) {
         window.location.href = "/index.html";
       }
-      currentUser = data.user;
+      currentUser = data.user; // Contains at least USER_ID
+      // Immediately refresh the user info from database to get updated name/surname, etc.
+      refreshUserInfo();
       initializePage();
     })
     .catch(err => {
@@ -59,12 +89,11 @@ function initializePage() {
   document.getElementById("postNow").addEventListener("click", () => {
     const headline = document.getElementById("postHeadline").value.trim();
     const detailText = document.getElementById("postDetail").innerText.trim();
-    // Allow post if effective text length is exactly MAX_TEXT_LENGTH.
     if (!headline || !detailText) {
       openValidationModal();
     } else if (
       headline.length > MAX_HEADLINE_LENGTH ||
-      getEffectiveTextLength() > MAX_TEXT_LENGTH || // using > instead of >=
+      getEffectiveTextLength() > MAX_TEXT_LENGTH ||
       selectedImageFiles.length > MAX_IMAGES
     ) {
       openLimitExceededModal();
@@ -90,7 +119,6 @@ function initializePage() {
     console.error("Upload Image button not found");
   }
 
-  // When a file is selected, check size and count, then insert a non-editable placeholder.
   const uploadInput = document.getElementById("uploadImageInput");
   if (uploadInput) {
     uploadInput.addEventListener("change", function () {
@@ -115,10 +143,8 @@ function initializePage() {
     });
   }
 
-  // Update text counter as user types.
   const postDetailDiv = document.getElementById("postDetail");
   postDetailDiv.addEventListener("input", updateTextCounter);
-  // Prevent further input if effective length has reached MAX_TEXT_LENGTH.
   postDetailDiv.addEventListener("keydown", function(event) {
     const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "Tab"];
     if (allowedKeys.includes(event.key)) return;
@@ -127,15 +153,13 @@ function initializePage() {
     }
   });
 
-  // Update headline counter as user types.
   const postHeadlineInput = document.getElementById("postHeadline");
   postHeadlineInput.addEventListener("input", updateHeadlineCounter);
   updateHeadlineCounter();
 
-  // Populate user info.
+  // Update top bar based on refreshed currentUser.
   document.getElementById("userName").textContent =
     currentUser.USER_Name + " " + currentUser.USER_Surname;
-  // Updated condition: if role is "student" or "admin", then change booking link text.
   const role = currentUser.USER_Role.toLowerCase();
   if (role === "student" || role === "admin") {
     if (role === "admin") {
@@ -166,11 +190,7 @@ function updateHeadlineCounter() {
   }
   const remaining = MAX_HEADLINE_LENGTH - headlineInput.value.length;
   counter.textContent = "จำนวนตัวอักษรที่ใส่เพิ่มในหัวเรื่องได้: " + remaining;
-  if (remaining < 0) {
-    headlineInput.style.borderColor = "red";
-  } else {
-    headlineInput.style.borderColor = "";
-  }
+  headlineInput.style.borderColor = remaining < 0 ? "red" : "";
 }
 
 function insertImagePlaceholder() {
@@ -203,10 +223,8 @@ function getEffectiveTextLength() {
   postDetailDiv.childNodes.forEach(node => {
     if (node.nodeType === Node.TEXT_NODE) {
       effectiveLength += node.nodeValue.length;
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      if (!node.classList.contains("img-placeholder")) {
-        effectiveLength += node.innerText.length;
-      }
+    } else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains("img-placeholder")) {
+      effectiveLength += node.innerText.length;
     }
   });
   return effectiveLength;
@@ -225,12 +243,7 @@ function updateTextCounter() {
     document.getElementById("postDetail").parentNode.insertBefore(counter, document.getElementById("postDetail").nextSibling);
   }
   counter.textContent = "จำนวนตัวอักษรที่ใส่เพิ่มในลายละเอียดประกาศได้: " + remaining;
-  const postDetailDiv = document.getElementById("postDetail");
-  if (remaining < 0) {
-    postDetailDiv.style.borderColor = "red";
-  } else {
-    postDetailDiv.style.borderColor = "";
-  }
+  document.getElementById("postDetail").style.borderColor = remaining < 0 ? "red" : "";
 }
 
 function updateImageCounter() {
@@ -333,9 +346,6 @@ function renderAnnouncements(list) {
   list.forEach(a => {
     const div = document.createElement("div");
     div.className = "announcement";
-
-    // Removed the icon image creation to no longer display an icon.
-    // Instead, simply create a header element.
     const header = document.createElement("div");
     header.className = "announcement-header";
     header.innerHTML = `
@@ -343,17 +353,14 @@ function renderAnnouncements(list) {
       <h4>${a.headline}</h4>
     `;
     div.appendChild(header);
-
     const detailContainer = document.createElement("div");
     detailContainer.className = "announcement-detail";
     detailContainer.style.display = "none";
     detailContainer.innerHTML = `<p>${a.detail}</p>`;
     div.appendChild(detailContainer);
-
     header.addEventListener("click", () => {
-      detailContainer.style.display = (detailContainer.style.display === "none") ? "block" : "none";
+      detailContainer.style.display = detailContainer.style.display === "none" ? "block" : "none";
     });
-
     if (currentUser && currentUser.USER_ID === a.user_id && currentUser.USER_Role.toLowerCase() !== "student") {
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-btn";
@@ -388,19 +395,18 @@ function stripHTML(html) {
 }
 
 function openPostModal() {
+  // Always refresh updated user info from the database.
+  refreshUserInfo();
+  
   document.getElementById("postHeadline").value = "";
   document.getElementById("postDetail").innerHTML = "";
   selectedImageFiles = [];
   updateHeadlineCounter();
   updateTextCounter();
   updateImageCounter();
-  // Display the user's full name.
   document.getElementById("postAuthor").value = currentUser ? currentUser.USER_Name + " " + currentUser.USER_Surname : "";
   document.getElementById("postRole").textContent = currentUser ? currentUser.USER_Role : "";
   document.getElementById("postDate").value = getThaiDate();
-
-  // Removed user icon display in the post modal.
-  // Optionally, you can hide the image element:
   const postUserImage = document.getElementById("postUserImage");
   if (postUserImage) {
     postUserImage.style.display = "none";
@@ -448,12 +454,9 @@ function closeDeleteSuccessModal() {
 }
 
 function handlePost() {
-  // Prevent duplicate posting.
   if (postingInProgress) return;
   postingInProgress = true;
-  document.getElementById("confirmPost").disabled = true; // Disable confirm button
-
-  // Use the actual user id from currentUser (not the displayed full name).
+  document.getElementById("confirmPost").disabled = true;
   const author = currentUser ? currentUser.USER_ID : "";
   const date = document.getElementById("postDate").value;
   const headline = document.getElementById("postHeadline").value;
@@ -476,8 +479,6 @@ function postAnnouncement(author, date, headline, detail) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       author,
-      user_name: currentUser.USER_Name,
-      user_surname: currentUser.USER_Surname,
       user_role: currentUser.USER_Role,
       date,
       headline,
@@ -486,14 +487,12 @@ function postAnnouncement(author, date, headline, detail) {
   })
     .then(res => res.json())
     .then(newAnnouncement => {
-      // We no longer add user_image since icons are removed.
       announcements.push(newAnnouncement);
       renderAnnouncements(announcements);
       if (selectedImageFiles.length > 0) {
         return uploadImagesForAnnouncement(newAnnouncement.id)
           .then(uploadResults => {
             let updatedDetail = document.getElementById("postDetail").innerHTML;
-            // Replace each placeholder sequentially.
             uploadResults.forEach(result => {
               const imgTag = `<img src="/announcements/${newAnnouncement.id}/image/${result.announcementImageId}" alt="Announcement Image">`;
               updatedDetail = updatedDetail.replace(/<span class="img-placeholder"[^>]*>\[Image\]<\/span>/, imgTag);

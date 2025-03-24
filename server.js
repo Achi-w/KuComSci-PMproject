@@ -103,6 +103,19 @@ app.post("/logout", (req, res) => {
 });
 
 // -------------------------
+// New Endpoint: Get Updated User Data
+// -------------------------
+app.get("/user/:id", (req, res) => {
+  const userId = req.params.id;
+  const sql = "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Image FROM user WHERE USER_ID = ?";
+  db.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: "User not found" });
+    res.json(results[0]);
+  });
+});
+
+// -------------------------
 // Announcement Endpoints
 // -------------------------
 
@@ -111,7 +124,6 @@ const memoryStorage = multer.memoryStorage();
 const uploadMemory = multer({ storage: memoryStorage });
 
 // GET /announcements – return all announcements sorted by date DESC
-// Now pulling user info from the user table using the foreign key USER_ID.
 app.get("/announcements", (req, res) => {
   const sql = `
     SELECT 
@@ -134,7 +146,6 @@ app.get("/announcements", (req, res) => {
 });
 
 // POST /announcements – create a new announcement
-// The announcement table now only stores the foreign key and announcement data.
 app.post("/announcements", (req, res) => {
   const { author, date, headline, detail, user_role } = req.body;
   if (user_role.toLowerCase() === "student") {
@@ -171,7 +182,7 @@ app.post("/announcements", (req, res) => {
   });
 });
 
-// PUT /announcements/:id – update an announcement (used to update details with image tags)
+// PUT /announcements/:id – update an announcement
 app.put("/announcements/:id", (req, res) => {
   const id = req.params.id;
   const { headline, detail, currentUserId, currentUserRole } = req.body;
@@ -214,7 +225,7 @@ app.put("/announcements/:id", (req, res) => {
   });
 });
 
-// POST /announcements/:id/uploadImage – upload an image for a given announcement (store binary data in DB)
+// POST /announcements/:id/uploadImage – upload an image for a given announcement
 app.post('/announcements/:id/uploadImage', uploadMemory.single('image'), (req, res) => {
   const announcementId = req.params.id;
   if (!req.file) {
@@ -252,7 +263,7 @@ app.get('/announcements/:announcementId/image/:imageId', (req, res) => {
   });
 });
 
-// DELETE /announcements/:id – delete announcement and associated images from the DB
+// DELETE /announcements/:id – delete announcement and associated images
 app.delete("/announcements/:id", (req, res) => {
   const id = req.params.id;
   const { currentUserId, currentUserRole } = req.body;
@@ -261,7 +272,6 @@ app.delete("/announcements/:id", (req, res) => {
     return res.status(403).json({ error: "Students are not allowed to delete announcements." });
   }
   
-  // First, verify that the announcement exists and is owned by the current user.
   const sqlSelect = `
     SELECT USER_ID 
     FROM announcement 
@@ -274,14 +284,12 @@ app.delete("/announcements/:id", (req, res) => {
       return res.status(403).json({ error: "Not authorized to delete this announcement" });
     }
     
-    // Delete images associated with the announcement
     const sqlDeleteImages = `DELETE FROM announcement_image WHERE Announcement_ID = ?`;
     db.query(sqlDeleteImages, [id], (err) => {
       if (err) {
         console.error("Error deleting announcement images:", err);
         return res.status(500).json({ error: err.message });
       }
-      // Now delete the announcement record.
       const sqlDelete = `DELETE FROM announcement WHERE Announcement_ID = ?`;
       db.query(sqlDelete, [id], (err, result) => {
         if (err) {
@@ -294,6 +302,7 @@ app.delete("/announcements/:id", (req, res) => {
     });
   });
 });
+
 
 //-------------------------------ming------------------------------
 app.get('/api/user/:USER_ID', (req, res) => {
