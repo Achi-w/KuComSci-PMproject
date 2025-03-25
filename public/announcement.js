@@ -22,14 +22,12 @@ function convertImageDataToBase64(imageData) {
   return window.btoa(binary);
 }
 
-/* --- NEW: Refresh user data from the database using user id --- */
+/* --- Refresh user info functions --- */
 function refreshUserInfo() {
-  // Instead of using session data, query the user table by user id
   if (!currentUser || !currentUser.USER_ID) return;
   fetch(`/user/${currentUser.USER_ID}`)
     .then(res => res.json())
     .then(data => {
-      // Update currentUser with the fresh values
       currentUser = data;
       updateUserDisplay();
     })
@@ -37,18 +35,15 @@ function refreshUserInfo() {
 }
 
 function updateUserDisplay() {
-  // Update top bar display
   const userNameEl = document.getElementById("userName");
   if (userNameEl && currentUser) {
     userNameEl.textContent = currentUser.USER_Name + " " + currentUser.USER_Surname;
   }
-  // Update post modal display for author
   const postAuthorEl = document.getElementById("postAuthor");
   if (postAuthorEl && currentUser) {
     postAuthorEl.value = currentUser.USER_Name + " " + currentUser.USER_Surname;
   }
 }
-/* --------------------------------------------------------- */
 
 document.addEventListener("DOMContentLoaded", () => {
   // Use session data only for the user id.
@@ -64,9 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "/index.html";
       }
       currentUser = data.user; // Contains at least USER_ID
-      // Immediately refresh the user info from database to get updated name/surname, etc.
-      refreshUserInfo();
+      refreshUserInfo(); // Get updated details from DB
       initializePage();
+      setupPostDetailObserver();
+      setupPasteHandler(); // Disable pasting
     })
     .catch(err => {
       console.error("Session check failed:", err);
@@ -85,7 +81,6 @@ function initializePage() {
     closePostModal();
   });
 
-  // Validate on clicking "โพสต์เลย"
   document.getElementById("postNow").addEventListener("click", () => {
     const headline = document.getElementById("postHeadline").value.trim();
     const detailText = document.getElementById("postDetail").innerText.trim();
@@ -109,7 +104,6 @@ function initializePage() {
   document.getElementById("confirmDelete").addEventListener("click", handleDelete);
   document.getElementById("confirmDeleteSuccess").addEventListener("click", closeDeleteSuccessModal);
 
-  // Set up file selection for image upload.
   const uploadBtn = document.getElementById("uploadImageBtn");
   if (uploadBtn) {
     uploadBtn.addEventListener("click", () => {
@@ -135,7 +129,7 @@ function initializePage() {
         return;
       }
       selectedImageFiles.push(file);
-      insertImagePlaceholder();
+      insertImagePlaceholder(file);
       updateTextCounter();
       updateImageCounter();
       console.log("Image file queued and placeholder inserted:", file.name);
@@ -143,30 +137,24 @@ function initializePage() {
     });
   }
 
-  const postDetailDiv = document.getElementById("postDetail");
-  postDetailDiv.addEventListener("input", updateTextCounter);
-  postDetailDiv.addEventListener("keydown", function(event) {
-    const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "Tab"];
-    if (allowedKeys.includes(event.key)) return;
-    if (getEffectiveTextLength() >= MAX_TEXT_LENGTH) {
-      event.preventDefault();
-    }
-  });
-
+  // Update the headline counter when user types
   const postHeadlineInput = document.getElementById("postHeadline");
   postHeadlineInput.addEventListener("input", updateHeadlineCounter);
   updateHeadlineCounter();
 
-  // Update top bar based on refreshed currentUser.
+  // *** NEW: Add keyup event to update text counter in real time ***
+  const postDetailDiv = document.getElementById("postDetail");
+  postDetailDiv.addEventListener("keyup", updateTextCounter);
+  postDetailDiv.addEventListener("input", updateTextCounter);
+
   document.getElementById("userName").textContent =
     currentUser.USER_Name + " " + currentUser.USER_Surname;
   const role = currentUser.USER_Role.toLowerCase();
   if (role === "student" || role === "admin") {
-    if (role === "admin") {
-      document.getElementById("roleTitle").textContent = "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-    } else {
-      document.getElementById("roleTitle").textContent = "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
-    }
+    document.getElementById("roleTitle").textContent =
+      role === "admin"
+        ? "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์"
+        : "Nisit Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
     const bookingLink = document.getElementById("bookingLink");
     if (bookingLink) bookingLink.textContent = "ห้องเรียนและห้องสอบ";
   } else if (role === "teacher" || role === "professor") {
@@ -175,6 +163,28 @@ function initializePage() {
   if (["teacher", "professor", "admin"].includes(role)) {
     document.getElementById("postBtn").style.display = "inline-block";
   }
+}
+
+// Set up a MutationObserver on the post detail area so that when image placeholders are removed,
+// we rebuild the selectedImageFiles array from the remaining placeholders.
+function setupPostDetailObserver() {
+  const postDetail = document.getElementById("postDetail");
+  const observer = new MutationObserver(() => {
+    const placeholders = document.querySelectorAll("#postDetail .img-placeholder");
+    selectedImageFiles = Array.from(placeholders).map(ph => ph.file);
+    updateImageCounter();
+  });
+  observer.observe(postDetail, { childList: true, subtree: true });
+}
+
+// Set up a paste event handler that disables pasting entirely.
+function setupPasteHandler() {
+  const postDetail = document.getElementById("postDetail");
+  postDetail.addEventListener("paste", function(event) {
+    event.preventDefault();
+    // If you want to show a message, you could use an alert; otherwise, leave it commented.
+    // alert("Pasting is disabled. Please type or use the upload button.");
+  });
 }
 
 function updateHeadlineCounter() {
@@ -193,13 +203,20 @@ function updateHeadlineCounter() {
   headlineInput.style.borderColor = remaining < 0 ? "red" : "";
 }
 
-function insertImagePlaceholder() {
+// insertImagePlaceholder now accepts a file object and attaches it.
+function insertImagePlaceholder(file) {
   const postDetailDiv = document.getElementById("postDetail");
   postDetailDiv.focus();
+  
   const placeholder = document.createElement("span");
   placeholder.className = "img-placeholder";
   placeholder.setAttribute("contenteditable", "false");
   placeholder.textContent = "[Image]";
+  
+  const index = selectedImageFiles.length - 1;
+  placeholder.dataset.index = index;
+  placeholder.file = file;
+  
   let sel, range;
   if (window.getSelection && (sel = window.getSelection()).rangeCount) {
     range = sel.getRangeAt(0);
@@ -215,6 +232,21 @@ function insertImagePlaceholder() {
   } else {
     postDetailDiv.appendChild(placeholder);
   }
+}
+
+function updateImageCounter() {
+  let counter = document.getElementById("imageCounter");
+  if (!counter) {
+    counter = document.createElement("div");
+    counter.id = "imageCounter";
+    counter.style.textAlign = "right";
+    counter.style.fontSize = "0.9rem";
+    counter.style.color = "#ffffff";
+    const uploadSection = document.getElementById("uploadImageBtn").parentNode;
+    uploadSection.appendChild(counter);
+  }
+  counter.textContent = "จำนวนรูปที่เพิ่มในประกาศแล้ว: " + selectedImageFiles.length + "/" + MAX_IMAGES;
+  counter.style.color = selectedImageFiles.length > MAX_IMAGES ? "red" : "#ffffff";
 }
 
 function getEffectiveTextLength() {
@@ -244,21 +276,6 @@ function updateTextCounter() {
   }
   counter.textContent = "จำนวนตัวอักษรที่ใส่เพิ่มในลายละเอียดประกาศได้: " + remaining;
   document.getElementById("postDetail").style.borderColor = remaining < 0 ? "red" : "";
-}
-
-function updateImageCounter() {
-  let counter = document.getElementById("imageCounter");
-  if (!counter) {
-    counter = document.createElement("div");
-    counter.id = "imageCounter";
-    counter.style.textAlign = "right";
-    counter.style.fontSize = "0.9rem";
-    counter.style.color = "#ffffff";
-    const uploadSection = document.getElementById("uploadImageBtn").parentNode;
-    uploadSection.appendChild(counter);
-  }
-  counter.textContent = "จำนวนรูปที่เพิ่มในประกาศแล้ว: " + selectedImageFiles.length + "/" + MAX_IMAGES;
-  counter.style.color = selectedImageFiles.length > MAX_IMAGES ? "red" : "#ffffff";
 }
 
 function openValidationModal() {
@@ -395,9 +412,7 @@ function stripHTML(html) {
 }
 
 function openPostModal() {
-  // Always refresh updated user info from the database.
   refreshUserInfo();
-  
   document.getElementById("postHeadline").value = "";
   document.getElementById("postDetail").innerHTML = "";
   selectedImageFiles = [];
