@@ -359,10 +359,12 @@ fetch("/dashboard")
         document.getElementById('back-btn').addEventListener('click', () => {
             window.location.href = `Course_Review_Details.html?CID=${courseID}`;
         });
-        const checkExistingReview = async () => {
+
+const checkExistingReview = async () => {
     try {
         const url = `http://localhost:3000/api/course_review?Course_ID=${courseID}&USER_ID=${currentUser.USER_ID}`;
         const response = await axios.get(url);
+        console.log("API Response:", response.data);
         const hasReview = response.data.some(review => 
             review.USER_ID === currentUser.USER_ID && review.Course_ID === courseID
         );

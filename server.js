@@ -322,22 +322,27 @@ app.get('/api/user/:USER_ID', (req, res) => {
 });
 
 
+app.get('/api/course_review', async (req, res) => {
+  try {
+      const { Course_ID, USER_ID } = req.query;
+      const sql = `SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time FROM course_review WHERE Course_ID = ? AND USER_ID = ?`;
 
-// ดึงข้อมูลรีวิวทั้งหมด
-app.get('/api/course_review', (req, res) => {
-  const query = `
-      SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time,Course_Name
-      FROM course_review
-  `;
-  db.query(query , (err, results) => {
-      if (err) {
-          console.error(err);
-          res.status(500).json({ error: 'Database query failed' });
-      } else {
-          res.json(results);
-      }
-  });
+      db.query(sql, [Course_ID, USER_ID], (err, results) => {
+          if (err) {
+              console.error("Database error:", err);
+              return res.status(500).json({ message: "Internal Server Error" });
+          }
+
+          // ✅ Always return an array
+          res.json(results.length ? results : []);
+      });
+  } catch (error) {
+      console.error("Error fetching course reviews:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+  }
 });
+
+
 
 
 // ดึงข้อมูลคอร์สจาก Course_ID
@@ -387,7 +392,7 @@ app.get('/api/course_review/:Course_ID', (req, res) => {
 
   const query = `
       SELECT Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, 
-             Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name
+             Review_Course_Rate, Review_Course_Date, Review_Course_Time
       FROM course_review 
       WHERE Course_ID = ?
   `;
@@ -434,15 +439,15 @@ app.get('/api/course', (req, res) => {
 });
 app.post('/api/course_review', async (req, res) => {
   try {
-      const { Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name } = req.body;
+      const { Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time} = req.body;
 
       if (!USER_ID || !Course_ID) {
           return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      const sql = `INSERT INTO course_review (Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+      const sql = `INSERT INTO course_review (Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-      db.query(sql, [Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time, Course_Name]);
+      db.query(sql, [Review_Course_ID, USER_ID, Course_ID, Review_Course_Details, Review_Course_Rate, Review_Course_Date, Review_Course_Time]);
 
       res.status(201).json({ message: 'Review added successfully' });
   } catch (error) {
@@ -830,6 +835,43 @@ app.put('/api/sectionform/status/:formId',(req,res)=>{
   )
 })
 
+app.get('/api/courseSecTeacher/:id',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
+
+  const id = req.params.id;
+  
+
+  db.query('SELECT u.USER_ID, u.USER_Name, u.USER_Surname, c.Course_ID, c.Course_Name, c.Course_Detail FROM user_s_course uc JOIN user u ON uc.USER_ID = u.USER_ID JOIN course c ON uc.Course_ID = c.Course_ID WHERE u.USER_ID = ?', [id],(err,result,fields)=>{
+    if(err){
+      console.error(err);
+      return res.status(201).send(
+          {
+              status:0,
+              info:'error'
+          }
+      )
+    }else{
+      console.log('------------------');
+      console.log(result);
+      
+      
+      return res.status(200).send(
+        {
+            status:1,
+            info:result
+        }
+    )
+    }
+  })
+})
+
 //ok implemented front end
 app.get('/api/sectionform/id/:id',(req,res)=>{
   if (!req.session.user){
@@ -1053,6 +1095,7 @@ app.set('layout', 'layouts/layout');
 app.use(expressLayouts);
 
 const roomBookingRouter = require('./routers/RoomBookingRouter.js');
+const { connect } = require("http2");
 app.use('/roomBooking', roomBookingRouter);
 //-------------------------------Frame------------------------------
 //--- WiN
