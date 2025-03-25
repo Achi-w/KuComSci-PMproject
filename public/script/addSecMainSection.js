@@ -228,8 +228,19 @@ const initial = async ()=>{
         //        filteredSection.push(section);
         //    }
         //}
-        const filteredSection = sections.filter(curr=> curr.courseName.includes(searchText));
-       
+        let filteredSection = sections.filter(curr=> curr.courseName.includes(searchText));
+        console.log(filteredSection);
+        
+        if(filteredSection.length < 1){
+            console.log('enter');
+            
+            filteredSection = sections.filter(curr=> curr.Course_ID.includes(searchText));
+        }
+        if(filteredSection.length < 1 ){
+            filteredSection = sections.filter(curr=> curr.courseOwnerName.includes(searchText));
+        }
+        console.log(filteredSection);
+        
         for(const section of filteredSection){       
             console.log(section);
                  
@@ -287,7 +298,7 @@ const checkAuth = async()=>{
             userRole = 1
             userID = isAuth.info.USER_ID;
         }else if( isAuth.info.USER_Role === 'Admin'){
-            document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
+            document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
             document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
             
             userRole = 2

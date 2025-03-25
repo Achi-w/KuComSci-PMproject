@@ -835,6 +835,43 @@ app.put('/api/sectionform/status/:formId',(req,res)=>{
   )
 })
 
+app.get('/api/courseSecTeacher/:id',(req,res)=>{
+  if (!req.session.user){
+    console.log('user have no right');
+
+    return res.status(201).send({
+      status:0,
+      info:'you have no access'
+    })
+  }
+
+  const id = req.params.id;
+  
+
+  db.query('SELECT u.USER_ID, u.USER_Name, u.USER_Surname, c.Course_ID, c.Course_Name, c.Course_Detail FROM user_s_course uc JOIN user u ON uc.USER_ID = u.USER_ID JOIN course c ON uc.Course_ID = c.Course_ID WHERE u.USER_ID = ?', [id],(err,result,fields)=>{
+    if(err){
+      console.error(err);
+      return res.status(201).send(
+          {
+              status:0,
+              info:'error'
+          }
+      )
+    }else{
+      console.log('------------------');
+      console.log(result);
+      
+      
+      return res.status(200).send(
+        {
+            status:1,
+            info:result
+        }
+    )
+    }
+  })
+})
+
 //ok implemented front end
 app.get('/api/sectionform/id/:id',(req,res)=>{
   if (!req.session.user){
@@ -1058,6 +1095,7 @@ app.set('layout', 'layouts/layout');
 app.use(expressLayouts);
 
 const roomBookingRouter = require('./routers/RoomBookingRouter.js');
+const { connect } = require("http2");
 app.use('/roomBooking', roomBookingRouter);
 //-------------------------------Frame------------------------------
 //--- WiN

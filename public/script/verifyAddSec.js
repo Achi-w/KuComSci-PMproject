@@ -126,8 +126,10 @@ const checkAuth = async()=>{
 
     if(isAuth.status){
         if(isAuth.info.USER_Role === 'Teacher'){
+            document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
             document.querySelector('#info-header-title').innerHTML = 'Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
         }else{
+            document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
             document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
         }
         document.querySelector('#nisit-name').innerHTML = isAuth.info.USER_Name + ' ' + isAuth.info.USER_Surname;

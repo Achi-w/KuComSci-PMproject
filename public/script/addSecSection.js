@@ -1,4 +1,4 @@
-import { fetchAllCourse, fetchCourse } from "../data/course.js"
+import { fetchAllCourse, fetchCourse, fetchCourseOfTeahcer } from "../data/course.js"
 import { addNewSection } from "../data/sectionForm.js";
 import { logout, reauth } from "./utils/auth.js";
 
@@ -12,7 +12,13 @@ const initial = async()=>{
     let htmlSelect = `
         <option value="0">รายวิชาที่ต้องการเปิด</option>
     `;
-    const courses = await fetchAllCourse();
+
+    let courses = [];
+    if(userRole === 1){
+        courses = await fetchCourseOfTeahcer(userid);
+    }else{
+        courses = await fetchAllCourse();
+    }
     
     for(const course of courses){
         htmlSelect += `
@@ -50,6 +56,7 @@ const initial = async()=>{
         
         
 
+        
         const nowDate = new Date();
         
         const dataToSend = {
@@ -138,12 +145,15 @@ const checkAuth = async()=>{
         if(isAuth.info.USER_Role === 'Teacher' || isAuth.info.USER_Role === 'Admin'){
             if(isAuth.info.USER_Role === 'Teacher'){
                 document.querySelector('#info-header-title').innerHTML = 'Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
+                document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
+                userRole = 1;
             }else{
                 document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
-            }
-            document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
+                document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
+                userRole = 2;
 
-            userRole = 1;
+            }
+
             userid = isAuth.info.USER_ID;
         }else{
             document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
