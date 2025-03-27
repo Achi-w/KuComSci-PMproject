@@ -20,14 +20,15 @@ export async function fetchSectionForm() {
     .catch(error => console.error("Error:", error));
 }
 
-export async function updateSection(id, status) {
+export async function updateSection(id, status, tId) {
   return fetch(`http://localhost:3000/api/sectionform/status/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     credentials: 'include',
     body: JSON.stringify({
       sectionFormStatus: status,
-      userId: 1
+      userId: 1,
+      sectionFormPermission:tId 
     })
   })
     .then(response => response.json())

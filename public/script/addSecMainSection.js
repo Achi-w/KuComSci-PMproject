@@ -1,5 +1,5 @@
 import { fetchCourse, fetchAllCourse } from "../data/course.js";
-import { fetchNotYetAcceptSectionForm, fetchSectionForm } from "../data/sectionForm.js"
+import { deleteSectionForm, fetchNotYetAcceptSectionForm, fetchSectionForm } from "../data/sectionForm.js"
 import { logout, reauth } from "./utils/auth.js";
 import { checkExpriedForm } from "./utils/date.js";
 
@@ -57,6 +57,11 @@ const initial = async ()=>{
     console.log(sections);
     
     for(const section of sections){
+
+        if( section.Section_Form_STATUS === 0 && checkExpriedForm(section.Section_Form_start_time)){
+            deleteSectionForm(section.Section_Form_ID);
+            continue;
+        }
         //const dateTest = new Date(section.Section_Form_start_time);
         //
         //if(!checkExpriedForm(dateTest)){
@@ -74,13 +79,13 @@ const initial = async ()=>{
         console.log(section.Section_Form_STATUS === 'Open');
         
         if(section.Section_Form_STATUS === '0' || section.Section_Form_STATUS === 'Open'){
-            status = 'waiting for confirm';
+            status = 'รอการอนุมัติ';
         }else if(section.Section_Form_STATUS === '1'){
-            status = 'Accept';
+            status = 'ยอมรับ';
         }else if(section.Section_Form_STATUS === '2'){
-            status = 'Decline';
+            status = 'ปฏิเสธ';
         }else{
-            status = 'unknown';
+            status = 'อื่นๆ';
         }
 
         
@@ -145,16 +150,16 @@ const initial = async ()=>{
 
             let status = '';
 
-            if(section.Section_Form_STATUS === '0'){
-                status = 'waiting for confirm';
+            if(section.Section_Form_STATUS === '0' || section.Section_Form_STATUS === 'Open'){
+                status = 'รอการอนุมัติ';
             }else if(section.Section_Form_STATUS === '1'){
-                status = 'Accept';
+                status = 'ยอมรับ';
             }else if(section.Section_Form_STATUS === '2'){
-                status = 'Decline';
+                status = 'ปฏิเสธ';
             }else{
-                status = 'unknown';
+                status = 'อื่นๆ';
             }
-
+    
             console.log(course.Course_Name, course.Course_ID,status);
 
                     //check role
@@ -222,12 +227,7 @@ const initial = async ()=>{
             section.courseOwnerName = course.Course_Owner_Name;            
         }
 
-        //const filteredSection =[];
-        //for(const section of sections){
-        //    if(section.courseName.includes(searchText)){
-        //        filteredSection.push(section);
-        //    }
-        //}
+     
         let filteredSection = sections.filter(curr=> curr.courseName.includes(searchText));
         console.log(filteredSection);
         
@@ -246,15 +246,16 @@ const initial = async ()=>{
                  
             let status = '';
             
-            if(section.Section_Form_STATUS === '0'){
-                status = 'waiting for confirm';
+            if(section.Section_Form_STATUS === '0' || section.Section_Form_STATUS === 'Open'){
+                status = 'รอการอนุมัติ';
             }else if(section.Section_Form_STATUS === '1'){
-                status = 'Accept';
+                status = 'ยอมรับ';
             }else if(section.Section_Form_STATUS === '2'){
-                status = 'Decline';
+                status = 'ปฏิเสธ';
             }else{
-                status = 'unknown';
+                status = 'อื่นๆ';
             }
+    
         
             //check role
             const navigate = checkRole(section.Section_Form_ID,status);
@@ -299,7 +300,7 @@ const checkAuth = async()=>{
             userID = isAuth.info.USER_ID;
         }else if( isAuth.info.USER_Role === 'Admin'){
             document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
-            document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
+            document.querySelector('#info-header-title').innerHTML = 'Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
             
             userRole = 2
             userID = isAuth.info.USER_ID;

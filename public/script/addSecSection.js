@@ -148,7 +148,7 @@ const checkAuth = async()=>{
                 document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
                 userRole = 1;
             }else{
-                document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
+                document.querySelector('#info-header-title').innerHTML = 'Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
                 document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
                 userRole = 2;
 

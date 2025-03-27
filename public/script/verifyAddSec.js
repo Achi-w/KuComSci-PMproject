@@ -2,8 +2,12 @@ import { fetchCourse } from "../data/course.js";
 import { addNisitSectionForm, deleteSectionForm, fetchSingleSectionForm, updateSection } from "../data/sectionForm.js";
 import { logout, reauth } from "./utils/auth.js";
 
+
+
+
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
+let userId = '';
 console.log(id);
 
 const initial = async() =>{
@@ -31,33 +35,6 @@ const initial = async() =>{
 
     document.querySelector('.name-list').innerHTML = html;
 
-    document.querySelector('#delete-btn').addEventListener('click',async()=>{
-        document.querySelector('.pop-up').style.display = 'block';
-        document.querySelector('.message').innerHTML = 'คุณต้องการลบคำขอเปิดหมู่เรียนเพิ่มหรือไม่';
-    
-        document.querySelector('.decline').addEventListener('click',async ()=>{
-            document.querySelector('.pop-up').style.display = 'none';
-        })
-
-        const acceptBtn = document.querySelector('.accept');
-        acceptBtn.replaceWith(acceptBtn.cloneNode(true));
-    
-    
-        document.querySelector('.accept').addEventListener('click',async ()=>{
-            const action = await deleteSectionForm(id);
-            if(action === 0){
-                document.querySelector('.message').innerHTML = 'มีข้อผิดพลาดเกิดขึ้น';
-            }else{
-                document.querySelector('.message').innerHTML = `คำขอเปิดหมู่เรียนเพิ่มได้รับ
-การลบแล้ว`;
-                document.querySelector('.decline').style.display = 'none';
-
-                document.querySelector('.accept').addEventListener('click',()=>{
-                    window.location.href = 'addSecMain.html';
-                })
-            }    
-        })
-    });
 
     document.querySelector('#accept-btn').addEventListener('click',async()=>{
        if(section.Section_Form_Minimum_Nisit>section.Current_Nisit_Number){
@@ -75,7 +52,7 @@ const initial = async() =>{
         acceptBtn.replaceWith(acceptBtn.cloneNode(true));
         
         document.querySelector('.accept').addEventListener('click',async ()=>{
-            const action = await updateSection(id, '1'); 
+            const action = await updateSection(id, '1', userId); 
 
             if(action === 0){
                 document.querySelector('.message').innerHTML = 'มีข้อผิดพลาดเกิดขึ้น';
@@ -102,7 +79,7 @@ const initial = async() =>{
         acceptBtn.replaceWith(acceptBtn.cloneNode(true));
         
         document.querySelector('.accept').addEventListener('click',async ()=>{
-            const action = await updateSection(id, '2'); 
+            const action = await updateSection(id, '2',userId); 
 
             if(action === 0){
                 document.querySelector('.message').innerHTML = 'มีข้อผิดพลาดเกิดขึ้น';
@@ -128,13 +105,18 @@ const checkAuth = async()=>{
         if(isAuth.info.USER_Role === 'Teacher'){
             document.querySelector('#bookRoom').innerHTML = 'จองห้องและย้ายห้อง';
             document.querySelector('#info-header-title').innerHTML = 'Professor Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
+
         }else{
+            document.querySelector('#accept-btn').style.display = 'none';
+            document.querySelector('#decline-btn').style.display = 'none';
+
             document.querySelector('#bookRoom').innerHTML = 'ห้องเรียนเเละห้องสอบ';
-            document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
+            document.querySelector('#info-header-title').innerHTML = 'Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
         }
         document.querySelector('#nisit-name').innerHTML = isAuth.info.USER_Name + ' ' + isAuth.info.USER_Surname;
 
         console.log('user auth  ok');
+        userId = isAuth.info.USER_ID;
         initial();
     }else{
         console.log('user not logged in');
@@ -142,5 +124,6 @@ const checkAuth = async()=>{
     }
 
 }
+
 
 checkAuth();

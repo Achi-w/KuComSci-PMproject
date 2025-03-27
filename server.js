@@ -536,6 +536,9 @@ app.post('/api/sectionform',(req,res)=>{
   
   db.query(`SELECT Section_Form_ID FROM section_form WHERE Course_ID = ? AND SEC = ? AND (Section_Form_STATUS = '0' OR Section_Form_STATUS = '1')`,[data.courseId,data.sec],(err,resultSec,fields)=>{
       console.log('-------------------log now find if same sec--------------');
+      console.log('eeeeeeeeeeeeeeeeeeeeee');
+    
+      
       console.log();
       
       if(err){
@@ -565,8 +568,8 @@ app.post('/api/sectionform',(req,res)=>{
           
           
           if(data.who){
-            db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
-          [idToinsertSec,data.courseId, data.userId,data.sec, userCurr,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
+            db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?)',
+          [idToinsertSec,data.courseId, data.sec, userCurr,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
           (err,resutl,fields)=>{
               if(err){
                   console.error(err);
@@ -588,8 +591,10 @@ app.post('/api/sectionform',(req,res)=>{
           }
       )
           }else{
-            db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`USER_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?,?)',
-          [idToinsertSec,data.courseId, data.userId,data.sec, 1,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
+            console.log('---------------------------------------------------nisit goes here');
+            
+            db.query('INSERT INTO `section_form`(`Section_Form_ID`,`Course_ID`,`SEC`, `Current_Nisit_Number`, `Section_Form_start_time`,`Section_Form_Maximum_Nisit`, `Section_Form_STATUS`,`Section_Form_Minimum_Nisit`) VALUES (?,?,?,?,?,?,?,?)',
+          [idToinsertSec,data.courseId, data.sec, 1,data.sectionFormStartTime, data.sectionFormMaximumNisit,0,data.sectionFormMinimumNisit],
           (err,resutl,fields)=>{
               if(err){
                   console.error(err);
@@ -768,7 +773,7 @@ app.get('/api/sectionform/teacher/:teacherId',(req,res)=>{
       FROM section_form sf
       JOIN course c ON sf.Course_ID = c.Course_ID
       JOIN user_s_course usc ON c.Course_ID = usc.Course_ID
-      WHERE usc.USER_ID = ?`,
+      WHERE usc.USER_ID = ? AND sf.Section_Form_STATUS = '0'`,
     teacherId,(err,result,fields)=>{
         if(err){
             console.error(err);
@@ -810,8 +815,8 @@ app.put('/api/sectionform/status/:formId',(req,res)=>{
   const formId = req.params.formId;
   console.log(data, formId);
   
-  db.query('UPDATE section_form SET Section_Form_STATUS = ? WHERE Section_Form_ID = ?',
-      [data.sectionFormStatus,formId],
+    db.query('UPDATE section_form SET Section_Form_STATUS = ? , USER_ID = ? WHERE Section_Form_ID = ?',
+      [data.sectionFormStatus,data.sectionFormPermission, formId],
       (err,result,fields)=>{
 
           if(err){
@@ -823,13 +828,18 @@ app.put('/api/sectionform/status/:formId',(req,res)=>{
                   }
               )
           }
-          console.log('complete');
-          res.status(200).send(
-              {
-                  status:1,
-                  info:"complete"
-              }
-          )
+          if(data.sectionFormStatus === 1){
+            db.query('UPDATE section_from')
+          }else{
+            console.log('complete');
+            res.status(200).send(
+                {
+                    status:1,
+                    info:"complete"
+                }
+            )
+  
+          }
 
       }
   )

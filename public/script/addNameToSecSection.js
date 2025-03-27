@@ -91,7 +91,7 @@ const checkAuth = async()=>{
 
     if(isAuth.status){
         if(isAuth.info.USER_Role === 'Admin'){
-            document.querySelector('#info-header-title').innerHTML = 'Admin - ภาควิชาวิทยาการคอมพิวเตอร์';
+            document.querySelector('#info-header-title').innerHTML = 'Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์';
         }
         document.querySelector('#nisit-name').innerHTML = isAuth.info.USER_Name + ' ' + isAuth.info.USER_Surname;
 
