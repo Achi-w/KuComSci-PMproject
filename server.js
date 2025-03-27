@@ -44,7 +44,7 @@ app.use(
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "",
+  password: "123",
   database: "pmdatabase4",
 });
 

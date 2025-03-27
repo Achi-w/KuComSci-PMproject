@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 if (!value) {
                     document.getElementById(labelId).innerHTML = 
-                        `${errorMessage} <span id="abcdefg" >กรุณากรอกข้อมูล</span>`;
+                        `${errorMessage} <span id="error" >กรุณากรอกข้อมูล</span>`;
                     isValid = false;
                 } 
                 else if(labelId == "email" && (!value.includes("@") || (!value.includes(".com") && !value.includes(".th")))) {
