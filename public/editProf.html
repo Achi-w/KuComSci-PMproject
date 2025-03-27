@@ -86,16 +86,16 @@
     <!-- Main content -->
     <div class="content">
         <form id="edit-form" enctype="multipart/form-data">
-            <label for="USER_Name">ชื่อ:</label>
+            <label for="USER_Name" id="name">ชื่อ:</label>
             <input type="text" id="USER_Name" name="USER_Name" required>
 
-            <label for="USER_Surname">นามสกุล:</label>
+            <label for="USER_Surname" id="surname">นามสกุล:</label>
             <input type="text" id="USER_Surname" name="USER_Surname" required>
 
-            <label for="USER_Contact_DETAIL">อีเมล:</label>
+            <label for="USER_Contact_DETAIL" id="email">อีเมล:</label>
             <input type="text" id="USER_Contact_DETAIL" name="USER_Contact_DETAIL" required>
 
-            <label for="USER_Room">ห้องทำงาน:</label>
+            <label for="USER_Room" id="room">ห้องทำงาน:</label>
             <input type="text" id="USER_Room" name="USER_Room" required>
 
             <label for="USER_Image">รูปภาพ:</label>
@@ -177,8 +177,47 @@ document.addEventListener("DOMContentLoaded", () => {
         const cancelPostConfirm = document.getElementById("cancelPostConfirm");
         const confirmPost = document.getElementById("confirmPost");
 
-        updateButton.addEventListener("click", () => {
-            modal.style.display = "block";
+        document.getElementById("updateButton").addEventListener("click", () => {
+            let isValid = true;
+            
+            function checkInput(id, labelId, errorMessage) {
+                const value = document.getElementById(id).value.trim();
+                
+                if (!value) {
+                    document.getElementById(labelId).innerHTML = 
+                        `${errorMessage} <span id="abcdefg" >กรุณากรอกข้อมูล</span>`;
+                    isValid = false;
+                } 
+                else if(labelId == "email" && (!value.includes("@") || (!value.includes(".com") && !value.includes(".th")))) {
+                    document.getElementById(labelId).innerHTML = `${errorMessage} <span id="error">กรุณาใส่ในรูปแบบ xxx@xxx.com หรือ xxx@xxx.th</span>`;
+                    isValid = false;
+                }
+                else if(labelId == "room" && !(value.startsWith("SC45-") && !isNaN(value.substring(4)))) {
+                    document.getElementById(labelId).innerHTML = `${errorMessage} <span id="error">กรุณาใส่ในรูปแบบ SC45-XXX</span>`;
+                    isValid = false;
+                }
+                else if ((labelId == "name" || labelId == "surname") && !/^[a-zA-Zก-๙\s]+$/.test(value)) {
+                    document.getElementById(labelId).innerHTML = `${errorMessage} <span id="error">กรุณากรอกเฉพาะตัวอักษรภาษาไทยและอังกฤษ</span>`;
+                    isValid = false;
+                }
+                else if(value.length > 40){
+                    document.getElementById(labelId).innerHTML = `${errorMessage} <span id="error">กรุณากรอกไม่เกิน 40 ตัวอักษร</span>`;
+                    isValid = false;
+                }
+                else {
+                    document.getElementById(labelId).innerHTML = errorMessage;
+                }
+            }
+
+            checkInput("USER_Name", "name", "ชื่อ:");
+            checkInput("USER_Surname", "surname", "นามสกุล:");
+            checkInput("USER_Contact_DETAIL", "email", "อีเมล:");
+            checkInput("USER_Room", "room", "ห้องทำงาน:");
+
+
+            if (isValid) {
+                document.getElementById("postConfirmModal").style.display = "block";
+            }
         });
 
         cancelPostConfirm.addEventListener("click", () => {
@@ -212,8 +251,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
                     } else if (currentUser.USER_Role.toLowerCase() === "admin") {
                         document.getElementById("roleTitle").textContent =
-                            "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
-                        document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
+                            "Admin Comsci- ภาควิชาวิทยาการคอมพิวเตอร์";
+                        document.getElementById("roomBooking").textContent = "ห้องเรียนและห้องสอบ";
                     }
                     const postBtn = document.getElementById("postBtn");
                     if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {

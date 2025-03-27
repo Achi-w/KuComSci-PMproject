@@ -135,9 +135,9 @@ function searchProfessors() {
     // กรองข้อมูลที่ตรงกับคำค้นหาจากชื่ออาจารย์
     const filteredProfessors = professorsData.filter(prof => {
         const fullName = `${prof.USER_Name} ${prof.USER_Surname}`.toLowerCase();
-        return fullName.includes(searchTerm);
+        const userID = prof.USER_ID.toLowerCase();
+        return fullName.includes(searchTerm) || userID.includes(searchTerm);
     });
-
     const professorList = document.getElementById('professor-list');
     professorList.innerHTML = '';
 
@@ -181,8 +181,8 @@ function searchProfessors() {
 
                     } else if (currentUser.USER_Role.toLowerCase() === "admin") {
                     document.getElementById("roleTitle").textContent =
-                        "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
-                    document.getElementById("roomBooking").textContent = "จองห้องและย้ายห้อง";
+                        "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    document.getElementById("roomBooking").textContent = "ห้องเรียนและห้องสอบ";
 
                     }
                     const postBtn = document.getElementById("postBtn");
