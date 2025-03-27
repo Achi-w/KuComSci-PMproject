@@ -176,10 +176,10 @@ class RoomSchedule{
         let query = '';
         let params = [];
         if (isTeacher){
-            query = 'SELECT course.course_name, section_form.course_id, sec FROM section_form JOIN course ON section_form.course_id = course.course_id WHERE section_form.user_id = ?';
+            query = 'SELECT course.course_name, section_form.course_id, sec FROM section_form JOIN course ON section_form.course_id = course.course_id WHERE section_form.user_id = ? AND section_form.Section_Form_STATUS= "1"';
             params = [user_id];
         } else if (isAdmin) {
-            query = 'SELECT course.course_name, section_form.course_id, sec FROM section_form JOIN course ON section_form.course_id = course.course_id';
+            query = 'SELECT course.course_name, section_form.course_id, sec FROM section_form JOIN course ON section_form.course_id = course.course_id WHERE section_form.Section_Form_STATUS= "1"';
         }
         try {
             const [rows, fields] = await this.pool.query(query, params);
