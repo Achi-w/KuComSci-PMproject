@@ -319,7 +319,7 @@ fetch("/dashboard")
        document.getElementById("bookingLink").textContent = "จองห้องและย้ายห้อง"
        window.location.href = "index.html"; 
      } else if (currentUser.USER_Role.toLowerCase() === "admin") {
-       document.getElementById("roleTitle").textContent = "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+       document.getElementById("roleTitle").textContent = "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
        window.location.href = "index.html"; 
      }
      if (["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {

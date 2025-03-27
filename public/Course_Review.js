@@ -54,7 +54,7 @@ const displayCourses = (courses) => {
             document.getElementById("bookingLink").textContent = "จองห้องและย้ายห้อง"
         } else if (currentUser.USER_Role.toLowerCase() === "admin") {
           document.getElementById("roleTitle").textContent =
-            "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+            "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
         }
         const postBtn = document.getElementById("postBtn");
         if (postBtn && ["teacher", "professor", "admin"].includes(currentUser.USER_Role.toLowerCase())) {

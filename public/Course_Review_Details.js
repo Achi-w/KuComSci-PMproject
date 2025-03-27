@@ -32,7 +32,7 @@ fetch("/dashboard")
                     createReviewButton.style.display = "none"; // Hide button for teachers
                     break;
                 case "admin":
-                    roleTitle.textContent = "Admin - ภาควิชาวิทยาการคอมพิวเตอร์";
+                    roleTitle.textContent = "Admin Comsci - ภาควิชาวิทยาการคอมพิวเตอร์";
                     createReviewButton.style.display = "none"; // Hide button for admins
                     break;
             }
