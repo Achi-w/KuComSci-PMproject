@@ -171,14 +171,9 @@ log
 
         if (isAdmin){
             const reserve_date = new Date(year, month - 1, day)
-            const currentDay = now.getDay();
-            const diff = currentDay === 0 ? -6 : 1 - currentDay;
 
-            const weekStart = new Date(now);
-            weekStart.setDate(now.getDate() + diff);
-
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekStart.getDate() + 6);
+            const weekEnd = new Date(reserve_date);
+            weekEnd.setDate(reserve_date.getDate() + 6);
             weekEnd.setHours(23, 59, 59, 999);
 
             if (reserve_date > weekEnd){

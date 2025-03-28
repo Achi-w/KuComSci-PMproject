@@ -706,15 +706,9 @@ function getLastDateWeekRange(){
    // Get current date
   var currentDate = new Date();
   
-  // Calculate first day (Monday) of current week
-  var firstDay = new Date(currentDate);
-  var day = currentDate.getDay();
-  var diff = day === 0 ? -6 : 1 - day; 
-  firstDay.setDate(currentDate.getDate() + diff);
-  
-  // Calculate last day (Sunday) of current week
-  var lastDay = new Date(firstDay);
-  lastDay.setDate(firstDay.getDate() + 6);
+
+  var lastDay = new Date(currentDate);
+  lastDay.setDate(currentDate.getDate() + 6);
 
   return lastDay;
 }

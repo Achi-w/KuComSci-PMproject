@@ -146,7 +146,7 @@ class RoomSchedule{
                 user_course_subquery = 'SELECT course_id, sec, user_id FROM section_form WHERE user_id = ?';
             } else if (isAdmin){
                 user_course_subquery = 'SELECT course_id, sec, user_id FROM section_form';
-                extraCond = `AND YEARWEEK(reserve_start_time, 1) = YEARWEEK('${now}', 1)`;
+                extraCond = `AND reserve_start_time BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)`;
                 params = [book_type, now];
             }
             else {
