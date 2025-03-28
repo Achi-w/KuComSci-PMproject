@@ -210,3 +210,7 @@ body {
 .left{
     font-size: 1.2rem;
 }
+
+.active{
+    background-color: #929292;
+}

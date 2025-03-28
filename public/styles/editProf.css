@@ -201,3 +201,7 @@ form input:focus {
 #error{
     color: rgb(255, 240, 29);
 }
+
+.active{
+    background-color: #929292;
+}

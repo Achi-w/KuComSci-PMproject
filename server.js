@@ -1192,7 +1192,24 @@ app.get('/getProfessors', (req, res) => {
       res.json(professors);
   });
 });
-
+app.get('/getProfessor/:id', (req, res) => {
+  const sql = "SELECT USER_ID, USER_Name, USER_Surname, USER_Role, USER_Contact_DETAIL, USER_Room, USER_Image FROM user WHERE USER_Role = 'Teacher' AND USER_ID = ?";
+  
+  db.query(sql, [req.params.id], (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Failed to fetch professors' });
+      }
+      
+      if (results.length > 0) {
+          const professor = results[0];
+          professor.USER_Image = professor.USER_Image ? `http://localhost:${PORT}/uploads/${professor.USER_Image}` : null;
+          res.json(professor); // ส่ง object เดียว ไม่ใช่ array
+      } else {
+          res.status(404).json({ error: 'Professor not found' });
+      }
+  });
+});
 // DELETE: ลบอาจารย์
 app.delete('/deleteProf/:USER_ID', (req, res) => {
   const { USER_ID } = req.params;
