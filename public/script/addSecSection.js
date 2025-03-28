@@ -39,6 +39,8 @@ const initial = async()=>{
         
         if(document.querySelector('#courseSelect').value === '0' || !document.querySelector('#numberNisit').value || !document.querySelector('#secInput').value || !document.querySelector('#numberNisitMin').value){
             return alert('Please fill all field');
+        }else if(minNisit < 1 || maxNisit < 1 || document.querySelector('#secInput').value < 1){
+            return alert('จำนวนต้องไม่ต่ำกว่่า 1');
         }else if(parseInt(maxNisit)<parseInt(minNisit)){
             return  alert('maximum cannot be less than minimum')
         }
